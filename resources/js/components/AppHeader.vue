@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from '@lucide/vue';
+import { Bell, LayoutGrid, Menu, Moon, ShoppingCart, Sun } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
@@ -32,9 +32,9 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import UserMenuContent from '@/components/UserMenuContent.vue';
+import { useAppearance } from '@/composables/useAppearance';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
-import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
@@ -48,6 +48,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const page = usePage();
 const auth = computed(() => page.props.auth);
+const { resolvedAppearance, updateAppearance } = useAppearance();
 const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
 
 const activeItemStyles =
@@ -61,18 +62,21 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
+const cartItemCount = 11;
+
+const nextAppearance = computed(() =>
+    resolvedAppearance.value === 'dark' ? 'light' : 'dark',
+);
+
+const themeIcon = computed(() =>
+    resolvedAppearance.value === 'dark' ? Sun : Moon,
+);
+
+const themeLabel = computed(() =>
+    resolvedAppearance.value === 'dark'
+        ? 'Switch to light mode'
+        : 'Switch to dark mode',
+);
 </script>
 
 <template>
@@ -124,23 +128,6 @@ const rightNavItems: NavItem[] = [
                                         {{ item.title }}
                                     </Link>
                                 </nav>
-                                <div class="flex flex-col space-y-4">
-                                    <a
-                                        v-for="item in rightNavItems"
-                                        :key="item.title"
-                                        :href="toUrl(item.href)"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="flex items-center space-x-2 text-sm font-medium"
-                                    >
-                                        <component
-                                            v-if="item.icon"
-                                            :is="item.icon"
-                                            class="h-5 w-5"
-                                        />
-                                        <span>{{ item.title }}</span>
-                                    </a>
-                                </div>
                             </div>
                         </SheetContent>
                     </Sheet>
@@ -188,55 +175,76 @@ const rightNavItems: NavItem[] = [
                     </NavigationMenu>
                 </div>
 
-                <div class="ml-auto flex items-center space-x-2">
-                    <div class="relative flex items-center space-x-1">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="group h-9 w-9 cursor-pointer"
-                        >
-                            <Search
-                                class="size-5 opacity-80 group-hover:opacity-100"
-                            />
-                        </Button>
+                <div class="ml-auto flex items-center gap-1 sm:gap-2">
+                    <TooltipProvider :delay-duration="0">
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="group h-9 w-9 cursor-pointer rounded-full"
+                                    :aria-label="themeLabel"
+                                    @click="updateAppearance(nextAppearance)"
+                                >
+                                    <component
+                                        :is="themeIcon"
+                                        class="size-5 opacity-80 transition-opacity group-hover:opacity-100"
+                                    />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{{ themeLabel }}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
 
-                        <div class="hidden space-x-1 lg:flex">
-                            <template
-                                v-for="item in rightNavItems"
-                                :key="item.title"
-                            >
-                                <TooltipProvider :delay-duration="0">
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                as-child
-                                                class="group h-9 w-9 cursor-pointer"
-                                            >
-                                                <a
-                                                    :href="toUrl(item.href)"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    <span class="sr-only">{{
-                                                        item.title
-                                                    }}</span>
-                                                    <component
-                                                        :is="item.icon"
-                                                        class="size-5 opacity-80 group-hover:opacity-100"
-                                                    />
-                                                </a>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>{{ item.title }}</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </template>
-                        </div>
-                    </div>
+                    <TooltipProvider :delay-duration="0">
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="group relative h-9 w-9 cursor-pointer rounded-full"
+                                    aria-label="Shopping cart"
+                                >
+                                    <ShoppingCart
+                                        class="size-5 opacity-80 transition-opacity group-hover:opacity-100"
+                                    />
+                                    <span
+                                        class="absolute top-0 right-0 flex min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-black px-1 text-[10px] leading-none font-semibold text-white dark:bg-white dark:text-black"
+                                    >
+                                        {{ cartItemCount }}
+                                    </span>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Shopping cart</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider :delay-duration="0">
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="group relative h-9 w-9 cursor-pointer rounded-full"
+                                    aria-label="Notifications"
+                                >
+                                    <Bell
+                                        class="size-5 opacity-80 transition-opacity group-hover:opacity-100"
+                                    />
+                                    <span
+                                        class="absolute top-1 right-1 size-2 rounded-full bg-red-500"
+                                    ></span>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Notifications</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger :as-child="true">
