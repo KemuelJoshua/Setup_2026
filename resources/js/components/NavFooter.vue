@@ -15,25 +15,36 @@ type Props = {
 };
 
 defineProps<Props>();
+
+const menuButtonClass =
+    'h-9 rounded-md px-3 text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-primary group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:p-0!';
 </script>
 
 <template>
     <SidebarGroup
-        :class="`group-data-[collapsible=icon]:p-0 ${$props.class || ''}`"
+        :class="`rounded-xl border border-sidebar-border/70 p-2 shadow-none group-data-[collapsible=icon]:p-2 ${$props.class || ''}`"
     >
+        <SidebarGroupContent class="flex flex-col gap-1">
+            <div
+                class="px-3 pb-1 text-[11px] font-semibold tracking-[0.14em] text-sidebar-foreground/50 uppercase group-data-[collapsible=icon]:hidden"
+            >
+                Resources
+            </div>
+        </SidebarGroupContent>
         <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu class="gap-1">
                 <SidebarMenuItem v-for="item in items" :key="item.title">
                     <SidebarMenuButton
-                        class="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                        :class="menuButtonClass"
                         as-child
+                        :tooltip="item.title"
                     >
                         <a
                             :href="toUrl(item.href)"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <component :is="item.icon" />
+                            <component :is="item.icon" class="size-5" />
                             <span>{{ item.title }}</span>
                         </a>
                     </SidebarMenuButton>
