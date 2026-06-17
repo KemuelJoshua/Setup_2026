@@ -73,18 +73,6 @@ const navigationGroups: NavGroup[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
-    },
-];
 </script>
 
 <template>
@@ -95,7 +83,7 @@ const footerNavItems: NavItem[] = [
                     <SidebarMenuButton
                         size="lg"
                         as-child
-                        class="h-auto px-3 py-3 pb-6 text-sidebar-primary shadow-none transition-[opacity,transform,background-color,color] duration-200 ease-out group-data-[collapsible=icon]:size-12! group-data-[collapsible=icon]:p-0! hover:bg-sidebar-accent hover:text-sidebar-primary"
+                        class="h-auto px-3 py-3 mb-2 text-sidebar-primary shadow-none transition-[opacity,transform,background-color,color] duration-200 ease-out group-data-[collapsible=icon]:size-12! group-data-[collapsible=icon]:p-0!"
                     >
                         <Link :href="dashboard()">
                             <AppLogo />
@@ -110,7 +98,6 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter class="gap-3 p-0">
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
