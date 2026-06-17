@@ -95,7 +95,7 @@ const footerNavItems: NavItem[] = [
                     <SidebarMenuButton
                         size="lg"
                         as-child
-                        class="h-auto rounded-xl border border-sidebar-border/70 px-3 py-3 text-sidebar-primary shadow-none group-data-[collapsible=icon]:size-12! group-data-[collapsible=icon]:p-0! hover:bg-sidebar-accent hover:text-sidebar-primary"
+                        class="h-auto px-3 py-3 pb-6 text-sidebar-primary shadow-none transition-[opacity,transform,background-color,color] duration-200 ease-out group-data-[collapsible=icon]:size-12! group-data-[collapsible=icon]:p-0! hover:bg-sidebar-accent hover:text-sidebar-primary"
                     >
                         <Link :href="dashboard()">
                             <AppLogo />

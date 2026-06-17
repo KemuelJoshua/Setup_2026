@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AppContent from '@/components/AppContent.vue';
 import AppShell from '@/components/AppShell.vue';
 import AppSidebar from '@/components/AppSidebar.vue';
@@ -13,6 +15,9 @@ type Props = {
 withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
+
+const page = usePage();
+const pageKey = computed(() => page.url);
 </script>
 
 <template>
@@ -20,7 +25,21 @@ withDefaults(defineProps<Props>(), {
         <AppSidebar />
         <AppContent variant="sidebar" class="overflow-x-hidden">
             <AppSidebarHeader :breadcrumbs="breadcrumbs" />
-            <slot />
+            <div class="relative flex flex-1 flex-col">
+                <Transition
+                    mode="out-in"
+                    enter-active-class="transition-all duration-200 ease-out"
+                    enter-from-class="translate-x-1 opacity-0"
+                    enter-to-class="translate-x-0 opacity-100"
+                    leave-active-class="transition-all duration-150 ease-out"
+                    leave-from-class="translate-x-0 opacity-100"
+                    leave-to-class="-translate-x-1 opacity-0"
+                >
+                    <div :key="pageKey" class="flex flex-1 flex-col">
+                        <slot />
+                    </div>
+                </Transition>
+            </div>
         </AppContent>
         <Toaster />
     </AppShell>

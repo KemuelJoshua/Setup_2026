@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { SidebarProps } from "."
-import { cn } from "@/lib/utils"
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import SheetDescription from '@/components/ui/sheet/SheetDescription.vue'
 import SheetHeader from '@/components/ui/sheet/SheetHeader.vue'
 import SheetTitle from '@/components/ui/sheet/SheetTitle.vue'
+import { cn } from "@/lib/utils"
 import { SIDEBAR_WIDTH_MOBILE, useSidebar } from "./utils"
+import type { SidebarProps } from "."
 
 defineOptions({
   inheritAttrs: false,
@@ -63,7 +63,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
     <!-- This is what handles the sidebar gap on desktop  -->
     <div
       :class="cn(
-        'relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear',
+        'relative w-(--sidebar-width) bg-transparent transition-[width,opacity] duration-200 ease-out',
         'group-data-[collapsible=offcanvas]:w-0',
         'group-data-[side=right]:rotate-180',
         variant === 'floating' || variant === 'inset'
@@ -73,10 +73,10 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
     />
     <div
       :class="cn(
-        'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex',
+        'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width,opacity] duration-200 ease-out md:flex',
         side === 'left'
-          ? 'left-0 group-data-[collapsible=offcanvas]:-left-(--sidebar-width)'
-          : 'right-0 group-data-[collapsible=offcanvas]:-right-(--sidebar-width)',
+          ? 'left-0 group-data-[collapsible=offcanvas]:-left-(--sidebar-width) group-data-[collapsible=offcanvas]:opacity-0'
+          : 'right-0 group-data-[collapsible=offcanvas]:-right-(--sidebar-width) group-data-[collapsible=offcanvas]:opacity-0',
         // Adjust the padding for floating and inset variants.
         variant === 'floating' || variant === 'inset'
           ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
@@ -87,7 +87,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
     >
       <div
         data-sidebar="sidebar"
-        class=" group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+        class="group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
       >
         <slot />
       </div>
