@@ -76,7 +76,7 @@ const navigationGroups: NavGroup[] = [
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset" class="bg-transparent p-3">
+    <Sidebar collapsible="icon" variant="inset" class="bg-transparent">
         <SidebarHeader class="gap-3 p-0">
             <SidebarMenu>
                 <SidebarMenuItem>
