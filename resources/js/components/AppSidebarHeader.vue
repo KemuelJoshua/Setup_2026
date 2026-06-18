@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
 import {
-    Bell,
     Brush,
     LogOut,
     Moon,
@@ -13,6 +12,7 @@ import {
 } from '@lucide/vue';
 import { computed } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import NotificationDropdown from '@/components/NotificationDropdown.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -148,28 +148,7 @@ const handleLogout = (): void => {
                 </Tooltip>
             </TooltipProvider>
 
-            <TooltipProvider :delay-duration="0">
-                <Tooltip>
-                    <TooltipTrigger as-child>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="group relative h-9 w-9 cursor-pointer rounded-full"
-                            aria-label="Notifications"
-                        >
-                            <Bell
-                                class="size-5 opacity-80 transition-opacity group-hover:opacity-100"
-                            />
-                            <span
-                                class="absolute top-1 right-1 size-2 rounded-full bg-red-500"
-                            ></span>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Notifications</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
+            <NotificationDropdown />
 
             <Sheet>
                 <SheetTrigger :as-child="true">
