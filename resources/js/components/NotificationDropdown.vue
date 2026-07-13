@@ -1,46 +1,43 @@
 <script setup lang="ts">
-import { Bell, CalendarDays, Command, LayoutGrid, Settings } from '@lucide/vue';
+import { usePage } from '@inertiajs/vue3';
+import { Bell, Check } from '@lucide/vue';
+import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-const notifications = [
-    {
-        title: 'Settings',
-        message: 'You can customize this template settings from the admin panel.',
-        time: '4:36 PM',
-        icon: Settings,
-        iconWrapperClass: 'bg-orange-50 text-orange-500 dark:bg-orange-500/12 dark:text-orange-300',
-    },
-    {
-        title: 'Launch Admin',
-        message: 'Just see the my new admin!',
-        time: '9:30 AM',
-        icon: LayoutGrid,
-        iconWrapperClass: 'bg-cyan-50 text-cyan-500 dark:bg-cyan-500/12 dark:text-cyan-300',
-    },
-    {
-        title: 'Launch Admin',
-        message: 'Just see the my new admin!',
-        time: '9:30 AM',
-        icon: Command,
-        iconWrapperClass: 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300',
-    },
-    {
-        title: 'Event Today',
-        message: 'Just a reminder that you have an event today.',
-        time: '9:15 AM',
-        icon: CalendarDays,
-        iconWrapperClass: 'bg-amber-50 text-amber-500 dark:bg-amber-500/12 dark:text-amber-300',
-        highlight: true,
-    },
-    {
-        title: 'Settings',
-        message: 'You can customize this template settings from the admin panel.',
-        time: '4:36 PM',
-        icon: Settings,
-        iconWrapperClass: 'bg-orange-50 text-orange-500 dark:bg-orange-500/12 dark:text-orange-300',
-    },
-];
+const page = usePage();
+
+const notifications = computed(() => page.props.notifications.items);
+const unreadCount = computed(() => page.props.notifications.unreadCount);
+
+const formatNotificationTime = (createdAt: string): string => {
+    const createdDate = new Date(createdAt);
+    const elapsedSeconds = Math.max(
+        0,
+        Math.floor((Date.now() - createdDate.getTime()) / 1000),
+    );
+
+    if (elapsedSeconds < 60) {
+        return 'Just now';
+    }
+
+    if (elapsedSeconds < 3600) {
+        return `${Math.floor(elapsedSeconds / 60)}m ago`;
+    }
+
+    if (elapsedSeconds < 86400) {
+        return `${Math.floor(elapsedSeconds / 3600)}h ago`;
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+        month: 'short',
+        day: 'numeric',
+    }).format(createdDate);
+};
 </script>
 
 <template>
@@ -49,7 +46,7 @@ const notifications = [
             <Button
                 variant="ghost"
                 size="icon"
-                class="group relative h-9 w-9 cursor-pointer rounded-full"
+                class="group relative h-9 w-9 cursor-pointer rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent/70 hover:text-sidebar-primary"
                 aria-label="Notifications"
                 data-test="notification-trigger"
             >
@@ -57,7 +54,8 @@ const notifications = [
                     class="size-5 opacity-80 transition-opacity group-hover:opacity-100"
                 />
                 <span
-                    class="absolute top-1 right-1 size-2 rounded-full bg-red-500"
+                    v-if="unreadCount > 0"
+                    class="absolute top-1 right-1 size-2 rounded-full bg-sidebar-primary ring-2 ring-background"
                 ></span>
             </Button>
         </DropdownMenuTrigger>
@@ -65,56 +63,97 @@ const notifications = [
         <DropdownMenuContent
             align="end"
             :side-offset="12"
-            class="w-[22rem] overflow-hidden rounded-2xl border border-neutral-200 bg-white p-0 shadow-[0_24px_60px_-24px_rgba(15,23,42,0.35)] dark:border-neutral-800 dark:bg-neutral-950"
+            class="w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-sidebar-border bg-sidebar p-0 text-sidebar-foreground shadow-lg shadow-black/10"
             data-test="notification-panel"
         >
-            <div class="flex items-center justify-between px-6 pt-6 pb-4">
+            <div
+                class="flex items-center justify-between gap-4 border-b border-sidebar-border/70 px-4 py-3.5"
+            >
                 <div>
-                    <h3 class="text-[1.7rem] font-semibold tracking-[-0.02em] text-neutral-950 dark:text-white">
+                    <h3 class="text-sm font-semibold text-sidebar-foreground">
                         Notifications
                     </h3>
+                    <p class="mt-0.5 text-xs text-sidebar-foreground/50">
+                        Your latest account activity
+                    </p>
                 </div>
-                <span class="rounded-full bg-neutral-950 px-3 py-1 text-xs font-semibold text-white dark:bg-white dark:text-neutral-950">
-                    5 new
+                <span
+                    class="rounded-md bg-sidebar-primary px-2 py-1 text-[11px] font-semibold text-sidebar-primary-foreground shadow-sm shadow-sidebar-primary/20"
+                >
+                    {{ unreadCount }} new
                 </span>
             </div>
 
-            <div class="max-h-[22rem] overflow-y-auto pb-3">
+            <div class="max-h-[22rem] overflow-y-auto p-2">
                 <button
-                    v-for="(notification, index) in notifications"
-                    :key="`${notification.title}-${index}`"
+                    v-for="notification in notifications"
+                    :key="notification.id"
                     type="button"
-                    class="flex w-full items-start gap-4 px-6 py-4 text-left transition-colors hover:bg-neutral-50 focus:bg-neutral-50 focus:outline-hidden dark:hover:bg-neutral-900 dark:focus:bg-neutral-900"
-                    :class="notification.highlight ? 'bg-neutral-100/90 dark:bg-neutral-900/80' : ''"
+                    class="group flex w-full items-start gap-3 rounded-md px-3 py-3 text-left transition-[background-color,color] duration-200 ease-out hover:bg-sidebar-accent/70 focus-visible:bg-sidebar-accent/70 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
+                    :class="notification.isUnread ? 'bg-sidebar-accent/80' : ''"
                 >
                     <span
-                        class="flex size-11 shrink-0 items-center justify-center rounded-full"
-                        :class="notification.iconWrapperClass"
+                        class="flex size-9 shrink-0 items-center justify-center rounded-md transition-transform duration-200 ease-out group-hover:scale-105"
+                        :class="
+                            notification.isUnread
+                                ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm shadow-sidebar-primary/20'
+                                : 'bg-sidebar-accent text-sidebar-foreground/70'
+                        "
                     >
-                        <component :is="notification.icon" class="size-5" />
+                        <Bell class="size-[18px]" :stroke-width="1.8" />
                     </span>
 
                     <span class="min-w-0 flex-1">
                         <span class="flex items-start justify-between gap-4">
-                            <span class="truncate text-base font-semibold text-neutral-950 dark:text-white">
+                            <span
+                                class="truncate text-[13px] font-semibold text-sidebar-foreground"
+                            >
                                 {{ notification.title }}
                             </span>
-                            <span class="shrink-0 text-sm text-neutral-600 dark:text-neutral-400">
-                                {{ notification.time }}
+                            <span
+                                class="shrink-0 text-[11px] text-sidebar-foreground/45"
+                            >
+                                {{
+                                    formatNotificationTime(
+                                        notification.createdAt,
+                                    )
+                                }}
                             </span>
                         </span>
-                        <span class="mt-1 block truncate text-sm text-neutral-500 dark:text-neutral-400">
+                        <span
+                            class="mt-1 block truncate text-xs leading-5 text-sidebar-foreground/55"
+                        >
                             {{ notification.message }}
                         </span>
                     </span>
                 </button>
+
+                <div
+                    v-if="notifications.length === 0"
+                    class="flex flex-col items-center px-6 py-10 text-center"
+                >
+                    <span
+                        class="flex size-10 items-center justify-center rounded-md bg-sidebar-accent text-sidebar-foreground/50"
+                    >
+                        <Bell class="size-5" :stroke-width="1.8" />
+                    </span>
+                    <p
+                        class="mt-3 text-sm font-semibold text-sidebar-foreground"
+                    >
+                        You're all caught up
+                    </p>
+                    <p class="mt-1 text-xs text-sidebar-foreground/50">
+                        New notifications will appear here.
+                    </p>
+                </div>
             </div>
 
-            <div class="border-t border-neutral-200 px-6 py-5 dark:border-neutral-800">
+            <div class="border-t border-sidebar-border/70 p-3">
                 <button
                     type="button"
-                    class="inline-flex h-12 w-full items-center justify-center rounded-xl bg-neutral-950 px-4 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 focus:outline-hidden focus:ring-2 focus:ring-neutral-400 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
+                    class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-sidebar-primary px-4 text-sm font-semibold text-sidebar-primary-foreground shadow-sm shadow-sidebar-primary/20 transition-[background-color,box-shadow] duration-200 hover:bg-sidebar-primary/90 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar focus-visible:outline-none"
                 >
+                    <Check class="size-4" :stroke-width="1.8" />
                     See All Notifications
                 </button>
             </div>

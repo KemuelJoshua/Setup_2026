@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -41,7 +43,48 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'notifications' => fn (): array => $this->notifications($request),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    /**
+     * Get the authenticated user's notification summary.
+     *
+     * @return array{items: array<int, array{id: string, title: string, message: string, createdAt: string, isUnread: bool}>, unreadCount: int}
+     */
+    private function notifications(Request $request): array
+    {
+        $user = $request->user();
+
+        if ($user === null) {
+            return ['items' => [], 'unreadCount' => 0];
+        }
+
+        $items = $user->notifications()
+            ->latest()
+            ->limit(5)
+            ->get(['id', 'type', 'data', 'read_at', 'created_at'])
+            ->map(fn (DatabaseNotification $notification): array => [
+                'id' => $notification->id,
+                'title' => (string) ($notification->data['title'] ?? $this->notificationTitle($notification)),
+                'message' => (string) ($notification->data['message'] ?? $notification->data['body'] ?? ''),
+                'createdAt' => $notification->created_at->toIso8601String(),
+                'isUnread' => $notification->unread(),
+            ])
+            ->all();
+
+        return [
+            'items' => $items,
+            'unreadCount' => $user->unreadNotifications()->count(),
+        ];
+    }
+
+    private function notificationTitle(DatabaseNotification $notification): string
+    {
+        return Str::of(class_basename($notification->type))
+            ->beforeLast('Notification')
+            ->headline()
+            ->toString();
     }
 }
