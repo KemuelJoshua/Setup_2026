@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editProfile } from '@/routes/profile';
+import { index as RolesAndPermissions } from '@/routes/administration/roles';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
 
@@ -36,24 +36,14 @@ const primaryNavItems: NavItem[] = [
 const settingsNavItems: NavItem[] = [
     {
         title: 'Settings',
-        href: editAppearance(),
+        href: RolesAndPermissions(),
         icon: Settings2,
         children: [
             {
-                title: 'Profile',
-                href: editProfile(),
+                title: 'Roles & Permissions',
+                href: RolesAndPermissions(),
                 icon: UserRound,
-            },
-            {
-                title: 'Security',
-                href: editSecurity(),
-                icon: Shield,
-            },
-            {
-                title: 'Appearance',
-                href: editAppearance(),
-                icon: Palette,
-            },
+            }
         ],
     },
 ];
