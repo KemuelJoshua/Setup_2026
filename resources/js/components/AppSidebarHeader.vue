@@ -1,27 +1,11 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
-import {
-    Brush,
-    LogOut,
-    Moon,
-    Shield,
-    Sparkles,
-    Sun,
-    UserCircle2,
-} from '@lucide/vue';
+import { usePage } from '@inertiajs/vue3';
+import { Moon, Sun } from '@lucide/vue';
 import { computed } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import MessageDropdown from '@/components/MessageDropdown.vue';
 import NotificationDropdown from '@/components/NotificationDropdown.vue';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import {
     Tooltip,
@@ -29,12 +13,8 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import UserAccountSheet from '@/components/UserAccountSheet.vue';
 import { useAppearance } from '@/composables/useAppearance';
-import { getInitials } from '@/composables/useInitials';
-import { logout } from '@/routes';
-import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editProfile } from '@/routes/profile';
-import { edit as editSecurity } from '@/routes/security';
 import type { BreadcrumbItem } from '@/types';
 
 withDefaults(
@@ -63,28 +43,6 @@ const themeLabel = computed(() =>
         ? 'Switch to light mode'
         : 'Switch to dark mode',
 );
-
-const userSheetItems = [
-    {
-        title: 'Profile',
-        href: editProfile(),
-        icon: UserCircle2,
-    },
-    {
-        title: 'Security',
-        href: editSecurity(),
-        icon: Shield,
-    },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
-        icon: Brush,
-    },
-];
-
-const handleLogout = (): void => {
-    router.flushAll();
-};
 </script>
 
 <template>
@@ -125,122 +83,7 @@ const handleLogout = (): void => {
 
             <NotificationDropdown />
 
-            <Sheet>
-                <SheetTrigger :as-child="true">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        class="relative size-10 w-auto rounded-full p-1 focus-visible:ring-2 focus-visible:ring-primary"
-                    >
-                        <Avatar class="size-8 overflow-hidden rounded-full">
-                            <AvatarImage
-                                v-if="auth.user.avatar"
-                                :src="auth.user.avatar"
-                                :alt="auth.user.name"
-                            />
-                            <AvatarFallback
-                                class="rounded-lg bg-neutral-200 font-semibold text-black dark:bg-neutral-700 dark:text-white"
-                            >
-                                {{ getInitials(auth.user?.name) }}
-                            </AvatarFallback>
-                        </Avatar>
-                    </Button>
-                </SheetTrigger>
-
-                <SheetContent
-                    side="right"
-                    class="w-full gap-0 border-l border-neutral-200 bg-white p-0 shadow-sm sm:max-w-md"
-                >
-                    <SheetTitle class="sr-only">Account menu</SheetTitle>
-
-                    <div class="flex min-h-full flex-col bg-white">
-                        <div
-                            class="flex flex-col items-center border-b border-neutral-200 px-6 pt-14 pb-8 text-center"
-                        >
-                            <Avatar
-                                class="mb-4 size-16 overflow-hidden rounded-full"
-                            >
-                                <AvatarImage
-                                    v-if="auth.user.avatar"
-                                    :src="auth.user.avatar"
-                                    :alt="auth.user.name"
-                                />
-                                <AvatarFallback
-                                    class="bg-neutral-100 text-base font-semibold text-neutral-950"
-                                >
-                                    {{ getInitials(auth.user?.name) }}
-                                </AvatarFallback>
-                            </Avatar>
-
-                            <h2 class="text-xl font-semibold text-neutral-950">
-                                {{ auth.user.name }}
-                            </h2>
-                            <p class="mt-2 text-sm text-neutral-500">
-                                {{ auth.user.email }}
-                            </p>
-                        </div>
-
-                        <nav class="flex flex-col gap-2 px-5 py-6">
-                            <SheetClose
-                                v-for="item in userSheetItems"
-                                :key="item.title"
-                                as-child
-                            >
-                                <Link
-                                    :href="item.href"
-                                    prefetch
-                                    class="flex min-h-9 items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-50"
-                                >
-                                    <component
-                                        :is="item.icon"
-                                        class="size-5 text-neutral-400"
-                                    />
-                                    <span>{{ item.title }}</span>
-                                </Link>
-                            </SheetClose>
-                        </nav>
-
-                        <div
-                            class="mt-auto border-t border-neutral-200 px-5 py-8"
-                        >
-                            <div
-                                class="mx-auto mb-4 flex size-14 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-700"
-                            >
-                                <Sparkles class="size-6" />
-                            </div>
-                            <div
-                                class="rounded-lg border border-neutral-200 bg-white p-5 text-center"
-                            >
-                                <h3
-                                    class="text-base font-semibold text-neutral-950"
-                                >
-                                    Need help setting things up?
-                                </h3>
-                                <p
-                                    class="mt-2 text-sm leading-6 text-neutral-500"
-                                >
-                                    I&apos;m available to help you update your
-                                    profile, security, and appearance anytime.
-                                </p>
-
-                                <SheetClose as-child>
-                                    <Link
-                                        :href="logout()"
-                                        method="post"
-                                        as="button"
-                                        class="mt-5 inline-flex h-9 items-center justify-center rounded-md bg-neutral-950 px-3 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
-                                        data-test="logout-button"
-                                        @click="handleLogout"
-                                    >
-                                        <LogOut class="mr-2 size-4" />
-                                        Log Out
-                                    </Link>
-                                </SheetClose>
-                            </div>
-                        </div>
-                    </div>
-                </SheetContent>
-            </Sheet>
+            <UserAccountSheet :user="auth.user" />
         </div>
     </header>
 </template>
