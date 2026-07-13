@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Menu, Moon, ShoppingCart, Sun } from '@lucide/vue';
+import { LayoutGrid, Menu, Moon, Sun } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import MessageDropdown from '@/components/MessageDropdown.vue';
 import NotificationDropdown from '@/components/NotificationDropdown.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -62,8 +63,6 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
 ];
-
-const cartItemCount = 11;
 
 const nextAppearance = computed(() =>
     resolvedAppearance.value === 'dark' ? 'light' : 'dark',
@@ -199,30 +198,7 @@ const themeLabel = computed(() =>
                         </Tooltip>
                     </TooltipProvider>
 
-                    <TooltipProvider :delay-duration="0">
-                        <Tooltip>
-                            <TooltipTrigger as-child>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    class="group relative h-9 w-9 cursor-pointer rounded-full"
-                                    aria-label="Shopping cart"
-                                >
-                                    <ShoppingCart
-                                        class="size-5 opacity-80 transition-opacity group-hover:opacity-100"
-                                    />
-                                    <span
-                                        class="absolute top-0 right-0 flex min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-black px-1 text-[10px] leading-none font-semibold text-white dark:bg-white dark:text-black"
-                                    >
-                                        {{ cartItemCount }}
-                                    </span>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Shopping cart</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <MessageDropdown />
 
                     <NotificationDropdown />
 

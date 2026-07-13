@@ -5,13 +5,13 @@ import {
     LogOut,
     Moon,
     Shield,
-    ShoppingCart,
     Sparkles,
     Sun,
     UserCircle2,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import MessageDropdown from '@/components/MessageDropdown.vue';
 import NotificationDropdown from '@/components/NotificationDropdown.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -49,8 +49,6 @@ withDefaults(
 const page = usePage();
 const auth = computed(() => page.props.auth);
 const { resolvedAppearance, updateAppearance } = useAppearance();
-
-const cartItemCount = 11;
 
 const nextAppearance = computed(() =>
     resolvedAppearance.value === 'dark' ? 'light' : 'dark',
@@ -123,30 +121,7 @@ const handleLogout = (): void => {
                 </Tooltip>
             </TooltipProvider>
 
-            <TooltipProvider :delay-duration="0">
-                <Tooltip>
-                    <TooltipTrigger as-child>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            class="group relative h-9 w-9 cursor-pointer rounded-full"
-                            aria-label="Shopping cart"
-                        >
-                            <ShoppingCart
-                                class="size-5 opacity-80 transition-opacity group-hover:opacity-100"
-                            />
-                            <span
-                                class="absolute top-0 right-0 flex min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-black px-1 text-[10px] leading-none font-semibold text-white dark:bg-white dark:text-black"
-                            >
-                                {{ cartItemCount }}
-                            </span>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Shopping cart</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
+            <MessageDropdown />
 
             <NotificationDropdown />
 
