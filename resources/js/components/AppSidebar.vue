@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import {
-    BookOpen,
-    FolderGit2,
-    LayoutGrid,
+    BookOpenCheck,
     Palette,
     Settings2,
     Shield,
     UserRound,
 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
-import NavFooter from '@/components/NavFooter.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
 import NavMain from '@/components/NavMain.vue';
-import NavUser from '@/components/NavUser.vue';
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { edit as editAppearance } from '@/routes/appearance';
@@ -33,7 +29,7 @@ const primaryNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
-        icon: LayoutGrid,
+        icon: BookOpenCheck,
     },
 ];
 
@@ -64,26 +60,27 @@ const settingsNavItems: NavItem[] = [
 
 const navigationGroups: NavGroup[] = [
     {
-        title: 'Workspace',
+        title: 'Learning',
         items: primaryNavItems,
     },
     {
-        title: 'Preferences',
+        title: 'Account',
         items: settingsNavItems,
     },
 ];
-
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset" class="bg-transparent">
-        <SidebarHeader class="gap-3 p-0">
+    <Sidebar collapsible="icon" variant="sidebar" class="bg-transparent">
+        <SidebarHeader
+            class="border-b border-sidebar-border/70 px-4 py-4 group-data-[collapsible=icon]:px-1"
+        >
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton
                         size="lg"
                         as-child
-                        class="h-auto px-3 py-3 mb-2 text-sidebar-primary shadow-none transition-[opacity,transform,background-color,color] duration-200 ease-out group-data-[collapsible=icon]:size-12! group-data-[collapsible=icon]:p-0!"
+                        class="h-13 rounded-md px-2.5 text-sidebar-foreground shadow-none transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-0! hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
                     >
                         <Link :href="dashboard()">
                             <AppLogo />
@@ -93,13 +90,13 @@ const navigationGroups: NavGroup[] = [
             </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent class="gap-0">
+        <SidebarContent
+            class="gap-3 px-4 py-5 group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-4"
+        >
             <NavMain :groups="navigationGroups" />
         </SidebarContent>
 
-        <SidebarFooter class="gap-3 p-0">
-            <NavUser />
-        </SidebarFooter>
+        <SidebarRail />
     </Sidebar>
     <slot />
 </template>

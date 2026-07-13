@@ -1,16 +1,26 @@
 <script setup lang="ts">
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import { usePage } from '@inertiajs/vue3';
+import { GraduationCap } from '@lucide/vue';
+
+const page = usePage();
 </script>
 
 <template>
     <div
-        class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
+        class="flex aspect-square size-9 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground shadow-sm shadow-sidebar-primary/20"
     >
-        <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
+        <GraduationCap class="size-5 text-white" :stroke-width="1.8" />
     </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate leading-tight font-semibold"
-            >Laravel Starter Kit</span
+    <div
+        class="grid min-w-0 flex-1 gap-0.5 text-left group-data-[collapsible=icon]:hidden"
+    >
+        <span class="truncate text-sm leading-tight font-semibold">
+            {{ page.props.name }}
+        </span>
+        <span
+            class="truncate text-[11px] leading-tight font-medium text-sidebar-foreground/50"
         >
+            Learning management system
+        </span>
     </div>
 </template>

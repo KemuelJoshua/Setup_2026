@@ -100,76 +100,218 @@
 }
 
 :root {
-    --background: hsl(0 0% 100%);
-    --foreground: hsl(0 0% 3.9%);
+    /* =========================================================
+       BASE
+       Neutral (No Red Tint)
+    ========================================================= */
+    --background: hsl(220 20% 98%);
+    --foreground: hsl(222 18% 12%);
+
+    /* =========================================================
+       SURFACES
+    ========================================================= */
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(0 0% 3.9%);
+    --card-foreground: hsl(222 18% 12%);
+
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(0 0% 3.9%);
-    --primary: hsl(0 0% 9%);
-    --primary-foreground: hsl(0 0% 98%);
-    --secondary: hsl(0 0% 92.1%);
-    --secondary-foreground: hsl(0 0% 9%);
-    --muted: hsl(0 0% 96.1%);
-    --muted-foreground: hsl(0 0% 45.1%);
-    --accent: hsl(0 0% 96.1%);
-    --accent-foreground: hsl(0 0% 9%);
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0, 0%, 88%);
-    --input: hsl(0 0% 89.8%);
-    --ring: hsl(0 0% 3.9%);
-    --chart-1: hsl(12 76% 61%);
-    --chart-2: hsl(173 58% 39%);
-    --chart-3: hsl(197 37% 24%);
-    --chart-4: hsl(43 74% 66%);
-    --chart-5: hsl(27 87% 67%);
-    --radius: 0.5rem;
-    --sidebar-background: hsl(0 0% 98%);
-    --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(0 0% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(0 0% 94%);
-    --sidebar-accent-foreground: hsl(0 0% 30%);
-    --sidebar-border: hsl(0 0% 91%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(0 0% 98%);
+    --popover-foreground: hsl(222 18% 12%);
+
+    /* =========================================================
+       BLOOD RED BRAND
+    ========================================================= */
+    --primary: hsl(355 78% 33%);
+    --primary-foreground: hsl(0 0% 100%);
+
+    --primary-hover: hsl(355 78% 39%);
+    --primary-active: hsl(355 82% 28%);
+
+    /* Keep these neutral instead of red */
+    --primary-soft: hsl(220 18% 96%);
+    --primary-muted: hsl(220 16% 92%);
+
+    --primary-glow: hsla(355, 78%, 33%, .22);
+
+    /* =========================================================
+       SECONDARY
+    ========================================================= */
+    --secondary: hsl(220 14% 95%);
+    --secondary-foreground: hsl(222 15% 18%);
+
+    /* =========================================================
+       ACCENT
+       Neutral Hover
+    ========================================================= */
+    --accent: hsl(220 16% 96%);
+    --accent-foreground: hsl(222 15% 18%);
+
+    /* =========================================================
+       MUTED
+    ========================================================= */
+    --muted: hsl(220 16% 96%);
+    --muted-foreground: hsl(220 8% 46%);
+
+    /* =========================================================
+       STATES
+    ========================================================= */
+    --destructive: hsl(0 78% 52%);
+    --destructive-foreground: white;
+
+    --success: hsl(145 63% 39%);
+    --success-foreground: white;
+
+    --warning: hsl(40 95% 50%);
+    --warning-foreground: hsl(35 60% 12%);
+
+    --info: hsl(210 88% 52%);
+    --info-foreground: white;
+
+    /* =========================================================
+       INPUTS
+    ========================================================= */
+    --border: hsl(220 13% 88%);
+    --input: hsl(220 13% 90%);
+    --ring: hsl(355 78% 33%);
+
+    /* =========================================================
+       CHARTS
+    ========================================================= */
+    --chart-1: hsl(355 78% 33%);
+    --chart-2: hsl(355 70% 42%);
+    --chart-3: hsl(355 62% 50%);
+    --chart-4: hsl(355 55% 60%);
+    --chart-5: hsl(355 45% 70%);
+
+    /* =========================================================
+       RADIUS
+    ========================================================= */
+    --radius: .5rem;
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+    --sidebar: hsl(0 0% 100%);
+    --sidebar-background: hsl(0 0% 100%);
+    --sidebar-foreground: hsl(222 15% 18%);
+
+    --sidebar-primary: hsl(355 78% 33%);
+    --sidebar-primary-foreground: white;
+
+    /* Neutral hover */
+    --sidebar-accent: hsl(220 16% 96%);
+    --sidebar-accent-foreground: hsl(222 15% 18%);
+
+    --sidebar-border: hsl(220 13% 89%);
+    --sidebar-ring: hsl(355 78% 33%);
+
+    /* =========================================================
+       SHADOWS
+    ========================================================= */
+    --shadow-color: hsla(220, 20%, 10%, .08);
+    --shadow-primary: hsla(355, 78%, 33%, .18);
 }
 
 .dark {
-    --background: hsl(0 0% 3.9%);
-    --foreground: hsl(0 0% 98%);
-    --card: hsl(0 0% 3.9%);
-    --card-foreground: hsl(0 0% 98%);
-    --popover: hsl(0 0% 3.9%);
-    --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(0 0% 9%);
-    --secondary: hsl(0 0% 14.9%);
-    --secondary-foreground: hsl(0 0% 98%);
-    --muted: hsl(0 0% 16.08%);
-    --muted-foreground: hsl(0 0% 63.9%);
-    --accent: hsl(0 0% 14.9%);
-    --accent-foreground: hsl(0 0% 98%);
-    --destructive: hsl(0 84% 60%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(0 0% 14.9%);
-    --input: hsl(0 0% 14.9%);
-    --ring: hsl(0 0% 83.1%);
-    --chart-1: hsl(220 70% 50%);
-    --chart-2: hsl(160 60% 45%);
-    --chart-3: hsl(30 80% 55%);
-    --chart-4: hsl(280 65% 60%);
-    --chart-5: hsl(340 75% 55%);
-    --sidebar-background: hsl(0 0% 7%);
-    --sidebar-foreground: hsl(0 0% 95.9%);
-    --sidebar-primary: hsl(360, 100%, 100%);
-    --sidebar-primary-foreground: hsl(0 0% 7%);
-    --sidebar-accent: hsl(0 0% 15.9%);
-    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-    --sidebar-border: hsl(0 0% 15.9%);
-    --sidebar-ring: hsl(217.2 91.2% 59.8%);
-    --sidebar: hsl(240 5.9% 10%);
+    /* =========================================================
+       BASE
+       Neutral Dark (No Red Tint)
+    ========================================================= */
+    --background: hsl(220 18% 8%);
+    --foreground: hsl(220 20% 96%);
+
+    /* =========================================================
+       SURFACES
+    ========================================================= */
+    --card: hsl(220 16% 11%);
+    --card-foreground: hsl(220 20% 96%);
+
+    --popover: hsl(220 16% 11%);
+    --popover-foreground: hsl(220 20% 96%);
+
+    /* =========================================================
+       BRAND
+    ========================================================= */
+    --primary: hsl(355 82% 50%);
+    --primary-foreground: white;
+
+    --primary-hover: hsl(355 82% 56%);
+    --primary-active: hsl(355 82% 44%);
+
+    /* Neutral */
+    --primary-soft: hsl(220 12% 16%);
+    --primary-muted: hsl(220 10% 20%);
+
+    --primary-glow: hsla(355,82%,50%,.30);
+
+    /* =========================================================
+       SECONDARY
+    ========================================================= */
+    --secondary: hsl(220 12% 16%);
+    --secondary-foreground: hsl(220 20% 96%);
+
+    /* =========================================================
+       ACCENT
+    ========================================================= */
+    --accent: hsl(220 12% 16%);
+    --accent-foreground: hsl(220 20% 96%);
+
+    /* =========================================================
+       MUTED
+    ========================================================= */
+    --muted: hsl(220 12% 15%);
+    --muted-foreground: hsl(220 10% 68%);
+
+    /* =========================================================
+       STATES
+    ========================================================= */
+    --destructive: hsl(0 78% 60%);
+    --destructive-foreground: white;
+
+    --success: hsl(145 58% 50%);
+    --success-foreground: white;
+
+    --warning: hsl(40 95% 58%);
+    --warning-foreground: hsl(40 90% 10%);
+
+    --info: hsl(210 90% 60%);
+    --info-foreground: white;
+
+    /* =========================================================
+       INPUTS
+    ========================================================= */
+    --border: hsl(220 12% 20%);
+    --input: hsl(220 12% 18%);
+    --ring: hsl(355 82% 50%);
+
+    /* =========================================================
+       CHARTS
+    ========================================================= */
+    --chart-1: hsl(355 82% 50%);
+    --chart-2: hsl(355 74% 58%);
+    --chart-3: hsl(355 66% 66%);
+    --chart-4: hsl(355 56% 74%);
+    --chart-5: hsl(355 46% 82%);
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+    --sidebar: hsl(220 16% 10%);
+    --sidebar-background: hsl(220 16% 10%);
+    --sidebar-foreground: hsl(220 20% 96%);
+
+    --sidebar-primary: hsl(355 82% 50%);
+    --sidebar-primary-foreground: white;
+
+    --sidebar-accent: hsl(220 12% 16%);
+    --sidebar-accent-foreground: hsl(220 20% 96%);
+
+    --sidebar-border: hsl(220 12% 20%);
+    --sidebar-ring: hsl(355 82% 50%);
+
+    /* =========================================================
+       SHADOWS
+    ========================================================= */
+    --shadow-color: hsla(0,0%,0%,.45);
+    --shadow-primary: hsla(355,82%,50%,.25);
 }
 
 @layer base {

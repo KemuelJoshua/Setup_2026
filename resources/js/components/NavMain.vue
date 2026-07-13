@@ -27,7 +27,7 @@ const props = defineProps<{
 const { isCurrentUrl } = useCurrentUrl();
 
 const menuButtonClass =
-    'h-9 rounded-sm px-3 text-sm font-medium text-sidebar-foreground/70 transition-[opacity,transform,background-color,color] duration-200 ease-out hover:bg-sidebar-accent hover:text-sidebar-primary data-[active=true]:bg-sidebar-primary/92 data-[active=true]:text-sidebar-primary-foreground data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:p-0!';
+    'h-10.5 rounded-md px-3 text-sm font-medium text-sidebar-foreground/65 transition-[background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-sidebar-accent/70 hover:text-sidebar-primary data-[active=true]:bg-sidebar-primary data-[active=true]:font-semibold data-[active=true]:text-sidebar-primary-foreground data-[active=true]:shadow-sm data-[active=true]:shadow-sidebar-primary/20 data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-0!';
 
 const expandedItems = ref<Record<string, boolean>>({});
 
@@ -78,14 +78,14 @@ watch(
     <SidebarGroup
         v-for="group in groups"
         :key="group.title"
-        class="rounded-lg shadow-none"
+        class="gap-1.5 p-0 shadow-none"
     >
         <SidebarGroupLabel
-            class="px-3 text-[11px] font-semibold tracking-[0.14em] text-sidebar-foreground/50 uppercase"
+            class="h-7 px-3 text-[11px] font-semibold tracking-[0.1em] text-sidebar-foreground/40 uppercase"
         >
             {{ group.title }}
         </SidebarGroupLabel>
-        <SidebarMenu class="gap-1">
+        <SidebarMenu class="gap-2">
             <SidebarMenuItem v-for="item in group.items" :key="item.title">
                 <SidebarMenuButton
                     as-child
@@ -98,32 +98,24 @@ watch(
                         type="button"
                         @click="toggleItem(item)"
                     >
-                        <span
-                            class="absolute inset-y-2 left-0 w-0.5 scale-y-75 rounded-full bg-sidebar-primary opacity-0 transition-[opacity,transform,background-color] duration-200 ease-out data-[active=true]:scale-y-100 data-[active=true]:opacity-100"
-                            :data-active="isItemActive(item)"
-                            aria-hidden="true"
-                        />
                         <component
                             v-if="item.icon"
                             :is="item.icon"
-                            class="size-5 transition-transform duration-200 ease-out group-hover/menu-button:scale-105"
+                            class="size-[18px] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu-button:scale-105"
+                            :stroke-width="1.8"
                         />
                         <span>{{ item.title }}</span>
                         <ChevronRight
-                            class="ml-auto size-4 opacity-70 transition-transform duration-200 ease-out"
+                            class="ml-auto size-4 opacity-50 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                             :class="isItemExpanded(item) ? 'rotate-90' : ''"
                         />
                     </button>
                     <Link v-else :href="item.href">
-                        <span
-                            class="absolute inset-y-2 left-0 w-0.5 scale-y-75 rounded-full bg-sidebar-primary opacity-0 transition-[opacity,transform,background-color] duration-200 ease-out data-[active=true]:scale-y-100 data-[active=true]:opacity-100"
-                            :data-active="isItemActive(item)"
-                            aria-hidden="true"
-                        />
                         <component
                             v-if="item.icon"
                             :is="item.icon"
-                            class="size-5 transition-transform duration-200 ease-out group-hover/menu-button:scale-105"
+                            class="size-[18px] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu-button:scale-105"
+                            :stroke-width="1.8"
                         />
                         <span>{{ item.title }}</span>
                     </Link>
@@ -139,7 +131,7 @@ watch(
                 >
                     <SidebarMenuSub
                         v-if="hasChildren(item) && isItemExpanded(item)"
-                        class="mt-0.5 mr-0 ml-5.5 translate-x-0 gap-0.5 border-sidebar-border/80 pr-0 pl-4"
+                        class="mt-1 mr-0 ml-5 translate-x-0 gap-1 border-sidebar-border/70 py-1 pr-0 pl-4"
                     >
                         <SidebarMenuSubItem
                             v-for="child in item.children"
@@ -150,7 +142,7 @@ watch(
                                 as-child
                                 size="sm"
                                 :is-active="isCurrentUrl(child.href)"
-                                class="h-7 rounded-sm px-2.5 text-sm text-sidebar-primary/85"
+                                class="h-8.5 rounded-md px-2.5 text-[13px] text-sidebar-foreground/60 transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-sidebar-accent/60 hover:text-sidebar-foreground data-[active=true]:bg-transparent data-[active=true]:font-semibold data-[active=true]:text-sidebar-primary"
                             >
                                 <Link :href="child.href">
                                     <span>{{ child.title }}</span>
