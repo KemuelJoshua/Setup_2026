@@ -24,11 +24,12 @@ const primaryNavItems: NavItem[] = [
     },
 ];
 
+
 const navigationGroups: NavGroup[] = [
     {
         title: 'Learning',
         items: primaryNavItems,
-    },
+    }
 ];
 </script>
 

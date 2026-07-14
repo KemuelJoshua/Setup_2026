@@ -95,7 +95,7 @@ const unreadCount = messages.filter((message) => message.isUnread).length;
                     v-for="message in messages"
                     :key="message.id"
                     type="button"
-                    class="group flex w-full items-start gap-3 rounded-md px-3 py-3 text-left transition-[background-color,color] duration-200 ease-out hover:bg-sidebar-accent/70 focus-visible:bg-sidebar-accent/70 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
+                    class="group flex w-full items-start gap-3 mb-1 rounded-md px-3 py-3 text-left transition-[background-color,color] duration-200 ease-out hover:bg-sidebar-accent/70 focus-visible:bg-sidebar-accent/70 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
                     :class="message.isUnread ? 'bg-sidebar-accent/80' : ''"
                 >
                     <span
