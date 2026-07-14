@@ -25,7 +25,7 @@ import {
 import { computed } from 'vue';
 import { useAppearance } from '@/composables/useAppearance';
 import { login } from '@/routes';
-import { dashboard } from '@/routes/administration';
+import { dashboard } from '@/routes/admin';
 
 const page = usePage();
 const { resolvedAppearance, updateAppearance } = useAppearance();

@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import {
-    BookOpenCheck,
-    Palette,
-    Settings2,
-    Shield,
-    UserRound,
-} from '@lucide/vue';
+import { BookOpenCheck } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -19,10 +13,7 @@ import {
     SidebarMenuItem,
     SidebarRail,
 } from '@/components/ui/sidebar';
-import { edit as editAppearance } from '@/routes/appearance';
-import { dashboard } from '@/routes/administration';
-import { index as RolesAndPermissions } from '@/routes/administration/roles';
-import { edit as editSecurity } from '@/routes/security';
+import { dashboard } from '@/routes/admin';
 import type { NavItem } from '@/types';
 
 const primaryNavItems: NavItem[] = [
@@ -33,29 +24,10 @@ const primaryNavItems: NavItem[] = [
     },
 ];
 
-const settingsNavItems: NavItem[] = [
-    {
-        title: 'Settings',
-        href: RolesAndPermissions(),
-        icon: Settings2,
-        children: [
-            {
-                title: 'Roles & Permissions',
-                href: RolesAndPermissions(),
-                icon: UserRound,
-            }
-        ],
-    },
-];
-
 const navigationGroups: NavGroup[] = [
     {
         title: 'Learning',
         items: primaryNavItems,
-    },
-    {
-        title: 'Account',
-        items: settingsNavItems,
     },
 ];
 </script>

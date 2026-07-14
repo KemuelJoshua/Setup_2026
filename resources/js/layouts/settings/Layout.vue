@@ -5,15 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editProfile } from '@/routes/profile';
-import { edit as editSecurity } from '@/routes/security';
+import { index as editRoles } from '@/routes/admin/settings/roles';
+import { edit as editAppearance } from '@/routes/admin/settings/appearance';
+import { edit as editProfile } from '@/routes/admin/settings/profile';
+import { edit as editSecurity } from '@/routes/admin/settings/security';
 import type { NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
-        href: editProfile(),
+        title: 'Roles & Permissions',
+        href: editRoles(),
     },
     {
         title: 'Security',
@@ -32,7 +33,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
     <div class="px-4 py-6">
         <Heading
             title="Settings"
-            description="Manage your profile and account settings"
+            description="Configure your account, preferences, and application settings."
         />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
@@ -61,8 +62,8 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 
             <Separator class="my-6 lg:hidden" />
 
-            <div class="flex-1 md:max-w-2xl">
-                <section class="max-w-xl space-y-12">
+            <div class="flex-1">
+                <section class="space-y-12">
                     <slot />
                 </section>
             </div>

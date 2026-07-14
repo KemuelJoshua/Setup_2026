@@ -54,7 +54,7 @@ class RoleController extends Controller
                 'permission_ids' => $role->permissions->modelKeys(),
             ]);
 
-        return Inertia::render('RolesAndPermissions/Index', [
+        return Inertia::render('admin/settings/RolesAndPermissions/Index', [
             'roles' => $roles,
             'guards' => Role::query()
                 ->select('guard_name')
@@ -68,7 +68,10 @@ class RoleController extends Controller
                 ->get()
                 ->map(fn (Permission $permission): array => [
                     'id' => $permission->getKey(),
-                    'name' => str_replace('admin', '', $permission->name),
+                    'name' => Str::of($permission->name)
+                        ->replace('admin', '')
+                        ->trim()
+                        ->toString(),
                     'guard_name' => $permission->guard_name,
                     'category' => Str::of($permission->name)
                         ->afterLast(' ')
@@ -89,7 +92,7 @@ class RoleController extends Controller
         $createRole->execute($request->validated());
 
         return redirect()
-            ->route('administration.roles.index')
+            ->route('admin.settings.roles.index')
             ->with('success', 'Role created successfully.');
     }
 
@@ -100,7 +103,7 @@ class RoleController extends Controller
         $updateRole->execute($role, $request->validated());
 
         return redirect()
-            ->route('administration.roles.index')
+            ->route('admin.settings.roles.index')
             ->with('success', 'Role updated successfully.');
     }
 
@@ -111,7 +114,7 @@ class RoleController extends Controller
         $deleteRole->execute($role);
 
         return redirect()
-            ->route('administration.roles.index')
+            ->route('admin.settings.roles.index')
             ->with('success', 'Role deleted successfully.');
     }
 }

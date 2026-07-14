@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 test('authenticated users can visit the roles index', function () {
     $user = User::factory()->create();
     $viewRolesPermission = Permission::create([
-        'name' => 'view roles',
+        'name' => 'admin view roles',
         'guard_name' => 'web',
     ]);
     $user->givePermissionTo($viewRolesPermission);
@@ -25,23 +25,23 @@ test('authenticated users can visit the roles index', function () {
     }
 
     $permission = Permission::create([
-        'name' => 'manage courses',
+        'name' => 'admin manage courses',
         'guard_name' => 'web',
     ]);
     Role::findByName('Role 01')->givePermissionTo($permission);
     $apiPermission = Permission::create([
-        'name' => 'manage api courses',
+        'name' => 'admin manage api courses',
         'guard_name' => 'api',
     ]);
 
     $response = $this
         ->actingAs($user)
-        ->get(route('administration.roles.index'));
+        ->get(route('admin.settings.roles.index'));
 
     $response
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('RolesAndPermissions/Index')
+            ->component('admin/settings/RolesAndPermissions/Index')
             ->has('roles.data', 10)
             ->where('roles.current_page', 1)
             ->where('roles.last_page', 2)
@@ -71,7 +71,7 @@ test('authenticated users can visit the roles index', function () {
 test('roles can be searched and filtered while paginating', function () {
     $user = User::factory()->create();
     $viewRolesPermission = Permission::create([
-        'name' => 'view roles',
+        'name' => 'admin view roles',
         'guard_name' => 'web',
     ]);
     $user->givePermissionTo($viewRolesPermission);
@@ -88,7 +88,7 @@ test('roles can be searched and filtered while paginating', function () {
 
     $response = $this
         ->actingAs($user)
-        ->get(route('administration.roles.index', [
+        ->get(route('admin.settings.roles.index', [
             'search' => 'Instructor',
             'guard' => 'web',
         ]));

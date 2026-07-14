@@ -21,7 +21,7 @@ test('users without permission cannot view roles', function () {
 
     $this
         ->actingAs($user)
-        ->get(route('administration.roles.index'))
+        ->get(route('admin.settings.roles.index'))
         ->assertForbidden();
 });
 
@@ -30,7 +30,7 @@ test('users without permission cannot create roles', function () {
 
     $this
         ->actingAs($user)
-        ->post(route('administration.roles.store'), [
+        ->post(route('admin.settings.roles.store'), [
             'name' => 'Instructor',
             'permissions' => [],
         ])
@@ -48,7 +48,7 @@ test('users without permission cannot update roles', function () {
 
     $this
         ->actingAs($user)
-        ->put(route('administration.roles.update', $role), [
+        ->put(route('admin.settings.roles.update', $role), [
             'name' => 'Senior Instructor',
             'permissions' => [],
         ])
@@ -66,7 +66,7 @@ test('users without permission cannot delete roles', function () {
 
     $this
         ->actingAs($user)
-        ->delete(route('administration.roles.destroy', $role))
+        ->delete(route('admin.settings.roles.destroy', $role))
         ->assertForbidden();
 
     $this->assertModelExists($role);

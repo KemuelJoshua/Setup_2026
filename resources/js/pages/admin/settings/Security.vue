@@ -8,7 +8,7 @@ import ManageTwoFactor from '@/components/ManageTwoFactor.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/security';
+import { edit } from '@/routes/admin/settings/security';
 
 type Props = {
     passwordRules: string;

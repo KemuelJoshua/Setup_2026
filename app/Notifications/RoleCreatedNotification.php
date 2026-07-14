@@ -38,7 +38,7 @@ class RoleCreatedNotification extends Notification implements ShouldQueue
             ->line("Guard: {$this->role->guard_name}")
             ->action(
                 'View Roles',
-                route('administration.roles.index')
+                route('admin.settings.roles.index')
             )
             ->line('No action is required if this change was expected.');
     }
@@ -56,7 +56,7 @@ class RoleCreatedNotification extends Notification implements ShouldQueue
             'role_id' => $this->role->id,
             'role_name' => $this->role->name,
             'guard_name' => $this->role->guard_name,
-            'url' => route('administration.roles.index'),
+            'url' => route('admin.settings.roles.index'),
         ];
     }
 

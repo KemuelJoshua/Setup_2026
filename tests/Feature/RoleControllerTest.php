@@ -25,10 +25,10 @@ test('authorized users can view the roles page', function () {
 
     $this
         ->actingAs($user)
-        ->get(route('administration.roles.index'))
+        ->get(route('admin.settings.roles.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('RolesAndPermissions/Index')
+            ->component('admin/settings/RolesAndPermissions/Index')
             ->has('roles.data'));
 });
 
@@ -39,13 +39,13 @@ test('authorized users can create a role', function () {
 
     $response = $this
         ->actingAs($user)
-        ->post(route('administration.roles.store'), [
+        ->post(route('admin.settings.roles.store'), [
             'name' => 'Admin',
             'permissions' => [],
         ]);
 
     $response
-        ->assertRedirect(route('administration.roles.index'))
+        ->assertRedirect(route('admin.settings.roles.index'))
         ->assertSessionHas('success', 'Role created successfully.');
 
     expect(Role::findByName('Admin')->guard_name)->toBe('web');
@@ -70,13 +70,13 @@ test('authorized users can update a role and replace its permissions', function 
 
     $response = $this
         ->actingAs($user)
-        ->put(route('administration.roles.update', $role), [
+        ->put(route('admin.settings.roles.update', $role), [
             'name' => 'Senior Instructor',
             'permissions' => [(string) $replacementPermission->getKey()],
         ]);
 
     $response
-        ->assertRedirect(route('administration.roles.index'))
+        ->assertRedirect(route('admin.settings.roles.index'))
         ->assertSessionHas('success', 'Role updated successfully.');
 
     $role->refresh();
@@ -104,12 +104,12 @@ test('role update validates duplicate names and permission guards', function () 
 
     $this
         ->actingAs($user)
-        ->from(route('administration.roles.index'))
-        ->put(route('administration.roles.update', $role), [
+        ->from(route('admin.settings.roles.index'))
+        ->put(route('admin.settings.roles.update', $role), [
             'name' => 'Administrator',
             'permissions' => [$apiPermission->getKey()],
         ])
-        ->assertRedirect(route('administration.roles.index'))
+        ->assertRedirect(route('admin.settings.roles.index'))
         ->assertSessionHasErrors(['name', 'permissions.0']);
 
     expect($role->refresh()->name)->toBe('Instructor');
@@ -125,10 +125,10 @@ test('authorized users can delete a role', function () {
 
     $response = $this
         ->actingAs($user)
-        ->delete(route('administration.roles.destroy', $role));
+        ->delete(route('admin.settings.roles.destroy', $role));
 
     $response
-        ->assertRedirect(route('administration.roles.index'))
+        ->assertRedirect(route('admin.settings.roles.index'))
         ->assertSessionHas('success', 'Role deleted successfully.');
 
     $this->assertModelMissing($role);

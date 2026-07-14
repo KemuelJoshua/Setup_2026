@@ -2,7 +2,8 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
-import SettingsLayout from '@/layouts/settings/Layout.vue';
+import SingleLayout from '@/layouts/SingleLayout.vue';
+import SettingLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 
 import '@fontsource/inter/400.css'
@@ -20,8 +21,8 @@ createInertiaApp({
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
-            case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+            case name.startsWith('admin/settings/'):
+                return [SingleLayout, SettingLayout];
             default:
                 return AppLayout;
         }

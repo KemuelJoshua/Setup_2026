@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/sheet';
 import { getInitials } from '@/composables/useInitials';
 import { logout } from '@/routes';
-import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editProfile } from '@/routes/profile';
-import { edit as editSecurity } from '@/routes/security';
+import { edit as editAppearance } from '@/routes/admin/settings/appearance';
+import { edit as editProfile } from '@/routes/admin/settings/profile';
+import { edit as editSecurity } from '@/routes/admin/settings/security';
 import type { User } from '@/types';
 
 defineProps<{
