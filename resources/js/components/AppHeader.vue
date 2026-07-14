@@ -37,7 +37,7 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useAppearance } from '@/composables/useAppearance';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
-import { dashboard } from '@/routes';
+import { dashboard } from '@/routes/administration';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {

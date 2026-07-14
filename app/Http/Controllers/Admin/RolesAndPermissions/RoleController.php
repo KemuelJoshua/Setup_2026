@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\RolesAndPermissions;
+namespace App\Http\Controllers\Admin\RolesAndPermissions;
 
 use App\Actions\Roles\CreateRole;
 use App\Actions\Roles\DeleteRole;
@@ -22,22 +22,28 @@ class RoleController extends Controller
 {
     public function index(Request $request): Response
     {
-        Gate::authorize('view roles');
+        Gate::authorize('admin view roles');
 
         $search = $request->string('search')->trim()->toString();
         $guard = $request->string('guard', 'all')->trim()->toString();
 
         $roles = Role::query()
             ->select(['id', 'name', 'guard_name'])
-            ->with('permissions:id')
+            ->with([
+                'permissions' => fn ($query) => $query
+                    ->select('id', 'name')
+                    ->where('name', 'like', '%admin%'),
+            ])
             ->when($search !== '', fn (Builder $query) => $query
                 ->where(fn (Builder $query) => $query
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('guard_name', 'like', "%{$search}%")))
             ->when($guard !== 'all', fn (Builder $query) => $query->where('guard_name', $guard))
-            ->where('name', '!=', 'Superadmin')
-            ->where('name', '!=', 'Student')
-            ->where('name', '!=', 'Student')
+            ->whereNotIn('name', [
+                'Superadmin',
+                'Teacher',
+                'Student',
+            ])
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString()
@@ -57,11 +63,12 @@ class RoleController extends Controller
                 ->pluck('guard_name'),
             'permissions' => Permission::query()
                 ->select(['id', 'name', 'guard_name'])
+                ->where('name', 'like', '%admin%')
                 ->orderBy('name')
                 ->get()
                 ->map(fn (Permission $permission): array => [
                     'id' => $permission->getKey(),
-                    'name' => $permission->name,
+                    'name' => str_replace('admin', '', $permission->name),
                     'guard_name' => $permission->guard_name,
                     'category' => Str::of($permission->name)
                         ->afterLast(' ')
@@ -77,7 +84,7 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request, CreateRole $createRole): RedirectResponse
     {
-        Gate::authorize('create roles');
+        Gate::authorize('admin create roles');
 
         $createRole->execute($request->validated());
 
@@ -88,7 +95,7 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request, Role $role, UpdateRole $updateRole): RedirectResponse
     {
-        Gate::authorize('update roles');
+        Gate::authorize('admin update roles');
 
         $updateRole->execute($role, $request->validated());
 
@@ -99,7 +106,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role, DeleteRole $deleteRole): RedirectResponse
     {
-        Gate::authorize('delete roles');
+        Gate::authorize('admin delete roles');
 
         $deleteRole->execute($role);
 

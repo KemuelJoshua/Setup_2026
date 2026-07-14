@@ -424,7 +424,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
                     <Form
                         v-if="selectedRole"
                         :key="selectedRole.id"
-                        v-bind="update.form(String(selectedRole.id))"
+                        v-bind="update.form(selectedRole.id)"
                         v-slot="{ errors, processing }"
                         class="flex min-h-0 flex-1 flex-col"
                         :options="{ preserveScroll: true }"
@@ -662,7 +662,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
         <Dialog v-model:open="isDeleteDialogOpen">
             <DialogContent v-if="rolePendingDeletion">
                 <Form
-                    v-bind="destroy.form(String(rolePendingDeletion.id))"
+                    v-bind="destroy.form(rolePendingDeletion.id)"
                     v-slot="{ processing }"
                     class="space-y-6"
                     :options="{ preserveScroll: true }"

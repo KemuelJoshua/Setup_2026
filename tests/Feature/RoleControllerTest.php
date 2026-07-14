@@ -9,7 +9,9 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    foreach (['view roles', 'create roles', 'update roles', 'delete roles'] as $permission) {
+    Role::findOrCreate('Superadmin', 'web');
+
+    foreach (['admin view roles', 'admin create roles', 'admin update roles', 'admin delete roles'] as $permission) {
         Permission::create([
             'name' => $permission,
             'guard_name' => 'web',
@@ -19,7 +21,7 @@ beforeEach(function () {
 
 test('authorized users can view the roles page', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('view roles');
+    $user->givePermissionTo('admin view roles');
 
     $this
         ->actingAs($user)
@@ -32,7 +34,8 @@ test('authorized users can view the roles page', function () {
 
 test('authorized users can create a role', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('create roles');
+
+    $user->givePermissionTo('admin create roles');
 
     $response = $this
         ->actingAs($user)
@@ -50,7 +53,7 @@ test('authorized users can create a role', function () {
 
 test('authorized users can update a role and replace its permissions', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('update roles');
+    $user->givePermissionTo('admin update roles');
     $originalPermission = Permission::create([
         'name' => 'view courses',
         'guard_name' => 'web',
@@ -85,7 +88,7 @@ test('authorized users can update a role and replace its permissions', function 
 
 test('role update validates duplicate names and permission guards', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('update roles');
+    $user->givePermissionTo('admin update roles');
     $role = Role::create([
         'name' => 'Instructor',
         'guard_name' => 'web',
@@ -114,7 +117,7 @@ test('role update validates duplicate names and permission guards', function () 
 
 test('authorized users can delete a role', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('delete roles');
+    $user->givePermissionTo('admin delete roles');
     $role = Role::create([
         'name' => 'Instructor',
         'guard_name' => 'web',

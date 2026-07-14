@@ -24,7 +24,8 @@ import {
 } from '@lucide/vue';
 import { computed } from 'vue';
 import { useAppearance } from '@/composables/useAppearance';
-import { dashboard, login } from '@/routes';
+import { login } from '@/routes';
+import { dashboard } from '@/routes/administration';
 
 const page = usePage();
 const { resolvedAppearance, updateAppearance } = useAppearance();

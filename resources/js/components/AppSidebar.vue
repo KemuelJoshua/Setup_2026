@@ -19,8 +19,8 @@ import {
     SidebarMenuItem,
     SidebarRail,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import { edit as editAppearance } from '@/routes/appearance';
+import { dashboard } from '@/routes/administration';
 import { index as RolesAndPermissions } from '@/routes/administration/roles';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
