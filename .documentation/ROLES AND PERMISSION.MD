@@ -1,55 +1,15 @@
 # Roles And Permissions Guide
 
-This project uses `spatie/laravel-permission` for role-based access control.
-
-Simple rule:
+## 1. Current Permissions
 
 ```text
-User -> Role -> Permissions
+admin view roles
+admin create roles
+admin update roles
+admin delete roles
 ```
 
-Controllers protect role management actions with `Gate::authorize('permission name')`.
-
-## Main Files
-
-```text
-app/Models/User.php
-app/Http/Controllers/Admin/RolesAndPermissions/RoleController.php
-app/Http/Requests/RolesAndPermissions/StoreRoleRequest.php
-app/Http/Requests/RolesAndPermissions/UpdateRoleRequest.php
-app/Actions/Roles/CreateRole.php
-app/Actions/Roles/UpdateRole.php
-app/Actions/Roles/DeleteRole.php
-app/Notifications/RoleCreatedNotification.php
-database/seeders/permissions/PermissionSeeder.php
-database/seeders/permissions/RoleSeeder.php
-resources/js/pages/RolesAndPermissions/Index.vue
-resources/js/components/AppSidebar.vue
-routes/web.php
-```
-
-## Structure
-
-```mermaid
-flowchart TD
-    A[User] --> B[Role]
-    B --> C[Permissions]
-    C --> D[Controller Gate Check]
-    D --> E[Allow Action]
-    D --> F[Return 403]
-```
-
-```mermaid
-erDiagram
-    users ||--o{ model_has_roles : has
-    roles ||--o{ model_has_roles : assigned
-    roles ||--o{ role_has_permissions : has
-    permissions ||--o{ role_has_permissions : assigned
-```
-
-## Default Roles
-
-These roles are created by `Database\Seeders\permissions\RoleSeeder`.
+## 2. Current Default Roles
 
 ```text
 Superadmin
@@ -57,51 +17,107 @@ Teacher
 Student
 ```
 
-`Superadmin` receives every permission from `Permission::all()`.
+## 3. Add New Permissions
 
-`Database\Seeders\DatabaseSeeder` creates the default admin user and assigns the `Superadmin` role.
-
-```text
-name: Super Admin
-email: admin@gmail.com
-role: Superadmin
-```
-
-The Roles & Permissions page manages custom roles only. It excludes `Superadmin`, `Teacher`, and `Student` from the role listing.
-
-## Current Permissions
-
-These permissions are seeded by `Database\Seeders\permissions\PermissionSeeder`.
+Edit:
 
 ```text
-admin view roles
-admin create roles
-admin update roles
-admin delete roles
+database/seeders/permissions/PermissionSeeder.php
 ```
 
-## Permission Naming
+Add permissions:
 
-Role management permissions currently use this format:
+```php
+$permissions = [
+    'admin view roles',
+    'admin create roles',
+    'admin update roles',
+    'admin delete roles',
 
-```text
-admin action feature
+    'admin view courses',
+    'admin create courses',
+    'admin update courses',
+    'admin delete courses',
+];
 ```
 
-Current examples:
+## 4. Run Seeders
 
-```text
-admin view roles
-admin create roles
-admin update roles
-admin delete roles
+```bash
+php artisan db:seed --class="Database\\Seeders\\permissions\\PermissionSeeder"
+php artisan db:seed --class="Database\\Seeders\\permissions\\RoleSeeder"
+php artisan permission:cache-reset
 ```
 
-Use the same style for new administration-only permissions.
+## 5. Protect A Controller Action
 
-## Routes
+```php
+use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
+use Inertia\Response;
 
-Current role routes are defined in `routes/web.php` inside the `auth` and `verified` middleware group.
+public function index(): Response
+{
+    Gate::authorize('admin view courses');
+
+    return Inertia::render('Courses/Index');
+}
+```
+
+## 6. Use One Permission Per Action
+
+```php
+Gate::authorize('admin view courses');
+Gate::authorize('admin create courses');
+Gate::authorize('admin update courses');
+Gate::authorize('admin delete courses');
+```
+
+## 7. Assign Permissions To A Role
+
+```php
+use Spatie\Permission\Models\Role;
+
+$role = Role::findByName('Teacher', 'web');
+
+$role->givePermissionTo([
+    'admin view courses',
+    'admin create courses',
+    'admin update courses',
+]);
+```
+
+## 8. Assign Role To A User
+
+```php
+$user->assignRole('Teacher');
+```
+
+## 9. Give Permission Directly To A User
+
+```php
+$user->givePermissionTo('admin view courses');
+```
+
+## 10. Check A User Permission
+
+```php
+if ($user->can('admin view courses')) {
+    // Allowed.
+}
+```
+
+## 11. Check A User Role
+
+```php
+if ($user->hasRole('Teacher')) {
+    // User is a teacher.
+}
+```
+
+## 12. Create Role Routes
+
+Current role routes:
 
 ```php
 use App\Http\Controllers\Admin\RolesAndPermissions\RoleController;
@@ -118,211 +134,175 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 ```
 
-Named routes:
+## 13. Use Role Route Names
 
-```text
-administration.roles.index
-administration.roles.store
-administration.roles.update
-administration.roles.destroy
+```php
+route('administration.roles.index');
+route('administration.roles.store');
+route('administration.roles.update', $role);
+route('administration.roles.destroy', $role);
 ```
 
-## Controller Access
-
-Each route has a matching permission check inside `App\Http\Controllers\Admin\RolesAndPermissions\RoleController`.
-
-```text
-index   -> admin view roles
-store   -> admin create roles
-update  -> admin update roles
-destroy -> admin delete roles
-```
-
-The controller renders `RolesAndPermissions/Index` through Inertia.
-
-## Role Listing
-
-The index action returns:
-
-```text
-roles
-guards
-permissions
-filters
-```
-
-Role listing behavior:
-
-```text
-- selects id, name, and guard_name
-- loads admin permissions assigned to each role
-- filters by search text across role name and guard name
-- filters by guard when guard is not "all"
-- excludes Superadmin, Teacher, and Student
-- orders by role name
-- paginates 10 roles per page
-```
-
-The `permissions` prop only includes permissions whose names contain `admin`. The display name removes the `admin` prefix, so `admin view roles` is shown as `view roles`.
-
-## Creating Roles
-
-`CreateRole` creates all new roles with the `web` guard.
-
-```text
-name: submitted role name
-guard_name: web
-permissions: submitted permission ids
-```
-
-After a role is created, all users with the `Superadmin` role receive `RoleCreatedNotification`.
-
-Create validation is handled by `StoreRoleRequest`.
-
-```text
-name            required, string, max 255, unique in roles.name
-permissions     nullable array
-permissions.*   integer, existing web permission id
-```
-
-## Updating Roles
-
-`UpdateRole` updates the role name and replaces the assigned permissions with the submitted permission ids.
-
-Update validation is handled by `UpdateRoleRequest`.
-
-```text
-name            required, string, max 255, unique for the role guard
-permissions     nullable array
-permissions.*   integer, existing permission id for the role guard
-```
-
-## Deleting Roles
-
-`DeleteRole` deletes the role inside a database transaction.
-
-## Frontend
-
-The roles page is here:
-
-```text
-resources/js/pages/RolesAndPermissions/Index.vue
-```
-
-The page uses Wayfinder route helpers from:
+## 14. Use Wayfinder In Vue
 
 ```ts
 import { destroy, index, store, update } from '@/routes/administration/roles';
 ```
 
-Frontend behavior:
-
-```text
-- search roles with a 300ms debounce
-- filter roles by guard
-- create roles in a sheet
-- edit roles in a sheet
-- delete roles through a confirmation dialog
-- search permissions inside create and edit sheets
-- group permissions by category
-- preserve scroll during form submissions and filter visits
+```vue
+<Form v-bind="store.form()">
+    <!-- fields -->
+</Form>
 ```
 
-The sidebar entry is in:
-
-```text
-resources/js/components/AppSidebar.vue
+```vue
+<Form v-bind="update.form(role.id)">
+    <!-- fields -->
+</Form>
 ```
 
-Regenerate Wayfinder routes after changing backend routes.
-
-```bash
-php artisan wayfinder:generate
+```ts
+router.visit(index({ query: { search: searchQuery.value } }));
 ```
 
-## Add Permissions For A New Feature
-
-### 1. Add permissions to the seeder
-
-Open:
-
-```text
-database/seeders/permissions/PermissionSeeder.php
-```
-
-Add the new permissions.
+## 15. Create A Role From A Request
 
 ```php
-$permissions = [
-    'admin view roles',
-    'admin create roles',
-    'admin update roles',
-    'admin delete roles',
-
-    'admin view courses',
-    'admin create courses',
-    'admin update courses',
-    'admin delete courses',
-];
-```
-
-### 2. Run the seeders
-
-```bash
-php artisan db:seed --class="Database\\Seeders\\permissions\\PermissionSeeder"
-php artisan db:seed --class="Database\\Seeders\\permissions\\RoleSeeder"
-php artisan permission:cache-reset
-```
-
-### 3. Protect the controller
-
-Use `Gate::authorize()` before the action runs.
-
-```php
+use App\Actions\Roles\CreateRole;
+use App\Http\Requests\RolesAndPermissions\StoreRoleRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 
-public function index(): Response
+public function store(StoreRoleRequest $request, CreateRole $createRole): RedirectResponse
 {
-    Gate::authorize('admin view courses');
+    Gate::authorize('admin create roles');
 
-    return Inertia::render('Courses/Index');
+    $createRole->execute($request->validated());
+
+    return redirect()
+        ->route('administration.roles.index')
+        ->with('success', 'Role created successfully.');
 }
 ```
 
-Use one permission per action.
+## 16. Update A Role From A Request
 
 ```php
-Gate::authorize('admin view courses');
-Gate::authorize('admin create courses');
-Gate::authorize('admin update courses');
-Gate::authorize('admin delete courses');
-```
-
-### 4. Assign permissions to a role
-
-Use the UI:
-
-```text
-Administration > Roles & Permissions > Edit role > Select permissions > Save
-```
-
-Use code in seeders or tests:
-
-```php
+use App\Actions\Roles\UpdateRole;
+use App\Http\Requests\RolesAndPermissions\UpdateRoleRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 
-$role = Role::findByName('Teacher', 'web');
+public function update(UpdateRoleRequest $request, Role $role, UpdateRole $updateRole): RedirectResponse
+{
+    Gate::authorize('admin update roles');
 
-$role->givePermissionTo([
-    'admin view courses',
-    'admin create courses',
-    'admin update courses',
-]);
+    $updateRole->execute($role, $request->validated());
+
+    return redirect()
+        ->route('administration.roles.index')
+        ->with('success', 'Role updated successfully.');
+}
 ```
 
-## Test The Changes
+## 17. Delete A Role
 
-Run the related tests.
+```php
+use App\Actions\Roles\DeleteRole;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
+
+public function destroy(Role $role, DeleteRole $deleteRole): RedirectResponse
+{
+    Gate::authorize('admin delete roles');
+
+    $deleteRole->execute($role);
+
+    return redirect()
+        ->route('administration.roles.index')
+        ->with('success', 'Role deleted successfully.');
+}
+```
+
+## 18. Store Role Request Rules
+
+```php
+return [
+    'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
+    'permissions' => ['nullable', 'array'],
+    'permissions.*' => [
+        'integer',
+        Rule::exists(Permission::class, 'id')->where('guard_name', 'web'),
+    ],
+];
+```
+
+## 19. Update Role Request Rules
+
+```php
+return [
+    'name' => [
+        'required',
+        'string',
+        'max:255',
+        Rule::unique(Role::class, 'name')
+            ->where('guard_name', $guardName)
+            ->ignore($role),
+    ],
+    'permissions' => ['nullable', 'array'],
+    'permissions.*' => [
+        'integer',
+        Rule::exists(Permission::class, 'id')->where('guard_name', $guardName),
+    ],
+];
+```
+
+## 20. Test Permission Access
+
+```php
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
+
+uses(RefreshDatabase::class);
+
+test('authorized users can view courses', function () {
+    Permission::create([
+        'name' => 'admin view courses',
+        'guard_name' => 'web',
+    ]);
+
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin view courses');
+
+    $this
+        ->actingAs($user)
+        ->get(route('courses.index'))
+        ->assertOk();
+});
+```
+
+## 21. Test Forbidden Access
+
+```php
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+test('users without permission cannot view courses', function () {
+    $user = User::factory()->create();
+
+    $this
+        ->actingAs($user)
+        ->get(route('courses.index'))
+        ->assertForbidden();
+});
+```
+
+## 22. Run Tests
 
 ```bash
 php artisan test --compact tests/Feature/RoleControllerTest.php
@@ -332,19 +312,18 @@ php artisan test --compact tests/Feature/RoleStoreTest.php
 php artisan test --compact tests/Feature/RolePermissionAssignmentTest.php
 ```
 
-Run all tests before merging.
+## 23. Current Files
 
-```bash
-php artisan test --compact
-```
-
-## New Feature Checklist
-
-```mermaid
-flowchart TD
-    A[Add permissions] --> B[Run seeders]
-    B --> C[Add Gate checks]
-    C --> D[Assign permissions to roles]
-    D --> E[Regenerate Wayfinder routes]
-    E --> F[Run tests]
+```text
+app/Http/Controllers/Admin/RolesAndPermissions/RoleController.php
+app/Http/Requests/RolesAndPermissions/StoreRoleRequest.php
+app/Http/Requests/RolesAndPermissions/UpdateRoleRequest.php
+app/Actions/Roles/CreateRole.php
+app/Actions/Roles/UpdateRole.php
+app/Actions/Roles/DeleteRole.php
+database/seeders/permissions/PermissionSeeder.php
+database/seeders/permissions/RoleSeeder.php
+resources/js/pages/RolesAndPermissions/Index.vue
+resources/js/components/AppSidebar.vue
+routes/web.php
 ```
