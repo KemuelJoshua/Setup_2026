@@ -84,9 +84,12 @@ export function initializeTheme(): void {
 }
 
 const appearance = ref<Appearance>('system');
+const hasMounted = ref(false);
 
 export function useAppearance(): UseAppearanceReturn {
     onMounted(() => {
+        hasMounted.value = true;
+
         const savedAppearance = localStorage.getItem(
             'appearance',
         ) as Appearance | null;
@@ -98,6 +101,10 @@ export function useAppearance(): UseAppearanceReturn {
 
     const resolvedAppearance = computed<ResolvedAppearance>(() => {
         if (appearance.value === 'system') {
+            if (!hasMounted.value) {
+                return 'light';
+            }
+
             return prefersDark() ? 'dark' : 'light';
         }
 

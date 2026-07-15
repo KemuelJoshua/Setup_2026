@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\Users\EloquentUserRepository;
+use App\Repositories\Users\UserRepositoryInterface;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +12,13 @@ use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * @var array<class-string, class-string>
+     */
+    public array $bindings = [
+        UserRepositoryInterface::class => EloquentUserRepository::class,
+    ];
+
     /**
      * Register any application services.
      */
