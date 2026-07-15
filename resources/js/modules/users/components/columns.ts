@@ -1,4 +1,7 @@
 import type { ColumnDef } from '@tanstack/vue-table';
+import type { Component } from 'vue';
+import { h } from 'vue';
+import { DataTableColumnHeader } from '@/components/ui/data-table';
 
 export interface User {
     id: number;
@@ -9,10 +12,18 @@ export interface User {
 export const columns: ColumnDef<User>[] = [
     {
         accessorKey: 'name',
-        header: 'Name',
+        header: ({ column }) =>
+            h(DataTableColumnHeader as Component, {
+                column,
+                title: 'Name',
+            }),
     },
     {
         accessorKey: 'email',
-        header: 'Email',
+        header: ({ column }) =>
+            h(DataTableColumnHeader as Component, {
+                column,
+                title: 'Email',
+            }),
     },
 ];
