@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpenCheck } from '@lucide/vue';
+import { BookOpenCheck, User2 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -14,6 +14,7 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes/admin';
+import { index as userIndex } from '@/routes/admin/users';
 import type { NavItem } from '@/types';
 
 const primaryNavItems: NavItem[] = [
@@ -21,6 +22,11 @@ const primaryNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: BookOpenCheck,
+    },
+    {
+        title: 'Users',
+        href: userIndex(),
+        icon: User2,
     },
 ];
 

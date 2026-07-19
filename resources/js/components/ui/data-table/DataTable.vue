@@ -90,6 +90,13 @@ const getRowClass = (row: Row<TData>): HTMLAttributes['class'] => {
 
     return props.rowClass;
 };
+
+const getColumnClass = (
+    columnDef: ColumnDef<TData, TValue>,
+): HTMLAttributes['class'] => {
+    return (columnDef.meta as { className?: HTMLAttributes['class'] } | undefined)
+        ?.className;
+};
 </script>
 
 <template>
@@ -113,6 +120,7 @@ const getRowClass = (row: Row<TData>): HTMLAttributes['class'] => {
                         <TableHead
                             v-for="header in headerGroup.headers"
                             :key="header.id"
+                            :class="getColumnClass(header.column.columnDef)"
                         >
                             <FlexRender
                                 v-if="!header.isPlaceholder"
@@ -134,6 +142,7 @@ const getRowClass = (row: Row<TData>): HTMLAttributes['class'] => {
                             <TableCell
                                 v-for="cell in row.getVisibleCells()"
                                 :key="cell.id"
+                                :class="getColumnClass(cell.column.columnDef)"
                             >
                                 <FlexRender
                                     :render="cell.column.columnDef.cell"
