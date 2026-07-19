@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
-// import { index } from '@/routes/admin/users';
+import { index } from '@/routes/admin/users';
 import { Form, Head, router } from '@inertiajs/vue3';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,9 +15,9 @@ import { Plus } from '@lucide/vue';
 
 const isCreateSheetOpen = ref(false);
 
-// const props = defineProps<{
+const props = defineProps<{
 
-// }>();
+}>();
 </script>
 
 <template>
@@ -30,7 +30,7 @@ const isCreateSheetOpen = ref(false);
         </SheetTrigger>
 
         <SheetContent side="right" class="w-full gap-0 p-0 sm:max-w-lg">
-            <!-- <Form v-slot="{ errors, processing }" reset-on-success
+            <Form v-slot="{ errors, processing }" reset-on-success
                 class="flex min-h-0 flex-1 flex-col" :options="{ preserveScroll: true }"
                 @success="isCreateSheetOpen = false">
                 <SheetHeader class="border-b border-border px-6 py-5 text-left">
@@ -63,7 +63,7 @@ const isCreateSheetOpen = ref(false);
                         }}
                     </Button>
                 </SheetFooter>
-            </Form> -->
+            </Form>
         </SheetContent>
     </Sheet>
 </template>

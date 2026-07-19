@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { onBeforeUnmount, ref, watch } from 'vue';
-import TablePagination from '@/components/TablePagination.vue';
-import TableToolbar from '@/components/TableToolbar.vue';
-import UserTable from '@/modules/users/components/UserTable.vue';
+import {
+    DataTablePagination,
+    DataTableToolbar,
+} from '@/components/ui/data-table';
 import type { User } from '@/modules/users/components/columns';
+import UserTable from '@/modules/users/components/UserTable.vue';
 import { index } from '@/routes/admin/users';
 import type { LengthAwarePaginator } from '@/types';
 import Create from './Create.vue';
@@ -60,7 +62,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <Head title="Users" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <TableToolbar
+        <DataTableToolbar
             v-model="searchQuery"
             title="User Management"
             description="Manage user accounts and assign roles."
@@ -72,12 +74,12 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             <template #actions>
                 <Create />
             </template>
-        </TableToolbar>
+        </DataTableToolbar>
 
         <div class="flex flex-col gap-4">
             <UserTable :users="users.data" />
 
-            <TablePagination
+            <DataTablePagination
                 :from="users.from"
                 :to="users.to"
                 :total="users.total"
