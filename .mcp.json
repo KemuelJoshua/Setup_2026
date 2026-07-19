@@ -4,7 +4,7 @@
             "command": "wsl.exe",
             "args": [
                 "/usr/bin/php8.3",
-                "/var/www/bz/laravel-ecommerce/artisan",
+                "/var/www/personal/laravel-ecommerce/artisan",
                 "boost:mcp"
             ]
         }
