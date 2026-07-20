@@ -1,31 +1,28 @@
-<!-- resources/js/modules/users/components/UserRowActions.vue -->
 <script setup lang="ts">
-import { Pencil, Trash } from '@lucide/vue';
-import { Button } from '@/components/ui/button';
+import { Pencil, Trash2 } from '@lucide/vue';
+import { DataTableRowActions } from '@/components/ui/data-table';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import type { User } from './columns';
 
 defineProps<{
     user: User;
 }>();
+
+defineEmits<{
+    edit: [];
+    delete: [];
+}>();
 </script>
 
 <template>
-    <div class="flex justify-end gap-2">
-        <Button
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            :aria-label="`Edit ${user.name}`"
-        >
+    <DataTableRowActions :label="`Open actions for ${user.name}`">
+        <DropdownMenuItem @select="$emit('edit')">
             <Pencil aria-hidden="true" />
-        </Button>
-        <Button
-            type="button"
-            variant="destructive"
-            size="icon-sm"
-            :aria-label="`Archived ${user.name}`"
-        >
-            <Trash aria-hidden="true" />
-        </Button>
-    </div>
+            Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem variant="destructive" @select="$emit('delete')">
+            <Trash2 aria-hidden="true" />
+            Delete
+        </DropdownMenuItem>
+    </DataTableRowActions>
 </template>

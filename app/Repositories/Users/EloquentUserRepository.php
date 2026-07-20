@@ -12,14 +12,20 @@ final class EloquentUserRepository implements UserRepositoryInterface
         int $perPage = 15,
         ?string $search = null
     ): LengthAwarePaginator {
-        $query = User::query();
+        $query = User::query()
+            ->select(['id', 'name', 'email'])
+            ->with('roles:id,name,guard_name')
+            ->latest('id');
 
         if ($search) {
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
+            $query->where(function ($query) use ($search): void {
+                $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
         }
 
-        return $query->paginate($perPage);
+        return $query->paginate($perPage)->withQueryString();
     }
 
     public function findById(int $id): ?UserData
@@ -32,28 +38,20 @@ final class EloquentUserRepository implements UserRepositoryInterface
         ) : null;
     }
 
-    public function create(UserData $data): UserData
+    public function create(UserData $data): User
     {
-        $user = User::create($data->toArray());
-
-        return new UserData(
-            name: $user->name,
-            email: $user->email,
-        );
+        return User::create($data->toArray());
     }
 
-    public function update(string $id, UserData $data): UserData
+    public function update(string $id, UserData $data): User
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
         $user->update(array_filter(
             $data->toArray(),
             fn (mixed $value): bool => $value !== null,
         ));
 
-        return new UserData(
-            name: $user->name,
-            email: $user->email,
-        );
+        return $user;
     }
 
     public function delete(string $id): bool

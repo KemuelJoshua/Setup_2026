@@ -3,6 +3,7 @@
 namespace App\Actions\User;
 
 use App\Data\Users\UserData;
+use App\Models\User;
 use App\Repositories\Users\UserRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,7 @@ final readonly class UpdateUserAction
         private readonly UserRepositoryInterface $userRepository
     ) {}
 
-    public function execute(string $id, UserData $data): UserData
+    public function execute(string $id, UserData $data): User
     {
         return DB::transaction(function () use ($id, $data) {
             $user = $this->userRepository->update(

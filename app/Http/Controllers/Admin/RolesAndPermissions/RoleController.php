@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\RolesAndPermissions;
 
 use App\Actions\Roles\CreateRole;
 use App\Actions\Roles\DeleteRole;
+use App\Actions\Roles\IndexRole;
 use App\Actions\Roles\UpdateRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RolesAndPermissions\StoreRoleRequest;
@@ -20,32 +21,15 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexRole $action): Response
     {
         Gate::authorize('admin view roles');
 
         $search = $request->string('search')->trim()->toString();
         $guard = $request->string('guard', 'all')->trim()->toString();
 
-        $roles = Role::query()
-            ->select(['id', 'name', 'guard_name'])
-            ->with([
-                'permissions' => fn ($query) => $query
-                    ->select('id', 'name')
-                    ->where('name', 'like', '%admin%'),
-            ])
-            ->when($search !== '', fn (Builder $query) => $query
-                ->where(fn (Builder $query) => $query
-                    ->where('name', 'like', "%{$search}%")
-                    ->orWhere('guard_name', 'like', "%{$search}%")))
-            ->when($guard !== 'all', fn (Builder $query) => $query->where('guard_name', $guard))
-            ->whereNotIn('name', [
-                'Superadmin',
-                'Teacher',
-                'Student',
-            ])
-            ->orderBy('name')
-            ->paginate(10)
+        $roles = $action->execute($request)
+            ->paginate($request->integer('per_page', 10))
             ->withQueryString()
             ->through(fn (Role $role): array => [
                 'id' => $role->getKey(),

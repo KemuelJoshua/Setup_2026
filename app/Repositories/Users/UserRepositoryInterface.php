@@ -20,9 +20,9 @@ interface UserRepositoryInterface
 
     public function findById(int $id): ?UserData;
 
-    public function create(UserData $data): UserData;
+    public function create(UserData $data): User;
 
-    public function update(string $id, UserData $data): UserData;
+    public function update(string $id, UserData $data): User;
 
     public function delete(string $id): bool;
 }

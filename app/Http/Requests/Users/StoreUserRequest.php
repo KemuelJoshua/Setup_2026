@@ -2,11 +2,15 @@
 
 namespace App\Http\Requests\Users;
 
+use App\Concerns\PasswordValidationRules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
+    use PasswordValidationRules;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,7 +27,14 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => $this->passwordRules(),
+            'role_name' => [
+                'nullable',
+                'string',
+                Rule::exists('roles', 'name')->where('guard_name', 'web'),
+            ],
         ];
     }
 }

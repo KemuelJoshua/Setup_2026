@@ -10,11 +10,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { destroy } from '@/routes/admin/settings/roles';
-import type { Role } from './columns';
+import { destroy } from '@/routes/admin/users';
+import type { User } from './columns';
 
 defineProps<{
-    role: Role | null;
+    user: User | null;
 }>();
 
 const isOpen = defineModel<boolean>('open', { default: false });
@@ -26,19 +26,18 @@ const closeDialog = (): void => {
 
 <template>
     <Dialog v-model:open="isOpen">
-        <DialogContent v-if="role">
+        <DialogContent v-if="user">
             <Form
-                v-bind="destroy.form(String(role.id))"
+                v-bind="destroy.form(user.id)"
                 v-slot="{ processing }"
                 class="space-y-6"
                 :options="{ preserveScroll: true }"
                 @success="closeDialog"
             >
                 <DialogHeader class="space-y-3">
-                    <DialogTitle>Delete role?</DialogTitle>
+                    <DialogTitle>Delete user?</DialogTitle>
                     <DialogDescription>
-                        The {{ role.name }} role will be permanently deleted.
-                        This action cannot be undone.
+                        The {{ user.name }} account will be permanently deleted.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -53,7 +52,7 @@ const closeDialog = (): void => {
                         variant="destructive"
                         :disabled="processing"
                     >
-                        {{ processing ? 'Deleting...' : 'Delete role' }}
+                        {{ processing ? 'Deleting...' : 'Delete user' }}
                     </Button>
                 </DialogFooter>
             </Form>

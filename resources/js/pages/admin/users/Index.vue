@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
+import { Plus } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
+import { Button } from '@/components/ui/button';
 import {
     DataTablePagination,
     DataTableToolbar,
 } from '@/components/ui/data-table';
 import type { User } from '@/modules/users/components/columns';
+import UserDeleteDialog from '@/modules/users/components/UserDeleteDialog.vue';
+import UserFormSheet from '@/modules/users/components/UserFormSheet.vue';
+import type { UserRoleOption } from '@/modules/users/components/UserFormSheet.vue';
 import UserTable from '@/modules/users/components/UserTable.vue';
 import { index } from '@/routes/admin/users';
 import type { LengthAwarePaginator } from '@/types';
-import Create from './Create.vue';
 
 defineOptions({
     layout: {
@@ -24,6 +28,7 @@ defineOptions({
 
 const props = defineProps<{
     users: LengthAwarePaginator<User>;
+    roles: UserRoleOption[];
     filters: {
         search?: string;
         per_page?: string | number;
@@ -31,6 +36,11 @@ const props = defineProps<{
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
+const isCreateSheetOpen = ref(false);
+const isEditSheetOpen = ref(false);
+const isDeleteDialogOpen = ref(false);
+const selectedUser = ref<User | null>(null);
+const userPendingDeletion = ref<User | null>(null);
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
 const fetchUsers = (): void => {
@@ -50,9 +60,31 @@ const fetchUsers = (): void => {
     );
 };
 
+const openEditSheet = (user: User): void => {
+    selectedUser.value = user;
+    isEditSheetOpen.value = true;
+};
+
+const openDeleteDialog = (user: User): void => {
+    userPendingDeletion.value = user;
+    isDeleteDialogOpen.value = true;
+};
+
 watch(searchQuery, () => {
     window.clearTimeout(searchTimer);
     searchTimer = window.setTimeout(fetchUsers, 300);
+});
+
+watch(isEditSheetOpen, (isOpen) => {
+    if (!isOpen) {
+        selectedUser.value = null;
+    }
+});
+
+watch(isDeleteDialogOpen, (isOpen) => {
+    if (!isOpen) {
+        userPendingDeletion.value = null;
+    }
 });
 
 onBeforeUnmount(() => window.clearTimeout(searchTimer));
@@ -72,12 +104,27 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             search-label="Search users"
         >
             <template #actions>
-                <Create />
+                <UserFormSheet
+                    v-model:open="isCreateSheetOpen"
+                    mode="create"
+                    :roles="roles"
+                >
+                    <template #trigger>
+                        <Button type="button" size="sm">
+                            <Plus aria-hidden="true" />
+                            Create
+                        </Button>
+                    </template>
+                </UserFormSheet>
             </template>
         </DataTableToolbar>
 
         <div class="flex flex-col gap-4">
-            <UserTable :users="users.data" />
+            <UserTable
+                :users="users.data"
+                @edit="openEditSheet"
+                @delete="openDeleteDialog"
+            />
 
             <DataTablePagination
                 :from="users.from"
@@ -89,4 +136,16 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             />
         </div>
     </div>
+
+    <UserFormSheet
+        v-model:open="isEditSheetOpen"
+        mode="edit"
+        :user="selectedUser"
+        :roles="roles"
+    />
+
+    <UserDeleteDialog
+        v-model:open="isDeleteDialogOpen"
+        :user="userPendingDeletion"
+    />
 </template>
