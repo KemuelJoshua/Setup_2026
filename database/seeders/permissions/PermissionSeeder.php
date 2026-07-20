@@ -20,6 +20,17 @@ class PermissionSeeder extends Seeder
             'admin create roles',
             'admin update roles',
             'admin delete roles',
+
+            'admin view user',
+            'admin create user',
+            'admin update user',
+            'admin delete user',
+
+            'admin view school-year',
+            'admin create school-year',
+            'admin update school-year',
+            'admin change-status school-year',
+            'admin delete school-year',
         ];
 
         foreach ($permissions as $permission) {

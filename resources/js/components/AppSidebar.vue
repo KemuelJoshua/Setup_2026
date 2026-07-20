@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpenCheck, User2 } from '@lucide/vue';
+import { 
+    BookOpenCheck,
+    User2,
+    BookA,
+    School,
+    CalendarRange,
+    GraduationCap,
+    Users,
+    BookOpen,
+    ScrollText,
+    CalendarDays,
+ } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,6 +26,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes/admin';
 import { index as userIndex } from '@/routes/admin/users';
+import { index as IndexSchoolYear } from '@/routes/admin/school-years'
 import type { NavItem } from '@/types';
 
 const primaryNavItems: NavItem[] = [
@@ -28,6 +40,49 @@ const primaryNavItems: NavItem[] = [
         href: userIndex(),
         icon: User2,
     },
+    {
+        title: 'Academics',
+        href: '#',
+        icon: BookA,
+          children: [
+            {
+                title: 'School Years',
+                href: IndexSchoolYear(),
+                icon: School,
+            },
+            {
+                title: 'Semesters',
+                href: '#',
+                icon: CalendarRange,
+            },
+            {
+                title: 'Grade Levels',
+                href: '#',
+                icon: GraduationCap,
+            },
+            {
+                title: 'Sections',
+                href: '#',
+                icon: Users,
+            },
+            {
+                title: 'Subjects',
+                href: '#',
+                icon: BookOpen,
+            },
+            {
+                title: 'Curriculum',
+                href: '#',
+                icon: ScrollText,
+            },
+            {
+                title: 'Class Scheduling',
+                href: '#',
+                icon: CalendarDays,
+            },
+        ],
+    },
+    
 ];
 
 

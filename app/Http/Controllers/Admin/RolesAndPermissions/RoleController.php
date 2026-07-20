@@ -9,7 +9,6 @@ use App\Actions\Roles\UpdateRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RolesAndPermissions\StoreRoleRequest;
 use App\Http\Requests\RolesAndPermissions\UpdateRoleRequest;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
