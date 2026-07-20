@@ -5,6 +5,7 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { toast } from 'vue-sonner'
 import {
     Sheet,
     SheetClose,
@@ -55,6 +56,20 @@ const processingLabel = computed(() =>
     props.mode === 'edit' ? 'Saving...' : 'Creating...',
 );
 
+const onSuccess = () => {
+    toast.success(
+        props.mode === 'create'
+            ? 'User created successfully.'
+            : 'User updated successfully.'
+    );
+
+    closeSheet();
+};
+
+const onError = () => {
+    toast.error('Please fix the validation errors.');
+};
+
 const closeSheet = (): void => {
     isOpen.value = false;
 };
@@ -75,7 +90,8 @@ const closeSheet = (): void => {
                 reset-on-success
                 class="flex min-h-0 flex-1 flex-col"
                 :options="{ preserveScroll: true }"
-                @success="closeSheet"
+                @success="onSuccess"
+                @error="onError"
             >
                 <SheetHeader class="border-b border-border px-6 py-5 text-left">
                     <SheetTitle>{{ title }}</SheetTitle>
