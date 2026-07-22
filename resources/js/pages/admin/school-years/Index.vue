@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/data-table';
 import type { SchoolYear } from '@/modules/academics/school-year/components/columns';
 import SchoolYearDeleteDialog from '@/modules/academics/school-year/components/SchoolYearDeleteDialog.vue';
-import SchoolYearFormSheet from '@/modules/academics/school-year/components/SchoolYearFormSheet.vue';
+import SchoolYearFormDialog from '@/modules/academics/school-year/components/SchoolYearFormDialog.vue';
 import SchoolYearTable from '@/modules/academics/school-year/components/SchoolYearTable.vue';
 import { index } from '@/routes/admin/school-years';
 import type { LengthAwarePaginator } from '@/types';
@@ -34,8 +34,8 @@ const props = defineProps<{
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
-const isCreateSheetOpen = ref(false);
-const isEditSheetOpen = ref(false);
+const isCreateDialogOpen = ref(false);
+const isEditDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const selectedSchoolYear = ref<SchoolYear | null>(null);
 const schoolYearPendingDeletion = ref<SchoolYear | null>(null);
@@ -58,9 +58,9 @@ const fetchSchoolYears = (perPage = props.schoolYears.per_page): void => {
     );
 };
 
-const openEditSheet = (schoolYear: SchoolYear): void => {
+const openEditDialog = (schoolYear: SchoolYear): void => {
     selectedSchoolYear.value = schoolYear;
-    isEditSheetOpen.value = true;
+    isEditDialogOpen.value = true;
 };
 
 const openDeleteDialog = (schoolYear: SchoolYear): void => {
@@ -73,7 +73,7 @@ watch(searchQuery, () => {
     searchTimer = window.setTimeout(() => fetchSchoolYears(), 300);
 });
 
-watch(isEditSheetOpen, (isOpen) => {
+watch(isEditDialogOpen, (isOpen) => {
     if (!isOpen) {
         selectedSchoolYear.value = null;
     }
@@ -130,8 +130,8 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             </template>
 
             <template #actions>
-                <SchoolYearFormSheet
-                    v-model:open="isCreateSheetOpen"
+                <SchoolYearFormDialog
+                    v-model:open="isCreateDialogOpen"
                     mode="create"
                 >
                     <template #trigger>
@@ -140,14 +140,14 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
                             Create
                         </Button>
                     </template>
-                </SchoolYearFormSheet>
+                </SchoolYearFormDialog>
             </template>
         </DataTableToolbar>
 
         <div class="flex flex-col gap-4">
             <SchoolYearTable
                 :school-years="schoolYears.data"
-                @edit="openEditSheet"
+                @edit="openEditDialog"
                 @delete="openDeleteDialog"
             />
 
@@ -162,8 +162,8 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
         </div>
     </div>
 
-    <SchoolYearFormSheet
-        v-model:open="isEditSheetOpen"
+    <SchoolYearFormDialog
+        v-model:open="isEditDialogOpen"
         mode="edit"
         :school-year="selectedSchoolYear"
     />

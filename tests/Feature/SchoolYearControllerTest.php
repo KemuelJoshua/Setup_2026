@@ -23,6 +23,18 @@ beforeEach(function () {
     }
 });
 
+test('school year form is presented in a dialog', function () {
+    $form = file_get_contents(resource_path(
+        'js/modules/academics/school-year/components/SchoolYearFormDialog.vue',
+    ));
+
+    expect($form)
+        ->toContain("from '@/components/ui/dialog'")
+        ->toContain('<Dialog v-model:open="isOpen">')
+        ->toContain('<DialogContent>')
+        ->not->toContain('Sheet');
+});
+
 test('authorized users can view the school years page', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin view school-year');

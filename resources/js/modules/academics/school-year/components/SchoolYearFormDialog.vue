@@ -4,18 +4,18 @@ import { computed } from 'vue';
 import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
 import { store, update } from '@/routes/admin/school-years';
 import type { SchoolYear } from './columns';
 
@@ -47,7 +47,7 @@ const processingLabel = computed(() =>
     props.mode === 'edit' ? 'Saving...' : 'Creating...',
 );
 
-const closeSheet = (): void => {
+const closeDialog = (): void => {
     isOpen.value = false;
 };
 
@@ -57,7 +57,7 @@ const onSuccess = (): void => {
             ? 'School year updated successfully.'
             : 'School year created successfully.',
     );
-    closeSheet();
+    closeDialog();
 };
 
 const onError = (): void => {
@@ -66,29 +66,29 @@ const onError = (): void => {
 </script>
 
 <template>
-    <Sheet v-model:open="isOpen">
-        <SheetTrigger v-if="$slots.trigger" as-child>
+    <Dialog v-model:open="isOpen">
+        <DialogTrigger v-if="$slots.trigger" as-child>
             <slot name="trigger" />
-        </SheetTrigger>
+        </DialogTrigger>
 
-        <SheetContent side="right" class="w-full gap-0 p-0 sm:max-w-lg">
+        <DialogContent>
             <Form
                 v-if="mode === 'create' || schoolYear"
                 :key="schoolYear?.id ?? 'create'"
                 v-bind="formAttributes"
                 v-slot="{ errors, processing }"
                 reset-on-success
-                class="flex min-h-0 flex-1 flex-col"
+                class="space-y-6"
                 :options="{ preserveScroll: true }"
                 @success="onSuccess"
                 @error="onError"
             >
-                <SheetHeader class="border-b border-border px-6 py-5 text-left">
-                    <SheetTitle>{{ title }}</SheetTitle>
-                    <SheetDescription>{{ description }}</SheetDescription>
-                </SheetHeader>
+                <DialogHeader>
+                    <DialogTitle>{{ title }}</DialogTitle>
+                    <DialogDescription>{{ description }}</DialogDescription>
+                </DialogHeader>
 
-                <div class="flex-1 space-y-5 overflow-y-auto px-6 py-5">
+                <div class="space-y-5">
                     <div class="grid gap-2">
                         <Label :for="`${mode}-school-year-name`">Name</Label>
                         <Input
@@ -158,17 +158,15 @@ const onError = (): void => {
                     </div>
                 </div>
 
-                <SheetFooter
-                    class="border-t border-border px-6 py-4 sm:flex-row sm:justify-end"
-                >
-                    <SheetClose as-child>
+                <DialogFooter>
+                    <DialogClose as-child>
                         <Button type="button" variant="outline">Cancel</Button>
-                    </SheetClose>
+                    </DialogClose>
                     <Button type="submit" :disabled="processing">
                         {{ processing ? processingLabel : submitLabel }}
                     </Button>
-                </SheetFooter>
+                </DialogFooter>
             </Form>
-        </SheetContent>
-    </Sheet>
+        </DialogContent>
+    </Dialog>
 </template>
