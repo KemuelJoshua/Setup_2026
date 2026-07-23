@@ -34,8 +34,6 @@ class UpdateSemesterRequest extends FormRequest
                 'max:255',
                 Rule::unique(Semester::class, 'code')->ignore($semester),
             ],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after:start_date'],
         ];
     }
 }

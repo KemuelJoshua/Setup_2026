@@ -41,8 +41,6 @@ class SemesterController extends Controller
                 'id' => $semester->getKey(),
                 'name' => $semester->name,
                 'code' => $semester->code,
-                'start_date' => $semester->start_date?->toDateString(),
-                'end_date' => $semester->end_date?->toDateString(),
             ]);
 
         return Inertia::render('admin/academics/semesters/Index', [

@@ -36,6 +36,21 @@ class PermissionSeeder extends Seeder
             'admin create semesters',
             'admin update semesters',
             'admin delete semesters',
+
+            'admin view grade levels',
+            'admin create grade levels',
+            'admin update grade levels',
+            'admin delete grade levels',
+
+            'admin view sections',
+            'admin create sections',
+            'admin update sections',
+            'admin delete sections',
+
+            'admin view subjects',
+            'admin create subjects',
+            'admin update subjects',
+            'admin delete subjects',
         ];
 
         foreach ($permissions as $permission) {

@@ -3,6 +3,7 @@
 use App\Models\Academics\Semester;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Permission;
 
@@ -22,6 +23,11 @@ beforeEach(function () {
     }
 });
 
+test('semester table does not have start and end dates', function () {
+    expect(Schema::hasColumn('semesters', 'start_date'))->toBeFalse()
+        ->and(Schema::hasColumn('semesters', 'end_date'))->toBeFalse();
+});
+
 test('authorized users can view and search semesters', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin view semesters');
@@ -29,8 +35,6 @@ test('authorized users can view and search semesters', function () {
     Semester::query()->create([
         'name' => 'First Semester',
         'code' => 'SEM-1',
-        'start_date' => '2026-08-01',
-        'end_date' => '2026-12-20',
     ]);
 
     $this
@@ -54,8 +58,6 @@ test('authorized users can create a semester', function () {
         ->post(route('admin.academics.semester.store'), [
             'name' => 'First Semester',
             'code' => '2026-1',
-            'start_date' => '2026-08-01',
-            'end_date' => '2026-12-20',
         ])
         ->assertRedirect(route('admin.academics.semester.index'))
         ->assertSessionHas('success', 'Semester created successfully.');
@@ -72,8 +74,6 @@ test('authorized users can update a semester', function () {
     $semester = Semester::query()->create([
         'name' => 'First Semester',
         'code' => 'SEM-1',
-        'start_date' => '2026-08-01',
-        'end_date' => '2026-12-20',
     ]);
 
     $this
@@ -81,8 +81,6 @@ test('authorized users can update a semester', function () {
         ->put(route('admin.academics.semester.update', $semester), [
             'name' => 'Updated Semester',
             'code' => 'SEM-UPDATED',
-            'start_date' => '2026-08-15',
-            'end_date' => '2026-12-21',
         ])
         ->assertRedirect(route('admin.academics.semester.index'))
         ->assertSessionHas('success', 'Semester updated successfully.');
@@ -99,8 +97,6 @@ test('authorized users can delete a semester', function () {
     $semester = Semester::query()->create([
         'name' => 'First Semester',
         'code' => 'SEM-1',
-        'start_date' => '2026-08-01',
-        'end_date' => '2026-12-20',
     ]);
 
     $this
@@ -112,7 +108,7 @@ test('authorized users can delete a semester', function () {
     $this->assertModelMissing($semester);
 });
 
-test('semester forms validate required fields and date order', function () {
+test('semester forms validate required fields', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin create semesters');
 
@@ -122,11 +118,9 @@ test('semester forms validate required fields and date order', function () {
         ->post(route('admin.academics.semester.store'), [
             'name' => '',
             'code' => '',
-            'start_date' => '2026-08-01',
-            'end_date' => '2026-07-31',
         ])
         ->assertRedirect(route('admin.academics.semester.index'))
-        ->assertSessionHasErrors(['name', 'code', 'end_date']);
+        ->assertSessionHasErrors(['name', 'code']);
 });
 
 test('users without permission cannot create a semester', function () {
@@ -137,8 +131,6 @@ test('users without permission cannot create a semester', function () {
         ->post(route('admin.academics.semester.store'), [
             'name' => 'First Semester',
             'code' => 'SEM-1',
-            'start_date' => '2026-08-01',
-            'end_date' => '2026-12-20',
         ])
         ->assertForbidden();
 

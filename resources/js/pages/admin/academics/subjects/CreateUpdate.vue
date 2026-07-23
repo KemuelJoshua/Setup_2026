@@ -16,28 +16,25 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { store, update } from '@/routes/admin/academics/semester';
+import { store, update } from '@/routes/admin/academics/subject';
 
-import type { Semester } from './columns';
+import type { Subject } from './columns';
 
 const props = defineProps<{
-    semester: Semester | null;
+    subject: Subject | null;
 }>();
 
-// Controls the dialog visibility from the parent component.
 const isOpen = defineModel<boolean>('open', { default: false });
 
-// Select the correct form action (create or update).
 const formAttributes = computed(() =>
-    props.semester ? update.form(props.semester.id) : store.form(),
+    props.subject ? update.form(props.subject.id) : store.form(),
 );
 
-// Display a success message and close the dialog.
 const handleSuccess = (): void => {
     toast.success(
-        props.semester
-            ? 'Semester updated successfully.'
-            : 'Semester created successfully.',
+        props.subject
+            ? 'Subject updated successfully.'
+            : 'Subject created successfully.',
     );
 
     isOpen.value = false;
@@ -52,7 +49,7 @@ const handleError = (): void => {
     <Dialog v-model:open="isOpen">
         <DialogContent>
             <Form
-                :key="semester?.id ?? 'create'"
+                :key="subject?.id ?? 'create'"
                 v-bind="formAttributes"
                 v-slot="{ errors, processing }"
                 reset-on-success
@@ -63,41 +60,25 @@ const handleError = (): void => {
             >
                 <DialogHeader>
                     <DialogTitle>
-                        {{ semester ? 'Edit semester' : 'Create semester' }}
+                        {{ subject ? 'Edit subject' : 'Create subject' }}
                     </DialogTitle>
                     <DialogDescription>
                         {{
-                            semester
-                                ? 'Update this academic period.'
-                                : 'Add an academic period to the calendar.'
+                            subject ? 'Update this subject.' : 'Add a subject.'
                         }}
                     </DialogDescription>
                 </DialogHeader>
 
-                <!-- Semester information -->
-                <div class="space-y-5">
-                    <div class="grid gap-2">
-                        <Label for="semester-name">Name</Label>
-                        <Input
-                            id="semester-name"
-                            name="name"
-                            :default-value="semester?.name"
-                            placeholder="First Semester"
-                            autofocus
-                        />
-                        <InputError :message="errors.name" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="semester-code">Code</Label>
-                        <Input
-                            id="semester-code"
-                            name="code"
-                            :default-value="semester?.code"
-                            placeholder="SEM-1"
-                        />
-                        <InputError :message="errors.code" />
-                    </div>
+                <div class="grid gap-2">
+                    <Label for="subject-name">Name</Label>
+                    <Input
+                        id="subject-name"
+                        name="name"
+                        :default-value="subject?.name"
+                        placeholder="Mathematics"
+                        autofocus
+                    />
+                    <InputError :message="errors.name" />
                 </div>
 
                 <DialogFooter>
@@ -109,9 +90,9 @@ const handleError = (): void => {
                         {{
                             processing
                                 ? 'Saving...'
-                                : semester
+                                : subject
                                   ? 'Save changes'
-                                  : 'Create semester'
+                                  : 'Create subject'
                         }}
                     </Button>
                 </DialogFooter>

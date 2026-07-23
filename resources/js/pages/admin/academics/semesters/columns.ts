@@ -8,14 +8,11 @@ import {
     DataTableRowActions,
 } from '@/components/ui/data-table';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { formatDate } from '@/lib/formatDate';
 
 export interface Semester {
     id: number;
     name: string;
     code: string;
-    start_date: string;
-    end_date: string;
 }
 
 export interface SemesterFilters {
@@ -64,46 +61,6 @@ export const createColumns = (
                     row.original.code,
                 ),
             ]),
-    },
-    {
-        accessorKey: 'start_date',
-        meta: {
-            className: 'min-w-[150px]',
-        },
-        header: ({ column }) =>
-            h(DataTableColumnHeader as Component, {
-                column,
-                title: 'Start Date',
-            }),
-        // Format the ISO date before displaying it to the user.
-        cell: ({ row }) =>
-            h(
-                'span',
-                {
-                    class: 'whitespace-nowrap text-sm text-muted-foreground',
-                },
-                formatDate(row.original.start_date),
-            ),
-    },
-    {
-        accessorKey: 'end_date',
-        meta: {
-            className: 'min-w-[150px]',
-        },
-        header: ({ column }) =>
-            h(DataTableColumnHeader as Component, {
-                column,
-                title: 'End Date',
-            }),
-        // Format the ISO date before displaying it to the user.
-        cell: ({ row }) =>
-            h(
-                'span',
-                {
-                    class: 'whitespace-nowrap text-sm text-muted-foreground',
-                },
-                formatDate(row.original.end_date),
-            ),
     },
     {
         id: 'actions',

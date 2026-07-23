@@ -2,12 +2,10 @@
 
 namespace App\Http\Requests\Academics;
 
-use App\Models\Academics\Semester;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreSemesterRequest extends FormRequest
+class StoreSectionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +24,6 @@ class StoreSemesterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', Rule::unique(Semester::class, 'code')],
         ];
     }
 }

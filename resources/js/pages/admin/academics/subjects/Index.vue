@@ -5,8 +5,8 @@ import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
 import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/ui/data-table';
 import {
+    DataTable,
     DataTablePagination,
     DataTableToolbar,
 } from '@/components/ui/data-table';
@@ -19,18 +19,18 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { destroy, index } from '@/routes/admin/academics/semester';
+import { destroy, index } from '@/routes/admin/academics/subject';
 import type { LengthAwarePaginator } from '@/types';
 
 import { createColumns } from './columns';
-import type { Semester, SemesterFilters } from './columns';
+import type { Subject, SubjectFilters } from './columns';
 import CreateUpdate from './CreateUpdate.vue';
 
 defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Semester',
+                title: 'Subjects',
                 href: index(),
             },
         ],
@@ -38,21 +38,18 @@ defineOptions({
 });
 
 const props = defineProps<{
-    semesters: LengthAwarePaginator<Semester>;
-    filters: SemesterFilters;
+    subjects: LengthAwarePaginator<Subject>;
+    filters: SubjectFilters;
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
 const isFormDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
-
-// Currently selected semester for edit or delete actions.
-const selectedSemester = ref<Semester | null>(null);
+const selectedSubject = ref<Subject | null>(null);
 
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-// Reload the semester list using the current filters.
-const fetchSemester = (
+const fetchSubjects = (
     perPage: string | number | undefined = props.filters.per_page,
 ): void => {
     router.visit(
@@ -63,7 +60,7 @@ const fetchSemester = (
             },
         }),
         {
-            only: ['semesters', 'filters'],
+            only: ['subjects', 'filters'],
             preserveScroll: true,
             preserveState: true,
             replace: true,
@@ -71,30 +68,26 @@ const fetchSemester = (
     );
 };
 
-// Debounce search requests while the user is typing.
 const handleSearch = (): void => {
     window.clearTimeout(searchTimer);
 
     searchTimer = window.setTimeout(() => {
-        fetchSemester();
+        fetchSubjects();
     }, 300);
 };
 
-// Open the dialog in create mode.
 const openCreateDialog = (): void => {
-    selectedSemester.value = null;
+    selectedSubject.value = null;
     isFormDialogOpen.value = true;
 };
 
-// Open the dialog in edit mode.
-const openEditDialog = (semester: Semester): void => {
-    selectedSemester.value = semester;
+const openEditDialog = (subject: Subject): void => {
+    selectedSubject.value = subject;
     isFormDialogOpen.value = true;
 };
 
-// Open the delete confirmation dialog.
-const openDeleteDialog = (semester: Semester): void => {
-    selectedSemester.value = semester;
+const openDeleteDialog = (subject: Subject): void => {
+    selectedSubject.value = subject;
     isDeleteDialogOpen.value = true;
 };
 
@@ -103,57 +96,52 @@ const columns = createColumns({
     delete: openDeleteDialog,
 });
 
-// Show a success message after deleting a semester.
 const handleDeleted = (): void => {
-    toast.success('Semester deleted successfully.');
+    toast.success('Subject deleted successfully.');
     isDeleteDialogOpen.value = false;
 };
 
 const handleDeleteError = (): void => {
-    toast.error('Unable to delete the semester. Please try again.');
+    toast.error('Unable to delete the subject. Please try again.');
 };
 
-// Refresh the table when the search query changes.
 watch(searchQuery, handleSearch);
 
-// Clear the selected semester after all dialogs are closed.
 watch([isFormDialogOpen, isDeleteDialogOpen], ([formOpen, deleteOpen]) => {
     if (!formOpen && !deleteOpen) {
-        selectedSemester.value = null;
+        selectedSubject.value = null;
     }
 });
 
-// Prevent pending search requests when leaving the page.
 onBeforeUnmount(() => {
     window.clearTimeout(searchTimer);
 });
 </script>
 
 <template>
-    <Head title="Semester" />
+    <Head title="Subjects" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
         <DataTableToolbar
             v-model="searchQuery"
-            title="Semesters"
-            description="Manage academic semesters."
-            :count="semesters.total"
-            item-label="Semester"
-            search-placeholder="Search name or code..."
-            search-label="Search semester"
+            title="Subjects"
+            description="Manage subjects."
+            :count="subjects.total"
+            item-label="Subject"
+            search-placeholder="Search name..."
+            search-label="Search subjects"
         >
-            <!-- Table filters -->
             <template #filters>
                 <label
                     class="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                     <span class="sr-only">Rows per page</span>
                     <select
-                        :value="semesters.per_page"
+                        :value="subjects.per_page"
                         class="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
                         aria-label="Rows per page"
                         @change="
-                            fetchSemester(
+                            fetchSubjects(
                                 Number(
                                     ($event.target as HTMLSelectElement).value,
                                 ),
@@ -171,7 +159,6 @@ onBeforeUnmount(() => {
                 </label>
             </template>
 
-            <!-- Table actions -->
             <template #actions>
                 <Button type="button" size="sm" @click="openCreateDialog">
                     <Plus aria-hidden="true" />
@@ -181,36 +168,29 @@ onBeforeUnmount(() => {
         </DataTableToolbar>
 
         <div class="flex flex-col gap-4">
-            <!-- Semester list -->
             <DataTable
                 :columns="columns"
-                :data="props.semesters.data"
-                empty-message="No Semesters found."
+                :data="props.subjects.data"
+                empty-message="No subjects found."
             />
 
-            <!-- Pagination -->
             <DataTablePagination
-                :from="semesters.from"
-                :to="semesters.to"
-                :total="semesters.total"
-                :links="semesters.links"
-                :previous-page-url="semesters.prev_page_url"
-                :next-page-url="semesters.next_page_url"
+                :from="subjects.from"
+                :to="subjects.to"
+                :total="subjects.total"
+                :links="subjects.links"
+                :previous-page-url="subjects.prev_page_url"
+                :next-page-url="subjects.next_page_url"
             />
         </div>
     </div>
 
-    <!-- Create / Edit semester dialog -->
-    <CreateUpdate
-        v-model:open="isFormDialogOpen"
-        :semester="selectedSemester"
-    />
+    <CreateUpdate v-model:open="isFormDialogOpen" :subject="selectedSubject" />
 
-    <!-- Delete confirmation dialog -->
     <Dialog v-model:open="isDeleteDialogOpen">
-        <DialogContent v-if="selectedSemester">
+        <DialogContent v-if="selectedSubject">
             <Form
-                v-bind="destroy.form(selectedSemester.id)"
+                v-bind="destroy.form(selectedSubject.id)"
                 v-slot="{ processing }"
                 class="space-y-6"
                 :options="{ preserveScroll: true }"
@@ -218,11 +198,9 @@ onBeforeUnmount(() => {
                 @error="handleDeleteError"
             >
                 <DialogHeader>
-                    <DialogTitle>Delete semester?</DialogTitle>
+                    <DialogTitle>Delete subject?</DialogTitle>
                     <DialogDescription>
-                        {{ selectedSemester.name }} ({{
-                            selectedSemester.code
-                        }}) will be permanently deleted.
+                        {{ selectedSubject.name }} will be permanently deleted.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -236,7 +214,7 @@ onBeforeUnmount(() => {
                         variant="destructive"
                         :disabled="processing"
                     >
-                        {{ processing ? 'Deleting...' : 'Delete semester' }}
+                        {{ processing ? 'Deleting...' : 'Delete subject' }}
                     </Button>
                 </DialogFooter>
             </Form>

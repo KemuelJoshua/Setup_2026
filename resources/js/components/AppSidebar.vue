@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { 
+import {
     BookOpenCheck,
     User2,
     BookA,
@@ -11,7 +11,7 @@ import {
     BookOpen,
     ScrollText,
     CalendarDays,
- } from '@lucide/vue';
+} from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -25,9 +25,12 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes/admin';
+import { index as IndexGradeLevel } from '@/routes/admin/academics/grade-level';
+import { index as IndexSection } from '@/routes/admin/academics/section';
+import { index as IndexSemester } from '@/routes/admin/academics/semester';
+import { index as IndexSubject } from '@/routes/admin/academics/subject';
+import { index as IndexSchoolYear } from '@/routes/admin/school-years';
 import { index as userIndex } from '@/routes/admin/users';
-import { index as IndexSchoolYear } from '@/routes/admin/school-years'
-import { index as IndexSemester } from '@/routes/admin/academics/semester'
 import type { NavItem } from '@/types';
 
 const primaryNavItems: NavItem[] = [
@@ -45,7 +48,7 @@ const primaryNavItems: NavItem[] = [
         title: 'Academics',
         href: '#',
         icon: BookA,
-          children: [
+        children: [
             {
                 title: 'School Years',
                 href: IndexSchoolYear(),
@@ -58,17 +61,17 @@ const primaryNavItems: NavItem[] = [
             },
             {
                 title: 'Grade Levels',
-                href: '#',
+                href: IndexGradeLevel(),
                 icon: GraduationCap,
             },
             {
                 title: 'Sections',
-                href: '#',
+                href: IndexSection(),
                 icon: Users,
             },
             {
                 title: 'Subjects',
-                href: '#',
+                href: IndexSubject(),
                 icon: BookOpen,
             },
             {
@@ -83,15 +86,13 @@ const primaryNavItems: NavItem[] = [
             },
         ],
     },
-    
 ];
-
 
 const navigationGroups: NavGroup[] = [
     {
         title: 'Learning',
         items: primaryNavItems,
-    }
+    },
 ];
 </script>
 
