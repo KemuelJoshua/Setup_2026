@@ -14,7 +14,7 @@ export interface CurriculumSubject {
     id: number;
     subject_id: number;
     year_level_id: number;
-    semester_id: number;
+    academic_term_id: number;
     is_required: boolean;
     sort_order: number;
 }
@@ -49,6 +49,7 @@ export interface SelectOption {
     id: number;
     name: string;
     code?: string;
+    type?: string;
 }
 
 interface CurriculumColumnActions {

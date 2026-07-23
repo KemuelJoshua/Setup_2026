@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Academics;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreCurriculumRequest;
 use App\Http\Requests\Academics\UpdateCurriculumRequest;
+use App\Models\Academics\AcademicTerm;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\CurriculumSubject;
 use App\Models\Academics\GradeLevel;
-use App\Models\Academics\Semester;
 use App\Models\Academics\Subject;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -97,7 +97,7 @@ class CurriculumController extends Controller
         Gate::authorize('admin update curricula');
 
         $curriculum->load([
-            'curriculumSubjects:id,curriculum_id,subject_id,year_level_id,semester_id,is_required,sort_order',
+            'curriculumSubjects:id,curriculum_id,subject_id,year_level_id,academic_term_id,is_required,sort_order',
         ]);
 
         return Inertia::render('admin/academics/curricula/Form', [
@@ -113,7 +113,7 @@ class CurriculumController extends Controller
                         'id' => $curriculumSubject->getKey(),
                         'subject_id' => $curriculumSubject->subject_id,
                         'year_level_id' => $curriculumSubject->year_level_id,
-                        'semester_id' => $curriculumSubject->semester_id,
+                        'academic_term_id' => $curriculumSubject->academic_term_id,
                         'is_required' => $curriculumSubject->is_required,
                         'sort_order' => $curriculumSubject->sort_order,
                     ])->all(),
@@ -158,7 +158,7 @@ class CurriculumController extends Controller
      * @return array{
      *     subjects: Collection<int, Subject>,
      *     yearLevels: Collection<int, GradeLevel>,
-     *     semesters: Collection<int, Semester>
+     *     academicTerms: Collection<int, AcademicTerm>
      * }
      */
     private function formOptions(): array
@@ -166,7 +166,10 @@ class CurriculumController extends Controller
         return [
             'subjects' => Subject::query()->orderBy('name')->get(['id', 'name']),
             'yearLevels' => GradeLevel::query()->orderBy('name')->get(['id', 'name']),
-            'semesters' => Semester::query()->orderBy('name')->get(['id', 'name', 'code']),
+            'academicTerms' => AcademicTerm::query()
+                ->orderBy('type')
+                ->orderBy('name')
+                ->get(['id', 'name', 'code', 'type']),
         ];
     }
 }

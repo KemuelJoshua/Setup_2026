@@ -1,21 +1,21 @@
 <?php
 
+use App\Http\Controllers\Academics\AcademicTermController;
 use App\Http\Controllers\Academics\CurriculumController;
 use App\Http\Controllers\Academics\GradeLevelController;
 use App\Http\Controllers\Academics\ProgramController;
 use App\Http\Controllers\Academics\SectionController;
-use App\Http\Controllers\Academics\SemesterController;
 use App\Http\Controllers\Academics\SubjectController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('academics')->name('academics.')->group(function () {
 
-        Route::prefix('semester')->name('semester.')->group(function () {
-            Route::get('/', [SemesterController::class, 'index'])->name('index');
-            Route::post('/', [SemesterController::class, 'store'])->name('store');
-            Route::put('/{semester}', [SemesterController::class, 'update'])->name('update');
-            Route::delete('/{semester}', [SemesterController::class, 'destroy'])->name('destroy');
+        Route::prefix('academic-term')->name('academic-term.')->group(function () {
+            Route::get('/', [AcademicTermController::class, 'index'])->name('index');
+            Route::post('/', [AcademicTermController::class, 'store'])->name('store');
+            Route::put('/{academicTerm}', [AcademicTermController::class, 'update'])->name('update');
+            Route::delete('/{academicTerm}', [AcademicTermController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('grade-level')->name('grade-level.')->group(function () {

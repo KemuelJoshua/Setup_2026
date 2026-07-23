@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\Academics;
 
-use App\Models\Academics\Semester;
+use App\Models\Academics\AcademicTerm;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreSemesterRequest extends FormRequest
+class StoreAcademicTermRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,12 @@ class StoreSemesterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', Rule::unique(Semester::class, 'code')],
+            'code' => ['required', 'string', 'max:255', Rule::unique(AcademicTerm::class, 'code')],
+            'type' => ['required', Rule::in(['Quarter', 'Semester', 'Not Applicable'])],
+            'grading_periods' => ['nullable', 'array'],
+            'grading_periods.*.name' => ['required', 'string', 'max:255'],
+            'grading_periods.*.code' => ['required', 'string', 'max:255', 'distinct:ignore_case'],
+            'grading_periods.*.sort_order' => ['required', 'integer', 'min:0'],
         ];
     }
 }

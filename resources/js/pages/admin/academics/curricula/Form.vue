@@ -16,7 +16,7 @@ interface CurriculumSubjectRow {
     key: number;
     subject_id: number | '';
     year_level_id: number | '';
-    semester_id: number | '';
+    academic_term_id: number | '';
     is_required: number;
     sort_order: number;
 }
@@ -25,7 +25,7 @@ const props = defineProps<{
     curriculum: CurriculumFormData | null;
     subjects: SelectOption[];
     yearLevels: SelectOption[];
-    semesters: SelectOption[];
+    academicTerms: SelectOption[];
 }>();
 
 defineOptions({
@@ -47,7 +47,7 @@ const curriculumSubjects = ref<CurriculumSubjectRow[]>(
         key: nextRowKey++,
         subject_id: subject.subject_id,
         year_level_id: subject.year_level_id,
-        semester_id: subject.semester_id,
+        academic_term_id: subject.academic_term_id,
         is_required: subject.is_required ? 1 : 0,
         sort_order: subject.sort_order,
     })) ?? [],
@@ -66,7 +66,7 @@ const addSubject = (): void => {
         key: nextRowKey++,
         subject_id: '',
         year_level_id: '',
-        semester_id: '',
+        academic_term_id: '',
         is_required: 1,
         sort_order: curriculumSubjects.value.length + 1,
     });
@@ -255,7 +255,7 @@ const handleError = (errors: Record<string, string>): void => {
                             Curriculum subjects
                         </h2>
                         <p class="text-sm leading-6 text-muted-foreground">
-                            Assign subjects by grade level and semester.
+                            Assign subjects by grade level and academic term.
                         </p>
                     </div>
                     <Button
@@ -338,22 +338,22 @@ const handleError = (errors: Record<string, string>): void => {
                     </div>
 
                     <div class="grid gap-2 md:col-span-2">
-                        <Label :for="`semester-${subject.key}`">
-                            Semester
+                        <Label :for="`academic-term-${subject.key}`">
+                            Academic term
                         </Label>
                         <select
-                            :id="`semester-${subject.key}`"
-                            v-model="subject.semester_id"
-                            :name="`curriculum_subjects[${subjectIndex}][semester_id]`"
+                            :id="`academic-term-${subject.key}`"
+                            v-model="subject.academic_term_id"
+                            :name="`curriculum_subjects[${subjectIndex}][academic_term_id]`"
                             class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
                         >
-                            <option value="">Select semester</option>
+                            <option value="">Select academic term</option>
                             <option
-                                v-for="option in semesters"
+                                v-for="option in academicTerms"
                                 :key="option.id"
                                 :value="option.id"
                             >
-                                {{ option.name }}
+                                {{ option.name }} · {{ option.type }}
                             </option>
                         </select>
                         <InputError
@@ -361,7 +361,7 @@ const handleError = (errors: Record<string, string>): void => {
                                 subjectError(
                                     errors,
                                     subjectIndex,
-                                    'semester_id',
+                                    'academic_term_id',
                                 )
                             "
                         />

@@ -25,11 +25,11 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes/admin';
+import { index as IndexAcademicTerm } from '@/routes/admin/academics/academic-term';
 import { index as IndexCurriculum } from '@/routes/admin/academics/curriculum';
 import { index as IndexGradeLevel } from '@/routes/admin/academics/grade-level';
 import { index as IndexProgram } from '@/routes/admin/academics/program';
 import { index as IndexSection } from '@/routes/admin/academics/section';
-import { index as IndexSemester } from '@/routes/admin/academics/semester';
 import { index as IndexSubject } from '@/routes/admin/academics/subject';
 import { index as IndexSchoolYear } from '@/routes/admin/school-years';
 import { index as userIndex } from '@/routes/admin/users';
@@ -57,8 +57,8 @@ const primaryNavItems: NavItem[] = [
                 icon: School,
             },
             {
-                title: 'Semesters',
-                href: IndexSemester(),
+                title: 'Academic Terms',
+                href: IndexAcademicTerm(),
                 icon: CalendarRange,
             },
             {

@@ -4,6 +4,7 @@ import { Plus } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
+import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import {
@@ -19,18 +20,18 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { destroy, index } from '@/routes/admin/academics/semester';
+import { destroy, index } from '@/routes/admin/academics/academic-term';
 import type { LengthAwarePaginator } from '@/types';
 
 import { createColumns } from './columns';
-import type { Semester, SemesterFilters } from './columns';
+import type { AcademicTerm, AcademicTermFilters } from './columns';
 import CreateUpdate from './CreateUpdate.vue';
 
 defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Semester',
+                title: 'Academic Terms',
                 href: index(),
             },
         ],
@@ -38,21 +39,19 @@ defineOptions({
 });
 
 const props = defineProps<{
-    semesters: LengthAwarePaginator<Semester>;
-    filters: SemesterFilters;
+    academicTerms: LengthAwarePaginator<AcademicTerm>;
+    filters: AcademicTermFilters;
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
 const isFormDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 
-// Currently selected semester for edit or delete actions.
-const selectedSemester = ref<Semester | null>(null);
+const selectedAcademicTerm = ref<AcademicTerm | null>(null);
 
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-// Reload the semester list using the current filters.
-const fetchSemester = (
+const fetchAcademicTerms = (
     perPage: string | number | undefined = props.filters.per_page,
 ): void => {
     router.visit(
@@ -63,7 +62,7 @@ const fetchSemester = (
             },
         }),
         {
-            only: ['semesters', 'filters'],
+            only: ['academicTerms', 'filters'],
             preserveScroll: true,
             preserveState: true,
             replace: true,
@@ -76,25 +75,25 @@ const handleSearch = (): void => {
     window.clearTimeout(searchTimer);
 
     searchTimer = window.setTimeout(() => {
-        fetchSemester();
+        fetchAcademicTerms();
     }, 300);
 };
 
 // Open the dialog in create mode.
 const openCreateDialog = (): void => {
-    selectedSemester.value = null;
+    selectedAcademicTerm.value = null;
     isFormDialogOpen.value = true;
 };
 
 // Open the dialog in edit mode.
-const openEditDialog = (semester: Semester): void => {
-    selectedSemester.value = semester;
+const openEditDialog = (academicTerm: AcademicTerm): void => {
+    selectedAcademicTerm.value = academicTerm;
     isFormDialogOpen.value = true;
 };
 
 // Open the delete confirmation dialog.
-const openDeleteDialog = (semester: Semester): void => {
-    selectedSemester.value = semester;
+const openDeleteDialog = (academicTerm: AcademicTerm): void => {
+    selectedAcademicTerm.value = academicTerm;
     isDeleteDialogOpen.value = true;
 };
 
@@ -103,23 +102,24 @@ const columns = createColumns({
     delete: openDeleteDialog,
 });
 
-// Show a success message after deleting a semester.
 const handleDeleted = (): void => {
-    toast.success('Semester deleted successfully.');
+    toast.success('Academic term deleted successfully.');
     isDeleteDialogOpen.value = false;
 };
 
-const handleDeleteError = (): void => {
-    toast.error('Unable to delete the semester. Please try again.');
+const handleDeleteError = (errors: Record<string, string>): void => {
+    toast.error(
+        errors.academic_term ??
+            'Unable to delete the academic term. Please try again.',
+    );
 };
 
 // Refresh the table when the search query changes.
 watch(searchQuery, handleSearch);
 
-// Clear the selected semester after all dialogs are closed.
 watch([isFormDialogOpen, isDeleteDialogOpen], ([formOpen, deleteOpen]) => {
     if (!formOpen && !deleteOpen) {
-        selectedSemester.value = null;
+        selectedAcademicTerm.value = null;
     }
 });
 
@@ -130,17 +130,17 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <Head title="Semester" />
+    <Head title="Academic Terms" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
         <DataTableToolbar
             v-model="searchQuery"
-            title="Semesters"
-            description="Manage academic semesters."
-            :count="semesters.total"
-            item-label="Semester"
-            search-placeholder="Search name or code..."
-            search-label="Search semester"
+            title="Academic Terms"
+            description="Manage terms and their grading periods in one place."
+            :count="academicTerms.total"
+            item-label="Academic Term"
+            search-placeholder="Search name, code, or type..."
+            search-label="Search academic terms"
         >
             <!-- Table filters -->
             <template #filters>
@@ -149,11 +149,11 @@ onBeforeUnmount(() => {
                 >
                     <span class="sr-only">Rows per page</span>
                     <select
-                        :value="semesters.per_page"
+                        :value="academicTerms.per_page"
                         class="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
                         aria-label="Rows per page"
                         @change="
-                            fetchSemester(
+                            fetchAcademicTerms(
                                 Number(
                                     ($event.target as HTMLSelectElement).value,
                                 ),
@@ -173,58 +173,58 @@ onBeforeUnmount(() => {
 
             <!-- Table actions -->
             <template #actions>
-                <Button type="button" size="sm" @click="openCreateDialog">
+                <Button type="button" size="sm" @click="openCreateDialog()">
                     <Plus aria-hidden="true" />
-                    Create
+                    Add term
                 </Button>
             </template>
         </DataTableToolbar>
 
         <div class="flex flex-col gap-4">
-            <!-- Semester list -->
             <DataTable
                 :columns="columns"
-                :data="props.semesters.data"
-                empty-message="No Semesters found."
+                :data="props.academicTerms.data"
+                empty-message="No academic terms found."
             />
 
             <!-- Pagination -->
             <DataTablePagination
-                :from="semesters.from"
-                :to="semesters.to"
-                :total="semesters.total"
-                :links="semesters.links"
-                :previous-page-url="semesters.prev_page_url"
-                :next-page-url="semesters.next_page_url"
+                :from="academicTerms.from"
+                :to="academicTerms.to"
+                :total="academicTerms.total"
+                :links="academicTerms.links"
+                :previous-page-url="academicTerms.prev_page_url"
+                :next-page-url="academicTerms.next_page_url"
             />
         </div>
     </div>
 
-    <!-- Create / Edit semester dialog -->
     <CreateUpdate
         v-model:open="isFormDialogOpen"
-        :semester="selectedSemester"
+        :academic-term="selectedAcademicTerm"
     />
 
     <!-- Delete confirmation dialog -->
     <Dialog v-model:open="isDeleteDialogOpen">
-        <DialogContent v-if="selectedSemester">
+        <DialogContent v-if="selectedAcademicTerm">
             <Form
-                v-bind="destroy.form(selectedSemester.id)"
-                v-slot="{ processing }"
+                v-bind="destroy.form(selectedAcademicTerm.id)"
+                v-slot="{ errors, processing }"
                 class="space-y-6"
                 :options="{ preserveScroll: true }"
                 @success="handleDeleted"
                 @error="handleDeleteError"
             >
                 <DialogHeader>
-                    <DialogTitle>Delete semester?</DialogTitle>
+                    <DialogTitle>Delete academic term?</DialogTitle>
                     <DialogDescription>
-                        {{ selectedSemester.name }} ({{
-                            selectedSemester.code
+                        {{ selectedAcademicTerm.name }} ({{
+                            selectedAcademicTerm.code
                         }}) will be permanently deleted.
                     </DialogDescription>
                 </DialogHeader>
+
+                <InputError :message="errors.academic_term" />
 
                 <DialogFooter>
                     <DialogClose as-child>
@@ -236,7 +236,9 @@ onBeforeUnmount(() => {
                         variant="destructive"
                         :disabled="processing"
                     >
-                        {{ processing ? 'Deleting...' : 'Delete semester' }}
+                        {{
+                            processing ? 'Deleting...' : 'Delete academic term'
+                        }}
                     </Button>
                 </DialogFooter>
             </Form>
