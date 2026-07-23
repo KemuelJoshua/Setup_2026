@@ -17,15 +17,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(PermissionSeeder::class);
-        $this->call(RoleSeeder::class);
-
-        // User::factory(10)->create();
-
-        $user = User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'admin@gmail.com',
+        $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            SchoolYearSeeder::class,
+            SemesterSeeder::class,
+            GradeLevelSeeder::class,
+            SectionSeeder::class,
+            SubjectSeeder::class,
+            ProgramSeeder::class,
+            CurriculumSeeder::class,
         ]);
+
+        $user = User::query()->firstOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => 'password',
+            ],
+        );
 
         $user->assignRole('Superadmin');
     }

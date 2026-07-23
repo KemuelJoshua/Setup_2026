@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Academics\CurriculumController;
 use App\Http\Controllers\Academics\GradeLevelController;
+use App\Http\Controllers\Academics\ProgramController;
 use App\Http\Controllers\Academics\SectionController;
 use App\Http\Controllers\Academics\SemesterController;
 use App\Http\Controllers\Academics\SubjectController;
@@ -35,6 +37,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/', [SubjectController::class, 'store'])->name('store');
             Route::put('/{subject}', [SubjectController::class, 'update'])->name('update');
             Route::delete('/{subject}', [SubjectController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('program')->name('program.')->group(function () {
+            Route::get('/', [ProgramController::class, 'index'])->name('index');
+            Route::post('/', [ProgramController::class, 'store'])->name('store');
+            Route::put('/{program}', [ProgramController::class, 'update'])->name('update');
+            Route::delete('/{program}', [ProgramController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('curriculum')->name('curriculum.')->group(function () {
+            Route::get('/', [CurriculumController::class, 'index'])->name('index');
+            Route::get('/create', [CurriculumController::class, 'create'])->name('create');
+            Route::post('/', [CurriculumController::class, 'store'])->name('store');
+            Route::get('/{curriculum}/edit', [CurriculumController::class, 'edit'])->name('edit');
+            Route::put('/{curriculum}', [CurriculumController::class, 'update'])->name('update');
+            Route::delete('/{curriculum}', [CurriculumController::class, 'destroy'])->name('destroy');
         });
 
     });

@@ -51,6 +51,16 @@ class PermissionSeeder extends Seeder
             'admin create subjects',
             'admin update subjects',
             'admin delete subjects',
+
+            'admin view programs',
+            'admin create programs',
+            'admin update programs',
+            'admin delete programs',
+
+            'admin view curricula',
+            'admin create curricula',
+            'admin update curricula',
+            'admin delete curricula',
         ];
 
         foreach ($permissions as $permission) {

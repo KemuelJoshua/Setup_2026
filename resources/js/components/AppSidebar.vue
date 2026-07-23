@@ -25,7 +25,9 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes/admin';
+import { index as IndexCurriculum } from '@/routes/admin/academics/curriculum';
 import { index as IndexGradeLevel } from '@/routes/admin/academics/grade-level';
+import { index as IndexProgram } from '@/routes/admin/academics/program';
 import { index as IndexSection } from '@/routes/admin/academics/section';
 import { index as IndexSemester } from '@/routes/admin/academics/semester';
 import { index as IndexSubject } from '@/routes/admin/academics/subject';
@@ -75,8 +77,13 @@ const primaryNavItems: NavItem[] = [
                 icon: BookOpen,
             },
             {
+                title: 'Programs',
+                href: IndexProgram(),
+                icon: BookA,
+            },
+            {
                 title: 'Curriculum',
-                href: '#',
+                href: IndexCurriculum(),
                 icon: ScrollText,
             },
             {
