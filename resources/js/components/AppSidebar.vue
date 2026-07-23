@@ -27,6 +27,7 @@ import {
 import { dashboard } from '@/routes/admin';
 import { index as userIndex } from '@/routes/admin/users';
 import { index as IndexSchoolYear } from '@/routes/admin/school-years'
+import { index as IndexSemester } from '@/routes/admin/academics/semester'
 import type { NavItem } from '@/types';
 
 const primaryNavItems: NavItem[] = [
@@ -52,7 +53,7 @@ const primaryNavItems: NavItem[] = [
             },
             {
                 title: 'Semesters',
-                href: '#',
+                href: IndexSemester(),
                 icon: CalendarRange,
             },
             {

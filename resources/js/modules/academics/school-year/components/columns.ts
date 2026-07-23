@@ -5,6 +5,7 @@ import { h } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/data-table';
 import SchoolYearRowActions from './SchoolYearRowActions.vue';
+import { formatDate } from '@/lib/formatDate.js';
 
 export interface SchoolYear {
     id: number;
@@ -19,14 +20,6 @@ interface SchoolYearColumnActions {
     edit: (schoolYear: SchoolYear) => void;
     delete: (schoolYear: SchoolYear) => void;
 }
-
-const formatDate = (date: string): string => {
-    return new Intl.DateTimeFormat('en-PH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    }).format(new Date(date));
-};
 
 const getStatusClasses = (status: SchoolYear['sc_status']): string => {
     const statusClasses: Record<SchoolYear['sc_status'], string> = {

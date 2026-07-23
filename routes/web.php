@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('school-years', SchoolYearController::class)
             ->only(['index', 'store', 'update', 'destroy']);
 
+        require __DIR__.'/academics.php';
         require __DIR__.'/settings.php';
     });
 
