@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
 import {
+    ArrowLeft,
     BookOpen,
     ChevronRight,
+    Clock3,
     GraduationCap,
+    Layers3,
     Pencil,
     Plus,
     Trash2,
@@ -12,7 +15,10 @@ import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
 
 import InputError from '@/components/InputError.vue';
+import PageHero from '@/components/PageHero.vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -76,6 +82,8 @@ defineOptions({
 
 const isDialogOpen = ref(false);
 const editingSubject = ref<CurriculumSubject | null>(null);
+const isDeleteDialogOpen = ref(false);
+const selectedSubject = ref<CurriculumSubject | null>(null);
 const dialogKey = ref(0);
 
 const emptyDraft = (): SubjectDraft => ({
@@ -115,6 +123,21 @@ const availableYearLevels = computed(() => {
 
 const terms = computed(
     () => props.curriculum.academic_structure?.root_periods ?? [],
+);
+const totalUnits = computed(() =>
+    props.curriculum.curriculum_subjects.reduce(
+        (total, subject) => total + Number(subject.units ?? 0),
+        0,
+    ),
+);
+const totalContactHours = computed(() =>
+    props.curriculum.curriculum_subjects.reduce(
+        (total, subject) =>
+            total +
+            Number(subject.lecture_hours ?? 0) +
+            Number(subject.laboratory_hours ?? 0),
+        0,
+    ),
 );
 
 const prerequisiteCandidates = computed(() =>
@@ -174,6 +197,11 @@ const openEditDialog = (subject: CurriculumSubject): void => {
     isDialogOpen.value = true;
 };
 
+const openDeleteDialog = (subject: CurriculumSubject): void => {
+    selectedSubject.value = subject;
+    isDeleteDialogOpen.value = true;
+};
+
 const toggleReference = (
     field: 'prerequisite_ids' | 'corequisite_ids',
     id: number,
@@ -192,70 +220,107 @@ const handleSaved = (): void => {
     );
     isDialogOpen.value = false;
 };
+
+const handleDeleted = (): void => {
+    toast.success('Subject removed successfully.');
+    isDeleteDialogOpen.value = false;
+    selectedSubject.value = null;
+};
 </script>
 
 <template>
     <Head :title="`${curriculum.name} subjects`" />
 
-    <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 md:p-8">
-        <div
-            class="flex flex-col gap-4 rounded-xl border bg-card p-5 shadow-sm sm:flex-row sm:items-start sm:justify-between"
-        >
-            <div class="flex gap-4">
-                <div
-                    class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground"
-                >
-                    2
-                </div>
-                <div>
-                    <p
-                        class="text-xs font-medium tracking-wide text-primary uppercase"
+    <div
+        class="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-6 p-4 md:p-8"
+    >
+        <PageHero>
+            <template #icon>
+                <BookOpen class="size-5" aria-hidden="true" />
+            </template>
+            <template #badge>
+                <GraduationCap class="size-3.5" aria-hidden="true" />
+                Subject planning
+            </template>
+            <template #title>{{ curriculum.name }}</template>
+            <template #description>
+                {{ curriculum.code }} · {{ curriculum.status }} ·
+                {{ curriculum.program?.name ?? 'No program' }} · Effective
+                {{ curriculum.effective_year }} ·
+                {{
+                    curriculum.academic_structure?.name ??
+                    'No academic structure assigned'
+                }}
+            </template>
+            <template #actions>
+                <div class="flex flex-wrap gap-2">
+                    <Button variant="outline" as-child>
+                        <Link :href="index()">
+                            <ArrowLeft aria-hidden="true" />
+                            All curricula
+                        </Link>
+                    </Button>
+                    <Button
+                        :disabled="!curriculum.academic_structure"
+                        @click="openAddDialog()"
                     >
-                        Curriculum subjects
-                    </p>
-                    <h1 class="mt-1 text-2xl font-semibold tracking-tight">
-                        {{ curriculum.name }}
-                    </h1>
+                        <Plus aria-hidden="true" />
+                        Add subject
+                    </Button>
+                </div>
+            </template>
+        </PageHero>
+
+        <div class="grid gap-3 sm:grid-cols-3">
+            <Card>
+                <CardContent class="flex items-center gap-3 p-4">
                     <div
-                        class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground"
+                        class="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary"
                     >
-                        <span>{{ curriculum.code }}</span>
-                        <span>{{
-                            curriculum.program?.name ?? 'No program'
-                        }}</span>
-                        <span>Effective {{ curriculum.effective_year }}</span>
-                        <span>
-                            {{ curriculum.number_of_years }}
-                            {{
-                                curriculum.number_of_years === 1
-                                    ? 'year'
-                                    : 'years'
-                            }}
-                        </span>
+                        <Layers3 class="size-4" aria-hidden="true" />
                     </div>
-                    <p class="mt-2 text-sm font-medium">
-                        {{
-                            curriculum.academic_structure?.name ??
-                            'No academic structure assigned'
-                        }}
-                    </p>
-                    <p class="mt-1 text-xs text-muted-foreground">
-                        Academic structure is locked for this curriculum.
-                    </p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <Button variant="outline" as-child>
-                    <Link :href="index()">Finish</Link>
-                </Button>
-                <Button
-                    :disabled="!curriculum.academic_structure"
-                    @click="openAddDialog()"
-                >
-                    <Plus aria-hidden="true" />
-                    Add subject
-                </Button>
-            </div>
+                    <div>
+                        <p class="text-2xl font-semibold tabular-nums">
+                            {{ curriculum.curriculum_subjects.length }}
+                        </p>
+                        <p class="text-xs text-muted-foreground">
+                            Assigned subjects
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardContent class="flex items-center gap-3 p-4">
+                    <div
+                        class="flex size-9 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400"
+                    >
+                        <BookOpen class="size-4" aria-hidden="true" />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-semibold tabular-nums">
+                            {{ totalUnits.toFixed(2) }}
+                        </p>
+                        <p class="text-xs text-muted-foreground">Total units</p>
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardContent class="flex items-center gap-3 p-4">
+                    <div
+                        class="flex size-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                    >
+                        <Clock3 class="size-4" aria-hidden="true" />
+                    </div>
+                    <div>
+                        <p class="text-2xl font-semibold tabular-nums">
+                            {{ totalContactHours.toFixed(2) }}
+                        </p>
+                        <p class="text-xs text-muted-foreground">
+                            Contact hours
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
 
         <div
@@ -265,11 +330,39 @@ const handleSaved = (): void => {
             No compatible year levels are configured for this curriculum.
         </div>
 
+        <nav
+            v-else
+            aria-label="Year level navigation"
+            class="sticky top-3 z-10 flex gap-2 overflow-x-auto rounded-xl border bg-background/95 p-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/80"
+        >
+            <Button
+                v-for="yearLevel in availableYearLevels"
+                :key="yearLevel.id"
+                variant="ghost"
+                size="sm"
+                as-child
+                class="shrink-0"
+            >
+                <a :href="`#year-level-${yearLevel.id}`">
+                    {{ yearLevel.name }}
+                    <Badge variant="secondary">
+                        {{
+                            curriculum.curriculum_subjects.filter(
+                                (subject) =>
+                                    subject.year_level_id === yearLevel.id,
+                            ).length
+                        }}
+                    </Badge>
+                </a>
+            </Button>
+        </nav>
+
         <details
             v-for="yearLevel in availableYearLevels"
             :key="yearLevel.id"
+            :id="`year-level-${yearLevel.id}`"
             open
-            class="group overflow-hidden rounded-xl border bg-card shadow-sm"
+            class="group scroll-mt-24 overflow-hidden rounded-xl border bg-card shadow-sm"
         >
             <summary
                 class="flex cursor-pointer list-none items-center gap-3 border-b bg-muted/20 px-5 py-4"
@@ -280,6 +373,14 @@ const handleSaved = (): void => {
                 />
                 <GraduationCap class="size-5 text-primary" aria-hidden="true" />
                 <span class="font-semibold">{{ yearLevel.name }}</span>
+                <Badge variant="secondary" class="ml-auto">
+                    {{
+                        curriculum.curriculum_subjects.filter(
+                            (subject) => subject.year_level_id === yearLevel.id,
+                        ).length
+                    }}
+                    subjects
+                </Badge>
             </summary>
 
             <div class="grid gap-4 p-4 lg:grid-cols-2">
@@ -299,6 +400,9 @@ const handleSaved = (): void => {
                             <h2 class="text-sm font-semibold">
                                 {{ term.name }}
                             </h2>
+                            <Badge variant="outline">
+                                {{ subjectsFor(yearLevel.id, term.id).length }}
+                            </Badge>
                         </div>
                         <Button
                             size="sm"
@@ -326,7 +430,7 @@ const handleSaved = (): void => {
                                 term.id,
                             )"
                             :key="subject.id"
-                            class="flex items-start justify-between gap-4 px-4 py-3"
+                            class="group/subject flex items-start justify-between gap-4 px-4 py-3 transition-colors hover:bg-muted/30"
                         >
                             <div class="min-w-0">
                                 <h3 class="text-sm font-medium">
@@ -381,29 +485,16 @@ const handleSaved = (): void => {
                                 >
                                     <Pencil aria-hidden="true" />
                                 </Button>
-                                <Form
-                                    v-bind="
-                                        destroy.form({
-                                            curriculum: curriculum.id,
-                                            curriculumSubject: subject.id,
-                                        })
-                                    "
-                                    @success="
-                                        toast.success(
-                                            'Subject removed successfully.',
-                                        )
-                                    "
+                                <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    class="text-destructive"
+                                    aria-label="Remove subject"
+                                    @click="openDeleteDialog(subject)"
                                 >
-                                    <Button
-                                        type="submit"
-                                        size="icon"
-                                        variant="ghost"
-                                        class="text-destructive"
-                                        aria-label="Remove subject"
-                                    >
-                                        <Trash2 aria-hidden="true" />
-                                    </Button>
-                                </Form>
+                                    <Trash2 aria-hidden="true" />
+                                </Button>
                             </div>
                         </article>
                     </div>
@@ -655,6 +746,45 @@ const handleSaved = (): void => {
                                   ? 'Save changes'
                                   : 'Add subject'
                         }}
+                    </Button>
+                </DialogFooter>
+            </Form>
+        </DialogContent>
+    </Dialog>
+
+    <Dialog v-model:open="isDeleteDialogOpen">
+        <DialogContent v-if="selectedSubject">
+            <Form
+                v-bind="
+                    destroy.form({
+                        curriculum: curriculum.id,
+                        curriculumSubject: selectedSubject.id,
+                    })
+                "
+                v-slot="{ processing }"
+                class="space-y-6"
+                :options="{ preserveScroll: true }"
+                @success="handleDeleted"
+                @error="toast.error('Unable to remove the subject.')"
+            >
+                <DialogHeader>
+                    <DialogTitle>Remove subject?</DialogTitle>
+                    <DialogDescription>
+                        {{ selectedSubject.subject_name }} will be removed from
+                        this curriculum. Any prerequisite or corequisite links
+                        to it may also be affected.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <DialogClose as-child>
+                        <Button type="button" variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button
+                        type="submit"
+                        variant="destructive"
+                        :disabled="processing"
+                    >
+                        {{ processing ? 'Removing...' : 'Remove subject' }}
                     </Button>
                 </DialogFooter>
             </Form>

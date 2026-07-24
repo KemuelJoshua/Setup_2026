@@ -108,8 +108,6 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <div class="flex flex-1 flex-col gap-5">
         <DataTableToolbar
             v-model="searchQuery"
-            title="Roles & permissions"
-            description="Manage access levels and the guards assigned to each role."
             :count="roles.total"
             item-label="role"
             search-placeholder="Search roles..."

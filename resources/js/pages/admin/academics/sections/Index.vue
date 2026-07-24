@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Form, Head, router } from '@inertiajs/vue3';
-import { Plus } from '@lucide/vue';
+import { LayoutGrid, Plus, Sparkles } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
+import DataTableContainer from '@/components/DataTableContainer.vue';
+import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
@@ -138,63 +140,77 @@ onBeforeUnmount(() => {
     <Head title="Sections" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <DataTableToolbar
-            v-model="searchQuery"
-            title="Sections"
-            description="Manage sections."
-            :count="sections.total"
-            item-label="Section"
-            search-placeholder="Search name..."
-            search-label="Search sections"
-        >
-            <template #filters>
-                <Select v-model="educationalLevelFilter">
-                    <SelectTrigger aria-label="Filter by educational level">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">
-                            All educational levels
-                        </SelectItem>
-                        <SelectItem
-                            v-for="level in educationalLevels"
-                            :key="level.id"
-                            :value="String(level.id)"
-                        >
-                            {{ level.name }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <DataTablePageSizeSelect
-                    :model-value="sections.per_page"
-                    @update:model-value="fetchSections"
-                />
+        <PageHero>
+            <template #icon>
+                <LayoutGrid class="size-5" aria-hidden="true" />
             </template>
-
+            <template #badge>
+                <Sparkles class="size-3.5" aria-hidden="true" />
+                Class organization
+            </template>
+            <template #title>Section workspace</template>
+            <template #description>
+                Create and organize class sections for each educational level.
+            </template>
             <template #actions>
-                <Button type="button" size="sm" @click="openCreateDialog">
+                <Button type="button" @click="openCreateDialog">
                     <Plus aria-hidden="true" />
-                    Create
+                    Create section
                 </Button>
             </template>
-        </DataTableToolbar>
+        </PageHero>
 
-        <div class="flex flex-col gap-4">
+        <DataTableContainer>
+            <DataTableToolbar
+                v-model="searchQuery"
+                :count="sections.total"
+                item-label="Section"
+                search-placeholder="Search name..."
+                search-label="Search sections"
+                class="border-b px-4 py-4 sm:px-5"
+            >
+                <template #filters>
+                    <Select v-model="educationalLevelFilter">
+                        <SelectTrigger aria-label="Filter by educational level">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">
+                                All educational levels
+                            </SelectItem>
+                            <SelectItem
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="String(level.id)"
+                            >
+                                {{ level.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <DataTablePageSizeSelect
+                        :model-value="sections.per_page"
+                        @update:model-value="fetchSections"
+                    />
+                </template>
+            </DataTableToolbar>
+
             <DataTable
                 :columns="columns"
                 :data="props.sections.data"
                 empty-message="No sections found."
             />
 
-            <DataTablePagination
-                :from="sections.from"
-                :to="sections.to"
-                :total="sections.total"
-                :links="sections.links"
-                :previous-page-url="sections.prev_page_url"
-                :next-page-url="sections.next_page_url"
-            />
-        </div>
+            <template #footer>
+                <DataTablePagination
+                    :from="sections.from"
+                    :to="sections.to"
+                    :total="sections.total"
+                    :links="sections.links"
+                    :previous-page-url="sections.prev_page_url"
+                    :next-page-url="sections.next_page_url"
+                />
+            </template>
+        </DataTableContainer>
     </div>
 
     <CreateUpdate

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Form, Head, router } from '@inertiajs/vue3';
-import { Plus } from '@lucide/vue';
+import { Plus, School, Sparkles } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
+import DataTableContainer from '@/components/DataTableContainer.vue';
+import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
@@ -101,44 +103,61 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <Head title="Educational Levels" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <DataTableToolbar
-            v-model="searchQuery"
-            title="Educational Levels"
-            description="Manage educational levels used across academics."
-            :count="educationalLevels.total"
-            item-label="Educational Level"
-            search-placeholder="Search name..."
-            search-label="Search educational levels"
-        >
-            <template #filters>
-                <DataTablePageSizeSelect
-                    :model-value="educationalLevels.per_page"
-                    @update:model-value="fetchEducationalLevels"
-                />
+        <PageHero>
+            <template #icon>
+                <School class="size-5" aria-hidden="true" />
+            </template>
+            <template #badge>
+                <Sparkles class="size-3.5" aria-hidden="true" />
+                Academic foundations
+            </template>
+            <template #title>Educational level workspace</template>
+            <template #description>
+                Define the learning stages used to organize programs, grade
+                levels, subjects, and curriculum structures.
             </template>
             <template #actions>
-                <Button type="button" size="sm" @click="openCreateDialog">
+                <Button type="button" @click="openCreateDialog">
                     <Plus aria-hidden="true" />
-                    Create
+                    Create educational level
                 </Button>
             </template>
-        </DataTableToolbar>
+        </PageHero>
 
-        <div class="flex flex-col gap-4">
+        <DataTableContainer>
+            <DataTableToolbar
+                v-model="searchQuery"
+                :count="educationalLevels.total"
+                item-label="Educational Level"
+                search-placeholder="Search name..."
+                search-label="Search educational levels"
+                class="border-b px-4 py-4 sm:px-5"
+            >
+                <template #filters>
+                    <DataTablePageSizeSelect
+                        :model-value="educationalLevels.per_page"
+                        @update:model-value="fetchEducationalLevels"
+                    />
+                </template>
+            </DataTableToolbar>
+
             <DataTable
                 :columns="columns"
                 :data="educationalLevels.data"
                 empty-message="No educational levels found."
             />
-            <DataTablePagination
-                :from="educationalLevels.from"
-                :to="educationalLevels.to"
-                :total="educationalLevels.total"
-                :links="educationalLevels.links"
-                :previous-page-url="educationalLevels.prev_page_url"
-                :next-page-url="educationalLevels.next_page_url"
-            />
-        </div>
+
+            <template #footer>
+                <DataTablePagination
+                    :from="educationalLevels.from"
+                    :to="educationalLevels.to"
+                    :total="educationalLevels.total"
+                    :links="educationalLevels.links"
+                    :previous-page-url="educationalLevels.prev_page_url"
+                    :next-page-url="educationalLevels.next_page_url"
+                />
+            </template>
+        </DataTableContainer>
     </div>
 
     <CreateUpdate

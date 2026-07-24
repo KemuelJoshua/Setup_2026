@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Form, Head, router } from '@inertiajs/vue3';
-import { Plus } from '@lucide/vue';
+import { BookOpen, Plus, Sparkles } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
+import DataTableContainer from '@/components/DataTableContainer.vue';
+import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
@@ -138,63 +140,78 @@ onBeforeUnmount(() => {
     <Head title="Subjects" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <DataTableToolbar
-            v-model="searchQuery"
-            title="Subjects"
-            description="Manage subjects."
-            :count="subjects.total"
-            item-label="Subject"
-            search-placeholder="Search name..."
-            search-label="Search subjects"
-        >
-            <template #filters>
-                <Select v-model="educationalLevelFilter">
-                    <SelectTrigger aria-label="Filter by educational level">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">
-                            All educational levels
-                        </SelectItem>
-                        <SelectItem
-                            v-for="level in educationalLevels"
-                            :key="level.id"
-                            :value="String(level.id)"
-                        >
-                            {{ level.name }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <DataTablePageSizeSelect
-                    :model-value="subjects.per_page"
-                    @update:model-value="fetchSubjects"
-                />
+        <PageHero>
+            <template #icon>
+                <BookOpen class="size-5" aria-hidden="true" />
             </template>
-
+            <template #badge>
+                <Sparkles class="size-3.5" aria-hidden="true" />
+                Course catalog
+            </template>
+            <template #title>Subject workspace</template>
+            <template #description>
+                Maintain the subject catalog used when building curriculum plans
+                across educational levels.
+            </template>
             <template #actions>
-                <Button type="button" size="sm" @click="openCreateDialog">
+                <Button type="button" @click="openCreateDialog">
                     <Plus aria-hidden="true" />
-                    Create
+                    Create subject
                 </Button>
             </template>
-        </DataTableToolbar>
+        </PageHero>
 
-        <div class="flex flex-col gap-4">
+        <DataTableContainer>
+            <DataTableToolbar
+                v-model="searchQuery"
+                :count="subjects.total"
+                item-label="Subject"
+                search-placeholder="Search name..."
+                search-label="Search subjects"
+                class="border-b px-4 py-4 sm:px-5"
+            >
+                <template #filters>
+                    <Select v-model="educationalLevelFilter">
+                        <SelectTrigger aria-label="Filter by educational level">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">
+                                All educational levels
+                            </SelectItem>
+                            <SelectItem
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="String(level.id)"
+                            >
+                                {{ level.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <DataTablePageSizeSelect
+                        :model-value="subjects.per_page"
+                        @update:model-value="fetchSubjects"
+                    />
+                </template>
+            </DataTableToolbar>
+
             <DataTable
                 :columns="columns"
                 :data="props.subjects.data"
                 empty-message="No subjects found."
             />
 
-            <DataTablePagination
-                :from="subjects.from"
-                :to="subjects.to"
-                :total="subjects.total"
-                :links="subjects.links"
-                :previous-page-url="subjects.prev_page_url"
-                :next-page-url="subjects.next_page_url"
-            />
-        </div>
+            <template #footer>
+                <DataTablePagination
+                    :from="subjects.from"
+                    :to="subjects.to"
+                    :total="subjects.total"
+                    :links="subjects.links"
+                    :previous-page-url="subjects.prev_page_url"
+                    :next-page-url="subjects.next_page_url"
+                />
+            </template>
+        </DataTableContainer>
     </div>
 
     <CreateUpdate

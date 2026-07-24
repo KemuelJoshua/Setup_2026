@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Form, Head, router } from '@inertiajs/vue3';
-import { Plus } from '@lucide/vue';
+import { GraduationCap, Plus, Sparkles } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
+import DataTableContainer from '@/components/DataTableContainer.vue';
+import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
@@ -138,63 +140,78 @@ onBeforeUnmount(() => {
     <Head title="Programs" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <DataTableToolbar
-            v-model="searchQuery"
-            title="Programs"
-            description="Manage academic programs."
-            :count="programs.total"
-            item-label="Program"
-            search-placeholder="Search code, name, or status..."
-            search-label="Search programs"
-        >
-            <template #filters>
-                <Select v-model="educationalLevelFilter">
-                    <SelectTrigger aria-label="Filter by educational level">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">
-                            All educational levels
-                        </SelectItem>
-                        <SelectItem
-                            v-for="level in educationalLevels"
-                            :key="level.id"
-                            :value="String(level.id)"
-                        >
-                            {{ level.name }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <DataTablePageSizeSelect
-                    :model-value="programs.per_page"
-                    @update:model-value="fetchPrograms"
-                />
+        <PageHero>
+            <template #icon>
+                <GraduationCap class="size-5" aria-hidden="true" />
             </template>
-
+            <template #badge>
+                <Sparkles class="size-3.5" aria-hidden="true" />
+                Academic planning
+            </template>
+            <template #title>Program workspace</template>
+            <template #description>
+                Manage academic programs and connect each one to the correct
+                educational level.
+            </template>
             <template #actions>
-                <Button type="button" size="sm" @click="openCreateDialog">
+                <Button type="button" @click="openCreateDialog">
                     <Plus aria-hidden="true" />
-                    Create
+                    Create program
                 </Button>
             </template>
-        </DataTableToolbar>
+        </PageHero>
 
-        <div class="flex flex-col gap-4">
+        <DataTableContainer>
+            <DataTableToolbar
+                v-model="searchQuery"
+                :count="programs.total"
+                item-label="Program"
+                search-placeholder="Search code, name, or status..."
+                search-label="Search programs"
+                class="border-b px-4 py-4 sm:px-5"
+            >
+                <template #filters>
+                    <Select v-model="educationalLevelFilter">
+                        <SelectTrigger aria-label="Filter by educational level">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">
+                                All educational levels
+                            </SelectItem>
+                            <SelectItem
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="String(level.id)"
+                            >
+                                {{ level.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <DataTablePageSizeSelect
+                        :model-value="programs.per_page"
+                        @update:model-value="fetchPrograms"
+                    />
+                </template>
+            </DataTableToolbar>
+
             <DataTable
                 :columns="columns"
                 :data="props.programs.data"
                 empty-message="No programs found."
             />
 
-            <DataTablePagination
-                :from="programs.from"
-                :to="programs.to"
-                :total="programs.total"
-                :links="programs.links"
-                :previous-page-url="programs.prev_page_url"
-                :next-page-url="programs.next_page_url"
-            />
-        </div>
+            <template #footer>
+                <DataTablePagination
+                    :from="programs.from"
+                    :to="programs.to"
+                    :total="programs.total"
+                    :links="programs.links"
+                    :previous-page-url="programs.prev_page_url"
+                    :next-page-url="programs.next_page_url"
+                />
+            </template>
+        </DataTableContainer>
     </div>
 
     <CreateUpdate

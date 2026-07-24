@@ -106,7 +106,7 @@ const getColumnClass = (
         <div
             :class="
                 cn(
-                    'overflow-hidden rounded-lg border border-border bg-background',
+                    'overflow-hidden',
                     props.containerClass,
                 )
             "

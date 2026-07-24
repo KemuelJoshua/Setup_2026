@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Form, Head, router } from '@inertiajs/vue3';
-import { Plus } from '@lucide/vue';
+import { Layers3, Plus, Sparkles } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
+import DataTableContainer from '@/components/DataTableContainer.vue';
+import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
@@ -48,15 +50,21 @@ defineOptions({
 const props = defineProps<{
     gradeLevels: LengthAwarePaginator<GradeLevel>;
     filters: GradeLevelFilters;
-    educationalLevels: Array<{ id: number; name: string }>;
+    educationalLevels: Array<{
+        id: number;
+        name: string;
+    }>;
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
+
 const educationalLevelFilter = ref(
     props.filters.educational_level_id?.toString() ?? 'all',
 );
+
 const isFormDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
+
 const selectedGradeLevel = ref<GradeLevel | null>(null);
 
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
@@ -92,6 +100,15 @@ const handleSearch = (): void => {
     }, 300);
 };
 
+const handleEducationalLevelFilter = (): void => {
+    window.clearTimeout(searchTimer);
+    fetchGradeLevels();
+};
+
+const handlePageSizeChange = (perPage: string | number): void => {
+    fetchGradeLevels(perPage);
+};
+
 const openCreateDialog = (): void => {
     selectedGradeLevel.value = null;
     isFormDialogOpen.value = true;
@@ -114,6 +131,7 @@ const columns = createColumns({
 
 const handleDeleted = (): void => {
     toast.success('Grade level deleted successfully.');
+
     isDeleteDialogOpen.value = false;
 };
 
@@ -121,7 +139,9 @@ const handleDeleteError = (): void => {
     toast.error('Unable to delete the grade level. Please try again.');
 };
 
-watch([searchQuery, educationalLevelFilter], handleSearch);
+watch(searchQuery, handleSearch);
+
+watch(educationalLevelFilter, handleEducationalLevelFilter);
 
 watch([isFormDialogOpen, isDeleteDialogOpen], ([formOpen, deleteOpen]) => {
     if (!formOpen && !deleteOpen) {
@@ -138,63 +158,88 @@ onBeforeUnmount(() => {
     <Head title="Grade Levels" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <DataTableToolbar
-            v-model="searchQuery"
-            title="Grade Levels"
-            description="Manage grade levels."
-            :count="gradeLevels.total"
-            item-label="Grade Level"
-            search-placeholder="Search name..."
-            search-label="Search grade levels"
-        >
-            <template #filters>
-                <Select v-model="educationalLevelFilter">
-                    <SelectTrigger aria-label="Filter by educational level">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">
-                            All educational levels
-                        </SelectItem>
-                        <SelectItem
-                            v-for="level in educationalLevels"
-                            :key="level.id"
-                            :value="String(level.id)"
-                        >
-                            {{ level.name }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <DataTablePageSizeSelect
-                    :model-value="gradeLevels.per_page"
-                    @update:model-value="fetchGradeLevels"
-                />
+        <PageHero>
+            <template #icon>
+                <Layers3 class="size-5" aria-hidden="true" />
+            </template>
+
+            <template #badge>
+                <Sparkles class="size-3.5" aria-hidden="true" />
+                Academic planning
+            </template>
+
+            <template #title> Grade level workspace </template>
+
+            <template #description>
+                Create and organize the grade levels available under each
+                educational level.
             </template>
 
             <template #actions>
-                <Button type="button" size="sm" @click="openCreateDialog">
-                    <Plus aria-hidden="true" />
-                    Create
+                <Button type="button" @click="openCreateDialog">
+                    <Plus class="size-4" aria-hidden="true" />
+                    Create grade level
                 </Button>
             </template>
-        </DataTableToolbar>
+        </PageHero>
 
-        <div class="flex flex-col gap-4">
+        <DataTableContainer>
+            <DataTableToolbar
+                v-model="searchQuery"
+                :count="gradeLevels.total"
+                item-label="grade level"
+                search-placeholder="Search grade levels..."
+                search-label="Search grade levels"
+                class="border-b px-4 py-4 sm:px-5"
+            >
+                <template #filters>
+                    <Select v-model="educationalLevelFilter">
+                        <SelectTrigger
+                            class="w-full sm:w-56"
+                            aria-label="Filter by educational level"
+                        >
+                            <SelectValue placeholder="Educational level" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                            <SelectItem value="all">
+                                All educational levels
+                            </SelectItem>
+
+                            <SelectItem
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="String(level.id)"
+                            >
+                                {{ level.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <DataTablePageSizeSelect
+                        :model-value="gradeLevels.per_page"
+                        @update:model-value="handlePageSizeChange"
+                    />
+                </template>
+            </DataTableToolbar>
+
             <DataTable
                 :columns="columns"
-                :data="props.gradeLevels.data"
+                :data="gradeLevels.data"
                 empty-message="No grade levels found."
             />
 
-            <DataTablePagination
-                :from="gradeLevels.from"
-                :to="gradeLevels.to"
-                :total="gradeLevels.total"
-                :links="gradeLevels.links"
-                :previous-page-url="gradeLevels.prev_page_url"
-                :next-page-url="gradeLevels.next_page_url"
-            />
-        </div>
+            <template #footer>
+                <DataTablePagination
+                    :from="gradeLevels.from"
+                    :to="gradeLevels.to"
+                    :total="gradeLevels.total"
+                    :links="gradeLevels.links"
+                    :previous-page-url="gradeLevels.prev_page_url"
+                    :next-page-url="gradeLevels.next_page_url"
+                />
+            </template>
+        </DataTableContainer>
     </div>
 
     <CreateUpdate
@@ -209,21 +254,31 @@ onBeforeUnmount(() => {
                 v-bind="destroy.form(selectedGradeLevel.id)"
                 v-slot="{ processing }"
                 class="space-y-6"
-                :options="{ preserveScroll: true }"
+                :options="{
+                    preserveScroll: true,
+                }"
                 @success="handleDeleted"
                 @error="handleDeleteError"
             >
                 <DialogHeader>
                     <DialogTitle>Delete grade level?</DialogTitle>
+
                     <DialogDescription>
-                        {{ selectedGradeLevel.name }} will be permanently
-                        deleted.
+                        <strong>{{ selectedGradeLevel.name }}</strong>
+                        will be permanently deleted. This action cannot be
+                        undone.
                     </DialogDescription>
                 </DialogHeader>
 
                 <DialogFooter>
                     <DialogClose as-child>
-                        <Button type="button" variant="outline">Cancel</Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            :disabled="processing"
+                        >
+                            Cancel
+                        </Button>
                     </DialogClose>
 
                     <Button

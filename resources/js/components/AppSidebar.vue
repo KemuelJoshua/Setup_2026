@@ -59,14 +59,14 @@ const primaryNavItems: NavItem[] = [
                 icon: School,
             },
             {
-                title: 'Academic Periods',
-                href: IndexAcademicTermStructure(),
-                icon: CalendarRange,
-            },
-            {
                 title: 'Educational Levels',
                 href: IndexEducationalLevel(),
                 icon: Layers3,
+            },
+            {
+                title: 'Academic Structure',
+                href: IndexAcademicTermStructure(),
+                icon: CalendarRange,
             },
             {
                 title: 'Grade Levels',

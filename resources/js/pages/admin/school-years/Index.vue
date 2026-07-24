@@ -94,8 +94,6 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
         <DataTableToolbar
             v-model="searchQuery"
-            title="School Years"
-            description="Manage academic periods, dates, and statuses."
             :count="schoolYears.total"
             item-label="school year"
             search-placeholder="Search name, code, or status..."

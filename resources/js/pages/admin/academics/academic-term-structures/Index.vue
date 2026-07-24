@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import { Form, Head, router } from '@inertiajs/vue3';
-import {
-    CalendarRange,
-    ChevronRight,
-    CirclePlus,
-    Pencil,
-    Plus,
-    Trash2,
-} from '@lucide/vue';
+import { CalendarRange, Plus, Sparkles } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
+import DataTableContainer from '@/components/DataTableContainer.vue';
 import InputError from '@/components/InputError.vue';
+import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import {
+    DataTable,
     DataTablePageSizeSelect,
     DataTablePagination,
     DataTableToolbar,
@@ -41,6 +37,7 @@ import {
 } from '@/routes/admin/academics/academic-term-structures';
 import type { LengthAwarePaginator } from '@/types';
 
+import { createColumns } from './columns';
 import PeriodFormDialog from './PeriodFormDialog.vue';
 import StructureFormDialog from './StructureFormDialog.vue';
 import type {
@@ -138,6 +135,16 @@ const openPeriodDelete = (
     deleteDialogOpen.value = true;
 };
 
+const columns = createColumns({
+    addPeriod: (structure, parent) =>
+        openPeriodForm(structure, null, parent ?? null),
+    editPeriod: (structure, period, parent) =>
+        openPeriodForm(structure, period, parent ?? null),
+    deletePeriod: openPeriodDelete,
+    editStructure: openStructureForm,
+    deleteStructure: openStructureDelete,
+});
+
 const clearSelection = (): void => {
     selectedStructure.value = null;
     selectedPeriod.value = null;
@@ -165,315 +172,78 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <Head title="Academic Term Structures" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <DataTableToolbar
-            v-model="searchQuery"
-            title="Academic Term Structures"
-            description="Manage flexible semesters, quarters, terms, and grading periods."
-            :count="academicTermStructures.total"
-            item-label="Structure"
-            search-placeholder="Search name or code..."
-            search-label="Search academic term structures"
-        >
-            <template #filters>
-                <Select v-model="educationalLevelFilter">
-                    <SelectTrigger aria-label="Filter by educational level">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">
-                            All educational levels
-                        </SelectItem>
-                        <SelectItem
-                            v-for="level in educationalLevels"
-                            :key="level.id"
-                            :value="String(level.id)"
-                        >
-                            {{ level.name }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-                <DataTablePageSizeSelect
-                    :model-value="academicTermStructures.per_page"
-                    @update:model-value="fetchStructures"
-                />
+        <PageHero>
+            <template #icon>
+                <CalendarRange class="size-5" aria-hidden="true" />
             </template>
-
+            <template #badge>
+                <Sparkles class="size-3.5" aria-hidden="true" />
+                Academic calendar
+            </template>
+            <template #title>Academic structure workspace</template>
+            <template #description>
+                Design reusable semester, trimester, and quarterly structures
+                with their grading periods.
+            </template>
             <template #actions>
-                <Button type="button" size="sm" @click="openStructureForm()">
+                <Button type="button" @click="openStructureForm()">
                     <Plus aria-hidden="true" />
                     Add structure
                 </Button>
             </template>
-        </DataTableToolbar>
+        </PageHero>
 
-        <div
-            v-if="academicTermStructures.data.length"
-            class="grid gap-5 xl:grid-cols-2"
-        >
-            <section
-                v-for="structure in academicTermStructures.data"
-                :key="structure.id"
-                class="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
+        <DataTableContainer>
+            <DataTableToolbar
+                v-model="searchQuery"
+                :count="academicTermStructures.total"
+                item-label="Structure"
+                search-placeholder="Search name or code..."
+                search-label="Search academic term structures"
+                class="border-b px-4 py-4 sm:px-5"
             >
-                <header
-                    class="flex flex-col gap-4 border-b bg-muted/20 p-5 sm:flex-row sm:items-start sm:justify-between"
-                >
-                    <div class="flex min-w-0 items-start gap-3">
-                        <span
-                            class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
-                        >
-                            <CalendarRange class="size-5" aria-hidden="true" />
-                        </span>
-                        <div class="min-w-0">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h2 class="truncate font-semibold">
-                                    {{ structure.name }}
-                                </h2>
-                                <span
-                                    class="rounded-full px-2 py-0.5 text-xs font-medium capitalize"
-                                    :class="
-                                        structure.status === 'active'
-                                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                                            : 'bg-muted text-muted-foreground'
-                                    "
-                                >
-                                    {{ structure.status }}
-                                </span>
-                                <span
-                                    class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary capitalize"
-                                >
-                                    {{ structure.type }}
-                                </span>
-                            </div>
-                            <p class="text-sm text-muted-foreground">
-                                {{ structure.code }}
-                                <template v-if="structure.educational_level">
-                                    · {{ structure.educational_level.name }}
-                                </template>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="flex shrink-0 gap-1">
-                        <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            :aria-label="`Edit ${structure.name}`"
-                            @click="openStructureForm(structure)"
-                        >
-                            <Pencil aria-hidden="true" />
-                        </Button>
-                        <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            class="text-muted-foreground hover:text-destructive"
-                            :aria-label="`Delete ${structure.name}`"
-                            @click="openStructureDelete(structure)"
-                        >
-                            <Trash2 aria-hidden="true" />
-                        </Button>
-                    </div>
-                </header>
-
-                <div class="flex flex-1 flex-col gap-4 p-5">
-                    <div class="flex items-center justify-between gap-4">
-                        <h3 class="text-sm font-medium">Academic periods</h3>
-                        <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            @click="openPeriodForm(structure)"
-                        >
-                            <CirclePlus aria-hidden="true" />
-                            Add root period
-                        </Button>
-                    </div>
-
-                    <div
-                        v-if="structure.root_periods.length"
-                        class="flex flex-col gap-3"
-                    >
-                        <article
-                            v-for="rootPeriod in structure.root_periods"
-                            :key="rootPeriod.id"
-                            class="rounded-lg border bg-background"
-                        >
-                            <div
-                                class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+                <template #filters>
+                    <Select v-model="educationalLevelFilter">
+                        <SelectTrigger aria-label="Filter by educational level">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">
+                                All educational levels
+                            </SelectItem>
+                            <SelectItem
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="String(level.id)"
                             >
-                                <div class="min-w-0">
-                                    <div
-                                        class="flex flex-wrap items-center gap-2"
-                                    >
-                                        <span class="font-medium">
-                                            {{ rootPeriod.name }}
-                                        </span>
-                                        <span
-                                            v-if="
-                                                rootPeriod.status === 'inactive'
-                                            "
-                                            class="text-xs text-muted-foreground"
-                                        >
-                                            Inactive
-                                        </span>
-                                    </div>
-                                    <p
-                                        class="mt-0.5 text-xs text-muted-foreground"
-                                    >
-                                        Sequence {{ rootPeriod.sequence
-                                        }}<template v-if="rootPeriod.code">
-                                            · {{ rootPeriod.code }}</template
-                                        >
-                                    </p>
-                                </div>
+                                {{ level.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <DataTablePageSizeSelect
+                        :model-value="academicTermStructures.per_page"
+                        @update:model-value="fetchStructures"
+                    />
+                </template>
+            </DataTableToolbar>
 
-                                <div class="flex shrink-0 gap-1">
-                                    <Button
-                                        v-if="
-                                            structure.type !== 'quarterly' &&
-                                            rootPeriod.children.length < 4
-                                        "
-                                        type="button"
-                                        size="sm"
-                                        variant="ghost"
-                                        @click="
-                                            openPeriodForm(
-                                                structure,
-                                                null,
-                                                rootPeriod,
-                                            )
-                                        "
-                                    >
-                                        <Plus aria-hidden="true" />
-                                        Add grading period
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        size="icon"
-                                        variant="ghost"
-                                        :aria-label="`Edit ${rootPeriod.name}`"
-                                        @click="
-                                            openPeriodForm(
-                                                structure,
-                                                rootPeriod,
-                                            )
-                                        "
-                                    >
-                                        <Pencil aria-hidden="true" />
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        size="icon"
-                                        variant="ghost"
-                                        class="text-muted-foreground hover:text-destructive"
-                                        :aria-label="`Delete ${rootPeriod.name}`"
-                                        @click="
-                                            openPeriodDelete(
-                                                structure,
-                                                rootPeriod,
-                                            )
-                                        "
-                                    >
-                                        <Trash2 aria-hidden="true" />
-                                    </Button>
-                                </div>
-                            </div>
+            <DataTable
+                :columns="columns"
+                :data="academicTermStructures.data"
+                empty-message="No academic term structures found."
+            />
 
-                            <div
-                                v-if="rootPeriod.children.length"
-                                class="flex flex-col border-t bg-muted/10"
-                            >
-                                <div
-                                    v-for="child in rootPeriod.children"
-                                    :key="child.id"
-                                    class="flex items-center justify-between gap-3 border-b px-4 py-3 last:border-b-0"
-                                >
-                                    <div
-                                        class="flex min-w-0 items-center gap-2 pl-2"
-                                    >
-                                        <ChevronRight
-                                            class="size-4 shrink-0 text-muted-foreground"
-                                            aria-hidden="true"
-                                        />
-                                        <span class="truncate text-sm">
-                                            {{ child.name }}
-                                        </span>
-                                        <span
-                                            class="text-xs text-muted-foreground"
-                                        >
-                                            {{ child.sequence }}
-                                        </span>
-                                        <span
-                                            v-if="child.status === 'inactive'"
-                                            class="text-xs text-muted-foreground"
-                                        >
-                                            Inactive
-                                        </span>
-                                    </div>
-                                    <div class="flex shrink-0 gap-1">
-                                        <Button
-                                            type="button"
-                                            size="icon"
-                                            variant="ghost"
-                                            :aria-label="`Edit ${child.name}`"
-                                            @click="
-                                                openPeriodForm(
-                                                    structure,
-                                                    child,
-                                                    rootPeriod,
-                                                )
-                                            "
-                                        >
-                                            <Pencil aria-hidden="true" />
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            size="icon"
-                                            variant="ghost"
-                                            class="text-muted-foreground hover:text-destructive"
-                                            :aria-label="`Delete ${child.name}`"
-                                            @click="
-                                                openPeriodDelete(
-                                                    structure,
-                                                    child,
-                                                )
-                                            "
-                                        >
-                                            <Trash2 aria-hidden="true" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-
-                    <p
-                        v-else
-                        class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground"
-                    >
-                        No academic periods configured.
-                    </p>
-                </div>
-            </section>
-        </div>
-
-        <p
-            v-else
-            class="rounded-xl border border-dashed px-5 py-16 text-center text-sm text-muted-foreground"
-        >
-            No academic term structures found.
-        </p>
-
-        <DataTablePagination
-            :from="academicTermStructures.from"
-            :to="academicTermStructures.to"
-            :total="academicTermStructures.total"
-            :links="academicTermStructures.links"
-            :previous-page-url="academicTermStructures.prev_page_url"
-            :next-page-url="academicTermStructures.next_page_url"
-        />
+            <template #footer>
+                <DataTablePagination
+                    :from="academicTermStructures.from"
+                    :to="academicTermStructures.to"
+                    :total="academicTermStructures.total"
+                    :links="academicTermStructures.links"
+                    :previous-page-url="academicTermStructures.prev_page_url"
+                    :next-page-url="academicTermStructures.next_page_url"
+                />
+            </template>
+        </DataTableContainer>
     </div>
 
     <StructureFormDialog

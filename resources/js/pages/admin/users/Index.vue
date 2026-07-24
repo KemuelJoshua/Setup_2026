@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { Plus } from '@lucide/vue';
+import { Plus, Sparkles, UsersRound } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
+import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import {
     DataTablePagination,
@@ -94,15 +95,19 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <Head title="Users" />
 
     <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <DataTableToolbar
-            v-model="searchQuery"
-            title="User Management"
-            description="Manage user accounts and assign roles."
-            :count="users.total"
-            item-label="user"
-            search-placeholder="Search by name or email..."
-            search-label="Search users"
-        >
+        <PageHero>
+            <template #icon>
+                <UsersRound class="size-5" aria-hidden="true" />
+            </template>
+            <template #badge>
+                <Sparkles class="size-3.5" aria-hidden="true" />
+                Access management
+            </template>
+            <template #title>User workspace</template>
+            <template #description>
+                Create user accounts, assign roles, and manage access from one
+                organized workspace.
+            </template>
             <template #actions>
                 <UserFormSheet
                     v-model:open="isCreateSheetOpen"
@@ -110,13 +115,22 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
                     :roles="roles"
                 >
                     <template #trigger>
-                        <Button type="button" size="sm">
+                        <Button type="button">
                             <Plus aria-hidden="true" />
-                            Create
+                            Create user
                         </Button>
                     </template>
                 </UserFormSheet>
             </template>
+        </PageHero>
+
+        <DataTableToolbar
+            v-model="searchQuery"
+            :count="users.total"
+            item-label="user"
+            search-placeholder="Search by name or email..."
+            search-label="Search users"
+        >
         </DataTableToolbar>
 
         <div class="flex flex-col gap-4">

@@ -22,7 +22,7 @@ defineProps<{
     <nav
         v-if="total > 0"
         aria-label="Table pagination"
-        class="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:items-center sm:justify-between"
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between"
     >
         <p class="text-sm text-muted-foreground">
             Showing
