@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\AcademicTerm\CreateAcademicTermAction;
+use App\Actions\Academics\AcademicTerm\DeleteAcademicTermAction;
+use App\Actions\Academics\AcademicTerm\IndexAcademicTermAction;
+use App\Actions\Academics\AcademicTerm\UpdateAcademicTermAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreAcademicTermRequest;
 use App\Http\Requests\Academics\UpdateAcademicTermRequest;
 use App\Models\Academics\AcademicTerm;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class AcademicTermController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexAcademicTermAction $indexAcademicTerms): Response
     {
         Gate::authorize('admin view academic terms');
 
@@ -28,18 +29,8 @@ class AcademicTermController extends Controller
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 25,
         ];
 
-        $academicTerms = AcademicTerm::query()
-            ->with('gradingPeriods:id,academic_term_id,name,code,sort_order')
-            ->when($filters['search'], function (Builder $query) use ($filters) {
-                $search = $filters['search'];
-
-                $query->where(function (Builder $query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('code', 'like', "%{$search}%")
-                        ->orWhere('type', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('id')
+        $academicTerms = $indexAcademicTerms
+            ->execute($filters)
             ->paginate($filters['per_page'])
             ->withQueryString()
             ->through(fn (AcademicTerm $academicTerm): array => [
@@ -63,18 +54,13 @@ class AcademicTermController extends Controller
         ]);
     }
 
-    public function store(StoreAcademicTermRequest $request): RedirectResponse
-    {
+    public function store(
+        StoreAcademicTermRequest $request,
+        CreateAcademicTermAction $createAcademicTerm,
+    ): RedirectResponse {
         Gate::authorize('admin create academic terms');
 
-        $validated = $request->validated();
-        $gradingPeriods = $validated['grading_periods'] ?? [];
-        unset($validated['grading_periods']);
-
-        DB::transaction(function () use ($validated, $gradingPeriods): void {
-            $academicTerm = AcademicTerm::query()->create($validated);
-            $academicTerm->gradingPeriods()->createMany($gradingPeriods);
-        });
+        $createAcademicTerm->execute($request->validated());
 
         return redirect()
             ->route('admin.academics.academic-term.index')
@@ -84,35 +70,24 @@ class AcademicTermController extends Controller
     public function update(
         UpdateAcademicTermRequest $request,
         AcademicTerm $academicTerm,
+        UpdateAcademicTermAction $updateAcademicTerm,
     ): RedirectResponse {
         Gate::authorize('admin update academic terms');
 
-        $validated = $request->validated();
-        $gradingPeriods = $validated['grading_periods'] ?? [];
-        unset($validated['grading_periods']);
-
-        DB::transaction(function () use ($academicTerm, $validated, $gradingPeriods): void {
-            $academicTerm->update($validated);
-            $academicTerm->gradingPeriods()->delete();
-            $academicTerm->gradingPeriods()->createMany($gradingPeriods);
-        });
+        $updateAcademicTerm->execute($academicTerm, $request->validated());
 
         return redirect()
             ->route('admin.academics.academic-term.index')
             ->with('success', 'Academic term updated successfully.');
     }
 
-    public function destroy(AcademicTerm $academicTerm): RedirectResponse
-    {
+    public function destroy(
+        AcademicTerm $academicTerm,
+        DeleteAcademicTermAction $deleteAcademicTerm,
+    ): RedirectResponse {
         Gate::authorize('admin delete academic terms');
 
-        if ($academicTerm->curriculumSubjects()->exists()) {
-            throw ValidationException::withMessages([
-                'academic_term' => 'This academic term is assigned to a curriculum.',
-            ]);
-        }
-
-        $academicTerm->delete();
+        $deleteAcademicTerm->execute($academicTerm);
 
         return redirect()
             ->route('admin.academics.academic-term.index')

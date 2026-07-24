@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\Program\CreateProgramAction;
+use App\Actions\Academics\Program\DeleteProgramAction;
+use App\Actions\Academics\Program\IndexProgramAction;
+use App\Actions\Academics\Program\UpdateProgramAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreProgramRequest;
 use App\Http\Requests\Academics\UpdateProgramRequest;
 use App\Models\Academics\Program;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -15,7 +18,7 @@ use Inertia\Response;
 
 class ProgramController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexProgramAction $indexPrograms): Response
     {
         Gate::authorize('admin view programs');
 
@@ -26,17 +29,8 @@ class ProgramController extends Controller
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
-        $programs = Program::query()
-            ->when($filters['search'], function (Builder $query) use ($filters) {
-                $search = $filters['search'];
-
-                $query->where(function (Builder $query) use ($search) {
-                    $query->where('code', 'like', "%{$search}%")
-                        ->orWhere('name', 'like', "%{$search}%")
-                        ->orWhere('status', 'like', "%{$search}%");
-                });
-            })
-            ->latest()
+        $programs = $indexPrograms
+            ->execute($filters)
             ->paginate($filters['per_page'])
             ->withQueryString()
             ->through(fn (Program $program): array => [
@@ -54,11 +48,13 @@ class ProgramController extends Controller
         ]);
     }
 
-    public function store(StoreProgramRequest $request): RedirectResponse
-    {
+    public function store(
+        StoreProgramRequest $request,
+        CreateProgramAction $createProgram,
+    ): RedirectResponse {
         Gate::authorize('admin create programs');
 
-        Program::query()->create($request->validated());
+        $createProgram->execute($request->validated());
 
         return redirect()
             ->route('admin.academics.program.index')
@@ -68,21 +64,24 @@ class ProgramController extends Controller
     public function update(
         UpdateProgramRequest $request,
         Program $program,
+        UpdateProgramAction $updateProgram,
     ): RedirectResponse {
         Gate::authorize('admin update programs');
 
-        $program->update($request->validated());
+        $updateProgram->execute($program, $request->validated());
 
         return redirect()
             ->route('admin.academics.program.index')
             ->with('success', 'Program updated successfully.');
     }
 
-    public function destroy(Program $program): RedirectResponse
-    {
+    public function destroy(
+        Program $program,
+        DeleteProgramAction $deleteProgram,
+    ): RedirectResponse {
         Gate::authorize('admin delete programs');
 
-        $program->delete();
+        $deleteProgram->execute($program);
 
         return redirect()
             ->route('admin.academics.program.index')

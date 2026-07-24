@@ -2,26 +2,25 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\Curriculum\CreateCurriculumAction;
+use App\Actions\Academics\Curriculum\DeleteCurriculumAction;
+use App\Actions\Academics\Curriculum\GetCurriculumFormOptionsAction;
+use App\Actions\Academics\Curriculum\IndexCurriculumAction;
+use App\Actions\Academics\Curriculum\UpdateCurriculumAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreCurriculumRequest;
 use App\Http\Requests\Academics\UpdateCurriculumRequest;
-use App\Models\Academics\AcademicTerm;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\CurriculumSubject;
-use App\Models\Academics\GradeLevel;
-use App\Models\Academics\Subject;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CurriculumController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexCurriculumAction $indexCurricula): Response
     {
         Gate::authorize('admin view curricula');
 
@@ -32,19 +31,8 @@ class CurriculumController extends Controller
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
-        $curricula = Curriculum::query()
-            ->withCount('curriculumSubjects')
-            ->when($filters['search'], function (Builder $query) use ($filters) {
-                $search = $filters['search'];
-
-                $query->where(function (Builder $query) use ($search) {
-                    $query->where('code', 'like', "%{$search}%")
-                        ->orWhere('name', 'like', "%{$search}%")
-                        ->orWhere('effective_year', 'like', "%{$search}%")
-                        ->orWhere('status', 'like', "%{$search}%");
-                });
-            })
-            ->latest()
+        $curricula = $indexCurricula
+            ->execute($filters)
             ->paginate($filters['per_page'])
             ->withQueryString()
             ->through(fn (Curriculum $curriculum): array => [
@@ -64,36 +52,33 @@ class CurriculumController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(GetCurriculumFormOptionsAction $getFormOptions): Response
     {
         Gate::authorize('admin create curricula');
 
         return Inertia::render('admin/academics/curricula/Form', [
             'curriculum' => null,
-            ...$this->formOptions(),
+            ...$getFormOptions->execute(),
         ]);
     }
 
-    public function store(StoreCurriculumRequest $request): RedirectResponse
-    {
+    public function store(
+        StoreCurriculumRequest $request,
+        CreateCurriculumAction $createCurriculum,
+    ): RedirectResponse {
         Gate::authorize('admin create curricula');
 
-        $data = $request->validated();
-        $curriculumSubjects = $data['curriculum_subjects'] ?? [];
-        unset($data['curriculum_subjects']);
-
-        DB::transaction(function () use ($data, $curriculumSubjects): void {
-            $curriculum = Curriculum::query()->create($data);
-            $curriculum->curriculumSubjects()->createMany($curriculumSubjects);
-        });
+        $createCurriculum->execute($request->validated());
 
         return redirect()
             ->route('admin.academics.curriculum.index')
             ->with('success', 'Curriculum created successfully.');
     }
 
-    public function edit(Curriculum $curriculum): Response
-    {
+    public function edit(
+        Curriculum $curriculum,
+        GetCurriculumFormOptionsAction $getFormOptions,
+    ): Response {
         Gate::authorize('admin update curricula');
 
         $curriculum->load([
@@ -118,58 +103,34 @@ class CurriculumController extends Controller
                         'sort_order' => $curriculumSubject->sort_order,
                     ])->all(),
             ],
-            ...$this->formOptions(),
+            ...$getFormOptions->execute(),
         ]);
     }
 
     public function update(
         UpdateCurriculumRequest $request,
         Curriculum $curriculum,
+        UpdateCurriculumAction $updateCurriculum,
     ): RedirectResponse {
         Gate::authorize('admin update curricula');
 
-        $data = $request->validated();
-        $curriculumSubjects = $data['curriculum_subjects'] ?? [];
-        unset($data['curriculum_subjects']);
-
-        DB::transaction(function () use ($curriculum, $data, $curriculumSubjects): void {
-            $curriculum->update($data);
-            $curriculum->curriculumSubjects()->delete();
-            $curriculum->curriculumSubjects()->createMany($curriculumSubjects);
-        });
+        $updateCurriculum->execute($curriculum, $request->validated());
 
         return redirect()
             ->route('admin.academics.curriculum.index')
             ->with('success', 'Curriculum updated successfully.');
     }
 
-    public function destroy(Curriculum $curriculum): RedirectResponse
-    {
+    public function destroy(
+        Curriculum $curriculum,
+        DeleteCurriculumAction $deleteCurriculum,
+    ): RedirectResponse {
         Gate::authorize('admin delete curricula');
 
-        $curriculum->delete();
+        $deleteCurriculum->execute($curriculum);
 
         return redirect()
             ->route('admin.academics.curriculum.index')
             ->with('success', 'Curriculum deleted successfully.');
-    }
-
-    /**
-     * @return array{
-     *     subjects: Collection<int, Subject>,
-     *     yearLevels: Collection<int, GradeLevel>,
-     *     academicTerms: Collection<int, AcademicTerm>
-     * }
-     */
-    private function formOptions(): array
-    {
-        return [
-            'subjects' => Subject::query()->orderBy('name')->get(['id', 'name']),
-            'yearLevels' => GradeLevel::query()->orderBy('name')->get(['id', 'name']),
-            'academicTerms' => AcademicTerm::query()
-                ->orderBy('type')
-                ->orderBy('name')
-                ->get(['id', 'name', 'code', 'type']),
-        ];
     }
 }

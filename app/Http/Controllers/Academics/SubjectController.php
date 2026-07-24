@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\Subject\CreateSubjectAction;
+use App\Actions\Academics\Subject\DeleteSubjectAction;
+use App\Actions\Academics\Subject\IndexSubjectAction;
+use App\Actions\Academics\Subject\UpdateSubjectAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreSubjectRequest;
 use App\Http\Requests\Academics\UpdateSubjectRequest;
 use App\Models\Academics\Subject;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -15,7 +18,7 @@ use Inertia\Response;
 
 class SubjectController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexSubjectAction $indexSubjects): Response
     {
         Gate::authorize('admin view subjects');
 
@@ -26,11 +29,8 @@ class SubjectController extends Controller
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
-        $subjects = Subject::query()
-            ->when($filters['search'], function (Builder $query) use ($filters) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            })
-            ->latest()
+        $subjects = $indexSubjects
+            ->execute($filters)
             ->paginate($filters['per_page'])
             ->withQueryString()
             ->through(fn (Subject $subject): array => [
@@ -45,11 +45,13 @@ class SubjectController extends Controller
         ]);
     }
 
-    public function store(StoreSubjectRequest $request): RedirectResponse
-    {
+    public function store(
+        StoreSubjectRequest $request,
+        CreateSubjectAction $createSubject,
+    ): RedirectResponse {
         Gate::authorize('admin create subjects');
 
-        Subject::query()->create($request->validated());
+        $createSubject->execute($request->validated());
 
         return redirect()
             ->route('admin.academics.subject.index')
@@ -59,21 +61,24 @@ class SubjectController extends Controller
     public function update(
         UpdateSubjectRequest $request,
         Subject $subject,
+        UpdateSubjectAction $updateSubject,
     ): RedirectResponse {
         Gate::authorize('admin update subjects');
 
-        $subject->update($request->validated());
+        $updateSubject->execute($subject, $request->validated());
 
         return redirect()
             ->route('admin.academics.subject.index')
             ->with('success', 'Subject updated successfully.');
     }
 
-    public function destroy(Subject $subject): RedirectResponse
-    {
+    public function destroy(
+        Subject $subject,
+        DeleteSubjectAction $deleteSubject,
+    ): RedirectResponse {
         Gate::authorize('admin delete subjects');
 
-        $subject->delete();
+        $deleteSubject->execute($subject);
 
         return redirect()
             ->route('admin.academics.subject.index')

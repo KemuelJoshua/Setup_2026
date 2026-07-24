@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\GradeLevel\CreateGradeLevelAction;
+use App\Actions\Academics\GradeLevel\DeleteGradeLevelAction;
+use App\Actions\Academics\GradeLevel\IndexGradeLevelAction;
+use App\Actions\Academics\GradeLevel\UpdateGradeLevelAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreGradeLevelRequest;
 use App\Http\Requests\Academics\UpdateGradeLevelRequest;
 use App\Models\Academics\GradeLevel;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -15,7 +18,7 @@ use Inertia\Response;
 
 class GradeLevelController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexGradeLevelAction $indexGradeLevels): Response
     {
         Gate::authorize('admin view grade levels');
 
@@ -26,11 +29,8 @@ class GradeLevelController extends Controller
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
-        $gradeLevels = GradeLevel::query()
-            ->when($filters['search'], function (Builder $query) use ($filters) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            })
-            ->latest()
+        $gradeLevels = $indexGradeLevels
+            ->execute($filters)
             ->paginate($filters['per_page'])
             ->withQueryString()
             ->through(fn (GradeLevel $gradeLevel): array => [
@@ -45,11 +45,13 @@ class GradeLevelController extends Controller
         ]);
     }
 
-    public function store(StoreGradeLevelRequest $request): RedirectResponse
-    {
+    public function store(
+        StoreGradeLevelRequest $request,
+        CreateGradeLevelAction $createGradeLevel,
+    ): RedirectResponse {
         Gate::authorize('admin create grade levels');
 
-        GradeLevel::query()->create($request->validated());
+        $createGradeLevel->execute($request->validated());
 
         return redirect()
             ->route('admin.academics.grade-level.index')
@@ -59,21 +61,24 @@ class GradeLevelController extends Controller
     public function update(
         UpdateGradeLevelRequest $request,
         GradeLevel $gradeLevel,
+        UpdateGradeLevelAction $updateGradeLevel,
     ): RedirectResponse {
         Gate::authorize('admin update grade levels');
 
-        $gradeLevel->update($request->validated());
+        $updateGradeLevel->execute($gradeLevel, $request->validated());
 
         return redirect()
             ->route('admin.academics.grade-level.index')
             ->with('success', 'Grade level updated successfully.');
     }
 
-    public function destroy(GradeLevel $gradeLevel): RedirectResponse
-    {
+    public function destroy(
+        GradeLevel $gradeLevel,
+        DeleteGradeLevelAction $deleteGradeLevel,
+    ): RedirectResponse {
         Gate::authorize('admin delete grade levels');
 
-        $gradeLevel->delete();
+        $deleteGradeLevel->execute($gradeLevel);
 
         return redirect()
             ->route('admin.academics.grade-level.index')

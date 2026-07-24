@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\Section\CreateSectionAction;
+use App\Actions\Academics\Section\DeleteSectionAction;
+use App\Actions\Academics\Section\IndexSectionAction;
+use App\Actions\Academics\Section\UpdateSectionAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreSectionRequest;
 use App\Http\Requests\Academics\UpdateSectionRequest;
 use App\Models\Academics\Section;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -15,7 +18,7 @@ use Inertia\Response;
 
 class SectionController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, IndexSectionAction $indexSections): Response
     {
         Gate::authorize('admin view sections');
 
@@ -26,11 +29,8 @@ class SectionController extends Controller
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
-        $sections = Section::query()
-            ->when($filters['search'], function (Builder $query) use ($filters) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            })
-            ->latest()
+        $sections = $indexSections
+            ->execute($filters)
             ->paginate($filters['per_page'])
             ->withQueryString()
             ->through(fn (Section $section): array => [
@@ -45,11 +45,13 @@ class SectionController extends Controller
         ]);
     }
 
-    public function store(StoreSectionRequest $request): RedirectResponse
-    {
+    public function store(
+        StoreSectionRequest $request,
+        CreateSectionAction $createSection,
+    ): RedirectResponse {
         Gate::authorize('admin create sections');
 
-        Section::query()->create($request->validated());
+        $createSection->execute($request->validated());
 
         return redirect()
             ->route('admin.academics.section.index')
@@ -59,21 +61,24 @@ class SectionController extends Controller
     public function update(
         UpdateSectionRequest $request,
         Section $section,
+        UpdateSectionAction $updateSection,
     ): RedirectResponse {
         Gate::authorize('admin update sections');
 
-        $section->update($request->validated());
+        $updateSection->execute($section, $request->validated());
 
         return redirect()
             ->route('admin.academics.section.index')
             ->with('success', 'Section updated successfully.');
     }
 
-    public function destroy(Section $section): RedirectResponse
-    {
+    public function destroy(
+        Section $section,
+        DeleteSectionAction $deleteSection,
+    ): RedirectResponse {
         Gate::authorize('admin delete sections');
 
-        $section->delete();
+        $deleteSection->execute($section);
 
         return redirect()
             ->route('admin.academics.section.index')
