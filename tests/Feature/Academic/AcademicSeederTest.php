@@ -1,10 +1,11 @@
 <?php
 
-use App\Models\Academics\AcademicTerm;
+use App\Enums\AcademicTermStructureType;
+use App\Models\Academics\AcademicPeriod;
+use App\Models\Academics\AcademicTermStructure;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\CurriculumSubject;
 use App\Models\Academics\GradeLevel;
-use App\Models\Academics\GradingPeriod;
 use App\Models\Academics\Program;
 use App\Models\Academics\Section;
 use App\Models\Academics\Subject;
@@ -15,23 +16,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('database seeder creates a complete repeatable academic dataset', function () {
-    AcademicTerm::query()->create([
-        'name' => 'Semester Track',
-        'code' => 'SEM',
-        'type' => 'Semester',
-    ]);
-    AcademicTerm::query()->create([
-        'name' => 'Old Prelim',
-        'code' => '1ST-PRE',
-        'type' => 'Not Applicable',
-    ]);
-
     $this->seed();
     $this->seed();
 
     expect(SchoolYear::query()->count())->toBe(3)
-        ->and(AcademicTerm::query()->count())->toBe(7)
-        ->and(GradingPeriod::query()->count())->toBe(8)
+        ->and(AcademicTermStructure::query()->count())->toBe(6)
+        ->and(AcademicPeriod::query()->count())->toBe(53)
         ->and(GradeLevel::query()->count())->toBe(6)
         ->and(Section::query()->count())->toBe(3)
         ->and(Subject::query()->count())->toBe(8)
@@ -43,11 +33,26 @@ test('database seeder creates a complete repeatable academic dataset', function 
     expect(CurriculumSubject::query()->where('is_required', true)->count())
         ->toBe(32);
 
-    $firstSemester = AcademicTerm::query()->where('code', '1ST')->firstOrFail();
-    $secondSemester = AcademicTerm::query()->where('code', '2ND')->firstOrFail();
+    $structures = AcademicTermStructure::query()
+        ->with('rootPeriods.children')
+        ->whereIn('code', ['C24GP', 'C23GP', 'C34GP', 'C33GP', 'JHS4Q', 'SHS4Q'])
+        ->get()
+        ->keyBy('code');
 
-    expect($firstSemester->gradingPeriods()->pluck('code')->all())
-        ->toBe(['PRE', 'MID', 'SEMI', 'FIN'])
-        ->and($secondSemester->gradingPeriods()->pluck('code')->all())
-        ->toBe(['PRE', 'MID', 'SEMI', 'FIN']);
+    expect($structures['C24GP']->type)->toBe(AcademicTermStructureType::Semester)
+        ->and($structures['C24GP']->rootPeriods)->toHaveCount(2)
+        ->and($structures['C24GP']->rootPeriods->first()->children)->toHaveCount(4)
+        ->and($structures['C23GP']->rootPeriods)->toHaveCount(2)
+        ->and($structures['C23GP']->rootPeriods->first()->children)->toHaveCount(3)
+        ->and($structures['C34GP']->type)->toBe(AcademicTermStructureType::Trisem)
+        ->and($structures['C34GP']->rootPeriods)->toHaveCount(3)
+        ->and($structures['C34GP']->rootPeriods->first()->children)->toHaveCount(4)
+        ->and($structures['C33GP']->rootPeriods)->toHaveCount(3)
+        ->and($structures['C33GP']->rootPeriods->first()->children)->toHaveCount(3)
+        ->and($structures['JHS4Q']->type)->toBe(AcademicTermStructureType::Quarterly)
+        ->and($structures['JHS4Q']->rootPeriods)->toHaveCount(4)
+        ->and($structures['JHS4Q']->rootPeriods->first()->children)->toBeEmpty()
+        ->and($structures['SHS4Q']->type)->toBe(AcademicTermStructureType::Quarterly)
+        ->and($structures['SHS4Q']->rootPeriods)->toHaveCount(4)
+        ->and($structures['SHS4Q']->rootPeriods->first()->children)->toBeEmpty();
 });

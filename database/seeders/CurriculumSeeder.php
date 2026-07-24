@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Academics\AcademicTerm;
+use App\Models\Academics\AcademicPeriod;
+use App\Models\Academics\AcademicTermStructure;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\GradeLevel;
 use App\Models\Academics\Subject;
@@ -31,9 +32,15 @@ class CurriculumSeeder extends Seeder
                 ->where('name', 'Grade 7')
                 ->firstOrFail();
 
-            $academicTerms = AcademicTerm::query()
+            $juniorHighSchool = AcademicTermStructure::query()
+                ->where('code', 'JHS4Q')
+                ->firstOrFail();
+
+            $academicPeriods = AcademicPeriod::query()
+                ->whereBelongsTo($juniorHighSchool, 'structure')
+                ->roots()
                 ->whereIn('code', ['Q1', 'Q2', 'Q3', 'Q4'])
-                ->orderBy('id')
+                ->ordered()
                 ->get();
 
             $subjects = Subject::query()
@@ -50,13 +57,13 @@ class CurriculumSeeder extends Seeder
                 ->orderBy('id')
                 ->get();
 
-            foreach ($academicTerms as $academicTerm) {
+            foreach ($academicPeriods as $academicPeriod) {
                 foreach ($subjects as $sortOrder => $subject) {
                     $curriculum->curriculumSubjects()->updateOrCreate(
                         [
                             'subject_id' => $subject->getKey(),
                             'year_level_id' => $gradeLevel->getKey(),
-                            'academic_term_id' => $academicTerm->getKey(),
+                            'academic_period_id' => $academicPeriod->getKey(),
                         ],
                         [
                             'is_required' => true,

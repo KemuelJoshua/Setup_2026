@@ -6,26 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('semesters', function (Blueprint $table) {
+        Schema::create('academic_term_structures', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->string('code')->unique();
+            $table->string('type')->index();
+            $table->string('status')->default('active')->index();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('semesters');
+        Schema::dropIfExists('academic_term_structures');
     }
 };

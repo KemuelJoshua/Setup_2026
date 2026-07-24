@@ -2,7 +2,7 @@
 
 namespace App\Actions\Academics\Curriculum;
 
-use App\Models\Academics\AcademicTerm;
+use App\Models\Academics\AcademicPeriod;
 use App\Models\Academics\GradeLevel;
 use App\Models\Academics\Subject;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,7 +13,7 @@ class GetCurriculumFormOptionsAction
      * @return array{
      *     subjects: Collection<int, Subject>,
      *     yearLevels: Collection<int, GradeLevel>,
-     *     academicTerms: Collection<int, AcademicTerm>
+     *     academicPeriods: Collection<int, AcademicPeriod>
      * }
      */
     public function execute(): array
@@ -21,10 +21,17 @@ class GetCurriculumFormOptionsAction
         return [
             'subjects' => Subject::query()->orderBy('name')->get(['id', 'name']),
             'yearLevels' => GradeLevel::query()->orderBy('name')->get(['id', 'name']),
-            'academicTerms' => AcademicTerm::query()
-                ->orderBy('type')
-                ->orderBy('name')
-                ->get(['id', 'name', 'code', 'type']),
+            'academicPeriods' => AcademicPeriod::query()
+                ->roots()
+                ->with('structure:id,name,type')
+                ->active()
+                ->ordered()
+                ->get([
+                    'id',
+                    'academic_term_structure_id',
+                    'name',
+                    'code',
+                ]),
         ];
     }
 }

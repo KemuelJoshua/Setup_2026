@@ -28,7 +28,7 @@ const closeDialog = (): void => {
     <Dialog v-model:open="isOpen">
         <DialogContent v-if="role">
             <Form
-                v-bind="destroy.form(String(role.id))"
+                v-bind="destroy.form(role.id)"
                 v-slot="{ processing }"
                 class="space-y-6"
                 :options="{ preserveScroll: true }"

@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('curriculum_id')->constrained('curricula')->cascadeOnDelete();
             $table->foreignId('subject_id')->constrained();
             $table->foreignId('year_level_id')->constrained('grade_levels');
-            $table->foreignId('semester_id')->constrained();
+            $table->foreignId('academic_period_id')
+                ->constrained()
+                ->restrictOnDelete();
             $table->boolean('is_required');
             $table->unsignedInteger('sort_order');
             $table->timestamps();

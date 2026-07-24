@@ -40,7 +40,7 @@ class UpdateCurriculumRequest extends FormRequest
             'curriculum_subjects' => ['nullable', 'array'],
             'curriculum_subjects.*.subject_id' => ['required', 'integer', 'exists:subjects,id'],
             'curriculum_subjects.*.year_level_id' => ['required', 'integer', 'exists:grade_levels,id'],
-            'curriculum_subjects.*.academic_term_id' => ['required', 'integer', 'exists:academic_terms,id'],
+            'curriculum_subjects.*.academic_period_id' => ['required', 'integer', 'exists:academic_periods,id'],
             'curriculum_subjects.*.is_required' => ['required', 'boolean'],
             'curriculum_subjects.*.sort_order' => ['required', 'integer', 'min:0'],
         ];

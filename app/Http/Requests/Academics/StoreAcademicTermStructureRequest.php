@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests\Academics;
 
-use App\Models\Academics\AcademicTerm;
+use App\Enums\AcademicStatus;
+use App\Enums\AcademicTermStructureType;
+use App\Models\Academics\AcademicTermStructure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreAcademicTermRequest extends FormRequest
+class StoreAcademicTermStructureRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,12 +28,14 @@ class StoreAcademicTermRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', Rule::unique(AcademicTerm::class, 'code')],
-            'type' => ['required', Rule::in(['Quarter', 'Semester', 'Not Applicable'])],
-            'grading_periods' => ['nullable', 'array'],
-            'grading_periods.*.name' => ['required', 'string', 'max:255'],
-            'grading_periods.*.code' => ['required', 'string', 'max:255', 'distinct:ignore_case'],
-            'grading_periods.*.sort_order' => ['required', 'integer', 'min:0'],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique(AcademicTermStructure::class, 'code'),
+            ],
+            'type' => ['required', Rule::enum(AcademicTermStructureType::class)],
+            'status' => ['required', Rule::enum(AcademicStatus::class)],
         ];
     }
 }

@@ -25,7 +25,7 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes/admin';
-import { index as IndexAcademicTerm } from '@/routes/admin/academics/academic-term';
+import { index as IndexAcademicTermStructure } from '@/routes/admin/academics/academic-term-structures';
 import { index as IndexCurriculum } from '@/routes/admin/academics/curriculum';
 import { index as IndexGradeLevel } from '@/routes/admin/academics/grade-level';
 import { index as IndexProgram } from '@/routes/admin/academics/program';
@@ -57,8 +57,8 @@ const primaryNavItems: NavItem[] = [
                 icon: School,
             },
             {
-                title: 'Academic Terms',
-                href: IndexAcademicTerm(),
+                title: 'Academic Periods',
+                href: IndexAcademicTermStructure(),
                 icon: CalendarRange,
             },
             {

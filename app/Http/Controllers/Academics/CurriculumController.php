@@ -82,7 +82,7 @@ class CurriculumController extends Controller
         Gate::authorize('admin update curricula');
 
         $curriculum->load([
-            'curriculumSubjects:id,curriculum_id,subject_id,year_level_id,academic_term_id,is_required,sort_order',
+            'curriculumSubjects:id,curriculum_id,subject_id,year_level_id,academic_period_id,is_required,sort_order',
         ]);
 
         return Inertia::render('admin/academics/curricula/Form', [
@@ -98,7 +98,7 @@ class CurriculumController extends Controller
                         'id' => $curriculumSubject->getKey(),
                         'subject_id' => $curriculumSubject->subject_id,
                         'year_level_id' => $curriculumSubject->year_level_id,
-                        'academic_term_id' => $curriculumSubject->academic_term_id,
+                        'academic_period_id' => $curriculumSubject->academic_period_id,
                         'is_required' => $curriculumSubject->is_required,
                         'sort_order' => $curriculumSubject->sort_order,
                     ])->all(),

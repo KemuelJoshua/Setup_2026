@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\Academics\AcademicTerm;
+use App\Models\Academics\AcademicPeriod;
+use App\Models\Academics\AcademicTermStructure;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\CurriculumSubject;
 use App\Models\Academics\GradeLevel;
@@ -29,13 +30,16 @@ beforeEach(function () {
 
 function curriculumSubjectOptions(): array
 {
+    $structure = AcademicTermStructure::factory()->quarterly()->create();
+
     return [
         Subject::query()->create(['name' => 'Mathematics']),
         GradeLevel::query()->create(['name' => 'Grade 7']),
-        AcademicTerm::query()->create([
+        AcademicPeriod::factory()->create([
+            'academic_term_structure_id' => $structure->getKey(),
             'name' => '1st Quarter',
             'code' => 'Q1',
-            'type' => 'Quarter',
+            'sequence' => 1,
         ]),
     ];
 }
@@ -43,7 +47,7 @@ function curriculumSubjectOptions(): array
 test('authorized users can view and search curricula', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin view curricula');
-    [$subject, $yearLevel, $academicTerm] = curriculumSubjectOptions();
+    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
 
     $curriculum = Curriculum::query()->create([
         'code' => 'JHS-2026',
@@ -55,7 +59,7 @@ test('authorized users can view and search curricula', function () {
     $curriculum->curriculumSubjects()->create([
         'subject_id' => $subject->getKey(),
         'year_level_id' => $yearLevel->getKey(),
-        'academic_term_id' => $academicTerm->getKey(),
+        'academic_period_id' => $academicPeriod->getKey(),
         'is_required' => true,
         'sort_order' => 1,
     ]);
@@ -71,7 +75,7 @@ test('authorized users can view and search curricula', function () {
             ->where('curricula.data.0.curriculum_subjects_count', 1)
             ->missing('subjects')
             ->missing('yearLevels')
-            ->missing('academicTerms'));
+            ->missing('academicPeriods'));
 });
 
 test('authorized users can open the create curriculum page', function () {
@@ -88,14 +92,14 @@ test('authorized users can open the create curriculum page', function () {
             ->where('curriculum', null)
             ->where('subjects.0.name', 'Mathematics')
             ->where('yearLevels.0.name', 'Grade 7')
-            ->where('academicTerms.0.code', 'Q1')
-            ->where('academicTerms.0.type', 'Quarter'));
+            ->where('academicPeriods.0.code', 'Q1')
+            ->where('academicPeriods.0.structure.type', 'quarterly'));
 });
 
 test('authorized users can open the edit curriculum page', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin update curricula');
-    [$subject, $yearLevel, $academicTerm] = curriculumSubjectOptions();
+    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
 
     $curriculum = Curriculum::query()->create([
         'code' => 'JHS-2026',
@@ -107,7 +111,7 @@ test('authorized users can open the edit curriculum page', function () {
     $curriculum->curriculumSubjects()->create([
         'subject_id' => $subject->getKey(),
         'year_level_id' => $yearLevel->getKey(),
-        'academic_term_id' => $academicTerm->getKey(),
+        'academic_period_id' => $academicPeriod->getKey(),
         'is_required' => true,
         'sort_order' => 1,
     ]);
@@ -122,13 +126,13 @@ test('authorized users can open the edit curriculum page', function () {
             ->where('curriculum.code', 'JHS-2026')
             ->where('curriculum.curriculum_subjects.0.subject_id', $subject->getKey())
             ->where('curriculum.curriculum_subjects.0.year_level_id', $yearLevel->getKey())
-            ->where('curriculum.curriculum_subjects.0.academic_term_id', $academicTerm->getKey()));
+            ->where('curriculum.curriculum_subjects.0.academic_period_id', $academicPeriod->getKey()));
 });
 
 test('authorized users can create a curriculum with subjects', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin create curricula');
-    [$subject, $yearLevel, $academicTerm] = curriculumSubjectOptions();
+    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
 
     $this
         ->actingAs($user)
@@ -141,7 +145,7 @@ test('authorized users can create a curriculum with subjects', function () {
             'curriculum_subjects' => [[
                 'subject_id' => $subject->getKey(),
                 'year_level_id' => $yearLevel->getKey(),
-                'academic_term_id' => $academicTerm->getKey(),
+                'academic_period_id' => $academicPeriod->getKey(),
                 'is_required' => true,
                 'sort_order' => 1,
             ]],
@@ -164,7 +168,7 @@ test('authorized users can create a curriculum with subjects', function () {
 test('authorized users can update a curriculum and replace its subjects', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin update curricula');
-    [$originalSubject, $yearLevel, $academicTerm] = curriculumSubjectOptions();
+    [$originalSubject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
     $replacementSubject = Subject::query()->create(['name' => 'Science']);
 
     $curriculum = Curriculum::query()->create([
@@ -177,7 +181,7 @@ test('authorized users can update a curriculum and replace its subjects', functi
     $originalAssignment = $curriculum->curriculumSubjects()->create([
         'subject_id' => $originalSubject->getKey(),
         'year_level_id' => $yearLevel->getKey(),
-        'academic_term_id' => $academicTerm->getKey(),
+        'academic_period_id' => $academicPeriod->getKey(),
         'is_required' => true,
         'sort_order' => 1,
     ]);
@@ -193,7 +197,7 @@ test('authorized users can update a curriculum and replace its subjects', functi
             'curriculum_subjects' => [[
                 'subject_id' => $replacementSubject->getKey(),
                 'year_level_id' => $yearLevel->getKey(),
-                'academic_term_id' => $academicTerm->getKey(),
+                'academic_period_id' => $academicPeriod->getKey(),
                 'is_required' => false,
                 'sort_order' => 2,
             ]],
@@ -217,7 +221,7 @@ test('authorized users can update a curriculum and replace its subjects', functi
 test('deleting a curriculum also deletes its subject assignments', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin delete curricula');
-    [$subject, $yearLevel, $academicTerm] = curriculumSubjectOptions();
+    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
 
     $curriculum = Curriculum::query()->create([
         'code' => 'JHS-2026',
@@ -229,7 +233,7 @@ test('deleting a curriculum also deletes its subject assignments', function () {
     $assignment = $curriculum->curriculumSubjects()->create([
         'subject_id' => $subject->getKey(),
         'year_level_id' => $yearLevel->getKey(),
-        'academic_term_id' => $academicTerm->getKey(),
+        'academic_period_id' => $academicPeriod->getKey(),
         'is_required' => true,
         'sort_order' => 1,
     ]);
@@ -266,7 +270,7 @@ test('curriculum forms validate curriculum and subject fields', function () {
             'curriculum_subjects' => [[
                 'subject_id' => 999,
                 'year_level_id' => 999,
-                'academic_term_id' => 999,
+                'academic_period_id' => 999,
                 'is_required' => 'invalid',
                 'sort_order' => -1,
             ]],
@@ -279,7 +283,7 @@ test('curriculum forms validate curriculum and subject fields', function () {
             'status',
             'curriculum_subjects.0.subject_id',
             'curriculum_subjects.0.year_level_id',
-            'curriculum_subjects.0.academic_term_id',
+            'curriculum_subjects.0.academic_period_id',
             'curriculum_subjects.0.is_required',
             'curriculum_subjects.0.sort_order',
         ]);

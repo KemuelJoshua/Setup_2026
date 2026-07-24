@@ -10,7 +10,7 @@ class CurriculumSubject extends Model
     protected $fillable = [
         'subject_id',
         'year_level_id',
-        'academic_term_id',
+        'academic_period_id',
         'is_required',
         'sort_order',
     ];
@@ -48,10 +48,10 @@ class CurriculumSubject extends Model
     }
 
     /**
-     * @return BelongsTo<AcademicTerm, $this>
+     * @return BelongsTo<AcademicPeriod, $this>
      */
-    public function academicTerm(): BelongsTo
+    public function academicPeriod(): BelongsTo
     {
-        return $this->belongsTo(AcademicTerm::class);
+        return $this->belongsTo(AcademicPeriod::class);
     }
 }

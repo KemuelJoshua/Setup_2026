@@ -29,7 +29,7 @@ const isOpen = defineModel<boolean>('open', { default: false });
 
 const formAttributes = computed(() =>
     props.mode === 'edit' && props.role
-        ? update.form(String(props.role.id))
+        ? update.form(props.role.id)
         : store.form(),
 );
 

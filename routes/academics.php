@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Academics\AcademicTermController;
+use App\Http\Controllers\Academics\AcademicPeriodController;
+use App\Http\Controllers\Academics\AcademicTermStructureController;
 use App\Http\Controllers\Academics\CurriculumController;
 use App\Http\Controllers\Academics\GradeLevelController;
 use App\Http\Controllers\Academics\ProgramController;
@@ -11,12 +12,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('academics')->name('academics.')->group(function () {
 
-        Route::prefix('academic-term')->name('academic-term.')->group(function () {
-            Route::get('/', [AcademicTermController::class, 'index'])->name('index');
-            Route::post('/', [AcademicTermController::class, 'store'])->name('store');
-            Route::put('/{academicTerm}', [AcademicTermController::class, 'update'])->name('update');
-            Route::delete('/{academicTerm}', [AcademicTermController::class, 'destroy'])->name('destroy');
-        });
+        Route::resource('academic-term-structures', AcademicTermStructureController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('academic-periods', AcademicPeriodController::class)
+            ->only(['store', 'update', 'destroy']);
 
         Route::prefix('grade-level')->name('grade-level.')->group(function () {
             Route::get('/', [GradeLevelController::class, 'index'])->name('index');
