@@ -14,6 +14,7 @@ import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
+    DataTablePageSizeSelect,
     DataTablePagination,
     DataTableToolbar,
 } from '@/components/ui/data-table';
@@ -158,24 +159,10 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             search-label="Search academic term structures"
         >
             <template #filters>
-                <select
-                    :value="academicTermStructures.per_page"
-                    class="h-9 rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
-                    aria-label="Rows per page"
-                    @change="
-                        fetchStructures(
-                            Number(($event.target as HTMLSelectElement).value),
-                        )
-                    "
-                >
-                    <option
-                        v-for="size in [10, 15, 25, 50]"
-                        :key="size"
-                        :value="size"
-                    >
-                        {{ size }} rows
-                    </option>
-                </select>
+                <DataTablePageSizeSelect
+                    :model-value="academicTermStructures.per_page"
+                    @update:model-value="fetchStructures"
+                />
             </template>
 
             <template #actions>

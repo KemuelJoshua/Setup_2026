@@ -7,6 +7,7 @@ import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
+    DataTablePageSizeSelect,
     DataTablePagination,
     DataTableToolbar,
 } from '@/components/ui/data-table';
@@ -19,6 +20,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { destroy, index } from '@/routes/admin/academics/subject';
 import type { LengthAwarePaginator } from '@/types';
 
@@ -45,7 +53,7 @@ const props = defineProps<{
 
 const searchQuery = ref(props.filters.search ?? '');
 const educationalLevelFilter = ref(
-    props.filters.educational_level_id?.toString() ?? '',
+    props.filters.educational_level_id?.toString() ?? 'all',
 );
 const isFormDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
@@ -60,7 +68,10 @@ const fetchSubjects = (
         index({
             query: {
                 search: searchQuery.value || undefined,
-                educational_level_id: educationalLevelFilter.value || undefined,
+                educational_level_id:
+                    educationalLevelFilter.value === 'all'
+                        ? undefined
+                        : educationalLevelFilter.value,
                 per_page: perPage,
             },
         }),
@@ -137,45 +148,27 @@ onBeforeUnmount(() => {
             search-label="Search subjects"
         >
             <template #filters>
-                <select
-                    v-model="educationalLevelFilter"
-                    class="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
-                    aria-label="Filter by educational level"
-                >
-                    <option value="">All educational levels</option>
-                    <option
-                        v-for="level in educationalLevels"
-                        :key="level.id"
-                        :value="level.id"
-                    >
-                        {{ level.name }}
-                    </option>
-                </select>
-                <label
-                    class="flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                    <span class="sr-only">Rows per page</span>
-                    <select
-                        :value="subjects.per_page"
-                        class="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
-                        aria-label="Rows per page"
-                        @change="
-                            fetchSubjects(
-                                Number(
-                                    ($event.target as HTMLSelectElement).value,
-                                ),
-                            )
-                        "
-                    >
-                        <option
-                            v-for="size in [10, 15, 25, 50]"
-                            :key="size"
-                            :value="size"
+                <Select v-model="educationalLevelFilter">
+                    <SelectTrigger aria-label="Filter by educational level">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">
+                            All educational levels
+                        </SelectItem>
+                        <SelectItem
+                            v-for="level in educationalLevels"
+                            :key="level.id"
+                            :value="String(level.id)"
                         >
-                            {{ size }} rows
-                        </option>
-                    </select>
-                </label>
+                            {{ level.name }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <DataTablePageSizeSelect
+                    :model-value="subjects.per_page"
+                    @update:model-value="fetchSubjects"
+                />
             </template>
 
             <template #actions>

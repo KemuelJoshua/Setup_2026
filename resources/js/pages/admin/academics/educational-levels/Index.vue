@@ -7,6 +7,7 @@ import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import {
     DataTable,
+    DataTablePageSizeSelect,
     DataTablePagination,
     DataTableToolbar,
 } from '@/components/ui/data-table';
@@ -110,31 +111,10 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             search-label="Search educational levels"
         >
             <template #filters>
-                <label
-                    class="flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                    <span class="sr-only">Rows per page</span>
-                    <select
-                        :value="educationalLevels.per_page"
-                        class="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
-                        aria-label="Rows per page"
-                        @change="
-                            fetchEducationalLevels(
-                                Number(
-                                    ($event.target as HTMLSelectElement).value,
-                                ),
-                            )
-                        "
-                    >
-                        <option
-                            v-for="size in [10, 15, 25, 50]"
-                            :key="size"
-                            :value="size"
-                        >
-                            {{ size }} rows
-                        </option>
-                    </select>
-                </label>
+                <DataTablePageSizeSelect
+                    :model-value="educationalLevels.per_page"
+                    @update:model-value="fetchEducationalLevels"
+                />
             </template>
             <template #actions>
                 <Button type="button" size="sm" @click="openCreateDialog">

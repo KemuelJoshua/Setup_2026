@@ -16,6 +16,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { store, update } from '@/routes/admin/academics/grade-level';
 
 import type { GradeLevel } from './columns';
@@ -81,21 +88,28 @@ const handleError = (): void => {
                         <Label for="grade-level-educational-level">
                             Educational Level
                         </Label>
-                        <select
-                            id="grade-level-educational-level"
+                        <Select
                             name="educational_level_id"
-                            :value="gradeLevel?.educational_level_id ?? ''"
-                            class="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                            :default-value="
+                                gradeLevel?.educational_level_id ?? undefined
+                            "
                         >
-                            <option value="" disabled>Select a level</option>
-                            <option
-                                v-for="level in educationalLevels"
-                                :key="level.id"
-                                :value="level.id"
+                            <SelectTrigger
+                                id="grade-level-educational-level"
+                                class="w-full"
                             >
-                                {{ level.name }}
-                            </option>
-                        </select>
+                                <SelectValue placeholder="Select a level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="level in educationalLevels"
+                                    :key="level.id"
+                                    :value="level.id"
+                                >
+                                    {{ level.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.educational_level_id" />
                     </div>
                     <div class="grid gap-2">

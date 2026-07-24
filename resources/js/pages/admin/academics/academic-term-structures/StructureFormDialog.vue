@@ -17,6 +17,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     store,
     update,
 } from '@/routes/admin/academics/academic-term-structures';
@@ -105,34 +112,42 @@ const handleSuccess = (): void => {
 
                     <div class="grid gap-2">
                         <Label for="structure-type">Type</Label>
-                        <select
-                            id="structure-type"
+                        <Select
                             name="type"
-                            :value="structure?.type ?? 'semester'"
-                            class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                            :default-value="structure?.type ?? 'semester'"
                         >
-                            <option
-                                v-for="typeOption in structureTypes"
-                                :key="typeOption.value"
-                                :value="typeOption.value"
-                            >
-                                {{ typeOption.label }}
-                            </option>
-                        </select>
+                            <SelectTrigger id="structure-type" class="w-full">
+                                <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="typeOption in structureTypes"
+                                    :key="typeOption.value"
+                                    :value="typeOption.value"
+                                >
+                                    {{ typeOption.label }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.type" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="structure-status">Status</Label>
-                        <select
-                            id="structure-status"
+                        <Select
                             name="status"
-                            :value="structure?.status ?? 'active'"
-                            class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                            :default-value="structure?.status ?? 'active'"
                         >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                            <SelectTrigger id="structure-status" class="w-full">
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive"
+                                    >Inactive</SelectItem
+                                >
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.status" />
                     </div>
                 </div>

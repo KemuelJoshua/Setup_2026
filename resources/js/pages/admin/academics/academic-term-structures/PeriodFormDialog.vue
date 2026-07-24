@@ -16,6 +16,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { store, update } from '@/routes/admin/academics/academic-periods';
 
 import type { AcademicPeriod, AcademicTermStructure } from './types';
@@ -126,15 +133,20 @@ const handleSuccess = (): void => {
 
                     <div class="grid gap-2 sm:col-span-2">
                         <Label for="period-status">Status</Label>
-                        <select
-                            id="period-status"
+                        <Select
                             name="status"
-                            :value="period?.status ?? 'active'"
-                            class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                            :default-value="period?.status ?? 'active'"
                         >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
+                            <SelectTrigger id="period-status" class="w-full">
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive"
+                                    >Inactive</SelectItem
+                                >
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.status" />
                     </div>
                 </div>

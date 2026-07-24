@@ -16,6 +16,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { store, update } from '@/routes/admin/academics/program';
 
 import type { Program } from './columns';
@@ -77,21 +85,28 @@ const handleError = (): void => {
                         <Label for="program-educational-level">
                             Educational Level
                         </Label>
-                        <select
-                            id="program-educational-level"
+                        <Select
                             name="educational_level_id"
-                            :value="program?.educational_level_id ?? ''"
-                            class="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                            :default-value="
+                                program?.educational_level_id ?? undefined
+                            "
                         >
-                            <option value="" disabled>Select a level</option>
-                            <option
-                                v-for="level in educationalLevels"
-                                :key="level.id"
-                                :value="level.id"
+                            <SelectTrigger
+                                id="program-educational-level"
+                                class="w-full"
                             >
-                                {{ level.name }}
-                            </option>
-                        </select>
+                                <SelectValue placeholder="Select a level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="level in educationalLevels"
+                                    :key="level.id"
+                                    :value="level.id"
+                                >
+                                    {{ level.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.educational_level_id" />
                     </div>
 
@@ -113,7 +128,7 @@ const handleError = (): void => {
                             <Input
                                 id="program-status"
                                 name="status"
-                                :default-value="program?.status"
+                                :default-value="program?.status ?? 'Active'"
                                 placeholder="Active"
                             />
                             <InputError :message="errors.status" />
@@ -133,12 +148,11 @@ const handleError = (): void => {
 
                     <div class="grid gap-2">
                         <Label for="program-description">Description</Label>
-                        <textarea
+                        <Textarea
                             id="program-description"
                             name="description"
-                            :value="program?.description ?? ''"
+                            :default-value="program?.description ?? ''"
                             rows="4"
-                            class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground shadow-xs transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/20"
                             placeholder="Optional program description"
                         />
                         <InputError :message="errors.description" />

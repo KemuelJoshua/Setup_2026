@@ -13,6 +13,7 @@ import { toast } from 'vue-sonner';
 
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogClose,
@@ -24,6 +25,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { index } from '@/routes/admin/academics/curriculum';
 import {
     destroy,
@@ -199,7 +208,9 @@ const handleSaved = (): void => {
                     2
                 </div>
                 <div>
-                    <p class="text-xs font-medium tracking-wide text-primary uppercase">
+                    <p
+                        class="text-xs font-medium tracking-wide text-primary uppercase"
+                    >
                         Curriculum subjects
                     </p>
                     <h1 class="mt-1 text-2xl font-semibold tracking-tight">
@@ -209,7 +220,9 @@ const handleSaved = (): void => {
                         class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground"
                     >
                         <span>{{ curriculum.code }}</span>
-                        <span>{{ curriculum.program?.name ?? 'No program' }}</span>
+                        <span>{{
+                            curriculum.program?.name ?? 'No program'
+                        }}</span>
                         <span>Effective {{ curriculum.effective_year }}</span>
                         <span>
                             {{ curriculum.number_of_years }}
@@ -299,7 +312,9 @@ const handleSaved = (): void => {
 
                     <div class="divide-y">
                         <p
-                            v-if="subjectsFor(yearLevel.id, term.id).length === 0"
+                            v-if="
+                                subjectsFor(yearLevel.id, term.id).length === 0
+                            "
                             class="px-4 py-8 text-center text-sm text-muted-foreground"
                         >
                             No subjects added.
@@ -317,12 +332,10 @@ const handleSaved = (): void => {
                                 <h3 class="text-sm font-medium">
                                     {{ subject.subject_name }}
                                 </h3>
-                                <p
-                                    class="mt-1 text-xs text-muted-foreground"
-                                >
+                                <p class="mt-1 text-xs text-muted-foreground">
                                     {{ subject.units ?? '0.00' }} units ·
-                                    {{ subject.lecture_hours ?? '0.00' }} lecture
-                                    ·
+                                    {{ subject.lecture_hours ?? '0.00' }}
+                                    lecture ·
                                     {{ subject.laboratory_hours ?? '0.00' }} lab
                                 </p>
                                 <div
@@ -421,61 +434,66 @@ const handleSaved = (): void => {
                 <div class="grid gap-5 sm:grid-cols-2">
                     <div class="grid gap-2 sm:col-span-2">
                         <Label for="course">Course *</Label>
-                        <select
-                            id="course"
-                            v-model="draft.subject_id"
-                            name="subject_id"
-                            class="h-10 rounded-md border border-input bg-background px-3 text-sm"
-                        >
-                            <option value="">Select course</option>
-                            <option
-                                v-for="subject in subjects"
-                                :key="subject.id"
-                                :value="subject.id"
-                            >
-                                {{ subject.name }}
-                            </option>
-                        </select>
+                        <Select v-model="draft.subject_id" name="subject_id">
+                            <SelectTrigger id="course" class="w-full">
+                                <SelectValue placeholder="Select course" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="subject in subjects"
+                                    :key="subject.id"
+                                    :value="subject.id"
+                                >
+                                    {{ subject.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.subject_id" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="year-level">Year level *</Label>
-                        <select
-                            id="year-level"
+                        <Select
                             v-model="draft.year_level_id"
                             name="year_level_id"
-                            class="h-10 rounded-md border border-input bg-background px-3 text-sm"
                         >
-                            <option value="">Select year level</option>
-                            <option
-                                v-for="yearLevel in availableYearLevels"
-                                :key="yearLevel.id"
-                                :value="yearLevel.id"
-                            >
-                                {{ yearLevel.name }}
-                            </option>
-                        </select>
+                            <SelectTrigger id="year-level" class="w-full">
+                                <SelectValue placeholder="Select year level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="yearLevel in availableYearLevels"
+                                    :key="yearLevel.id"
+                                    :value="yearLevel.id"
+                                >
+                                    {{ yearLevel.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.year_level_id" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="academic-term">Academic term *</Label>
-                        <select
-                            id="academic-term"
+                        <Select
                             v-model="draft.academic_period_id"
                             name="academic_period_id"
-                            class="h-10 rounded-md border border-input bg-background px-3 text-sm"
                         >
-                            <option value="">Select academic term</option>
-                            <option
-                                v-for="term in terms"
-                                :key="term.id"
-                                :value="term.id"
-                            >
-                                {{ term.name }}
-                            </option>
-                        </select>
+                            <SelectTrigger id="academic-term" class="w-full">
+                                <SelectValue
+                                    placeholder="Select academic term"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="term in terms"
+                                    :key="term.id"
+                                    :value="term.id"
+                                >
+                                    {{ term.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.academic_period_id" />
                     </div>
 
@@ -506,9 +524,7 @@ const handleSaved = (): void => {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="laboratory-hours">
-                            Laboratory hours
-                        </Label>
+                        <Label for="laboratory-hours"> Laboratory hours </Label>
                         <Input
                             id="laboratory-hours"
                             v-model="draft.laboratory_hours"
@@ -549,19 +565,17 @@ const handleSaved = (): void => {
                             :key="candidate.id"
                             class="flex items-center gap-2 text-sm"
                         >
-                            <input
-                                type="checkbox"
-                                :checked="
-                                    draft.prerequisite_ids.includes(candidate.id)
+                            <Checkbox
+                                :model-value="
+                                    draft.prerequisite_ids.includes(
+                                        candidate.id,
+                                    )
                                 "
-                                class="size-4 accent-primary"
-                                @change="
+                                @update:model-value="
                                     toggleReference(
                                         'prerequisite_ids',
                                         candidate.id,
-                                        (
-                                            $event.target as HTMLInputElement
-                                        ).checked,
+                                        $event === true,
                                     )
                                 "
                             />
@@ -592,19 +606,15 @@ const handleSaved = (): void => {
                             :key="candidate.id"
                             class="flex items-center gap-2 text-sm"
                         >
-                            <input
-                                type="checkbox"
-                                :checked="
+                            <Checkbox
+                                :model-value="
                                     draft.corequisite_ids.includes(candidate.id)
                                 "
-                                class="size-4 accent-primary"
-                                @change="
+                                @update:model-value="
                                     toggleReference(
                                         'corequisite_ids',
                                         candidate.id,
-                                        (
-                                            $event.target as HTMLInputElement
-                                        ).checked,
+                                        $event === true,
                                     )
                                 "
                             />
@@ -623,12 +633,12 @@ const handleSaved = (): void => {
 
                 <div class="grid gap-2">
                     <Label for="remarks">Remarks</Label>
-                    <textarea
+                    <Textarea
                         id="remarks"
                         v-model="draft.remarks"
                         name="remarks"
                         rows="3"
-                        class="w-full resize-y rounded-md border border-input bg-transparent px-3 py-2.5 text-sm"
+                        class="resize-y"
                     />
                     <InputError :message="errors.remarks" />
                 </div>

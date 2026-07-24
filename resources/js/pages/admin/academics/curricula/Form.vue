@@ -8,6 +8,14 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { index, store } from '@/routes/admin/academics/curriculum';
 
 import type {
@@ -108,48 +116,52 @@ defineOptions({
 
                 <div class="grid gap-2">
                     <Label for="educational-level">Educational level *</Label>
-                    <select
-                        id="educational-level"
-                        v-model="educationalLevelId"
-                        class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
-                    >
-                        <option value="">Select educational level</option>
-                        <option
-                            v-for="level in educationalLevels"
-                            :key="level.id"
-                            :value="level.id"
-                        >
-                            {{ level.name }}
-                        </option>
-                    </select>
+                    <Select v-model="educationalLevelId">
+                        <SelectTrigger id="educational-level" class="w-full">
+                            <SelectValue
+                                placeholder="Select educational level"
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="String(level.id)"
+                            >
+                                {{ level.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="program">Program *</Label>
-                    <select
-                        id="program"
+                    <Select
                         v-model="programId"
                         name="program_id"
                         :disabled="!educationalLevelId"
-                        class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
                     >
-                        <option value="">
-                            {{
-                                educationalLevelId
-                                    ? filteredPrograms.length
-                                        ? 'Select program'
-                                        : 'No programs available'
-                                    : 'Select educational level first'
-                            }}
-                        </option>
-                        <option
-                            v-for="program in filteredPrograms"
-                            :key="program.id"
-                            :value="program.id"
-                        >
-                            {{ program.code }} — {{ program.name }}
-                        </option>
-                    </select>
+                        <SelectTrigger id="program" class="w-full">
+                            <SelectValue
+                                :placeholder="
+                                    educationalLevelId
+                                        ? filteredPrograms.length
+                                            ? 'Select program'
+                                            : 'No programs available'
+                                        : 'Select educational level first'
+                                "
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem
+                                v-for="program in filteredPrograms"
+                                :key="program.id"
+                                :value="String(program.id)"
+                            >
+                                {{ program.code }} — {{ program.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                     <InputError :message="errors.program_id" />
                 </div>
 
@@ -181,25 +193,26 @@ defineOptions({
 
                 <div class="grid gap-2">
                     <Label for="status">Status *</Label>
-                    <select
-                        id="status"
-                        name="status"
-                        class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
-                    >
-                        <option value="Draft">Draft</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
+                    <Select name="status" default-value="Draft">
+                        <SelectTrigger id="status" class="w-full">
+                            <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Draft">Draft</SelectItem>
+                            <SelectItem value="Active">Active</SelectItem>
+                            <SelectItem value="Inactive">Inactive</SelectItem>
+                        </SelectContent>
+                    </Select>
                     <InputError :message="errors.status" />
                 </div>
 
                 <div class="grid gap-2 sm:col-span-2">
                     <Label for="description">Remarks</Label>
-                    <textarea
+                    <Textarea
                         id="description"
                         name="description"
                         rows="3"
-                        class="w-full resize-y rounded-md border border-input bg-transparent px-3 py-2.5 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
+                        class="resize-y"
                         placeholder="Optional curriculum remarks"
                     />
                     <InputError :message="errors.description" />
