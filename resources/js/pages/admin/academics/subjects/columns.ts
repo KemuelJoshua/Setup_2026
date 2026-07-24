@@ -12,12 +12,15 @@ import { formatDate } from '@/lib/formatDate';
 
 export interface Subject {
     id: number;
+    educational_level_id: number | null;
+    educational_level: { id: number; name: string } | null;
     name: string;
     created_at: string;
 }
 
 export interface SubjectFilters {
     search?: string;
+    educational_level_id?: string | number;
     per_page?: string | number;
 }
 
@@ -44,6 +47,23 @@ export const createColumns = (
                 'span',
                 { class: 'font-medium text-foreground' },
                 row.original.name,
+            ),
+    },
+    {
+        accessorKey: 'educational_level.name',
+        meta: {
+            className: 'min-w-[190px]',
+        },
+        header: ({ column }) =>
+            h(DataTableColumnHeader as Component, {
+                column,
+                title: 'Educational Level',
+            }),
+        cell: ({ row }) =>
+            h(
+                'span',
+                { class: 'text-sm text-muted-foreground' },
+                row.original.educational_level?.name ?? 'Not assigned',
             ),
     },
     {

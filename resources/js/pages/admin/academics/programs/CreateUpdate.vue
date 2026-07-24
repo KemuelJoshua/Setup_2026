@@ -22,6 +22,7 @@ import type { Program } from './columns';
 
 const props = defineProps<{
     program: Program | null;
+    educationalLevels: Array<{ id: number; name: string }>;
 }>();
 
 const isOpen = defineModel<boolean>('open', { default: false });
@@ -72,6 +73,28 @@ const handleError = (): void => {
                 </DialogHeader>
 
                 <div class="space-y-5">
+                    <div class="grid gap-2">
+                        <Label for="program-educational-level">
+                            Educational Level
+                        </Label>
+                        <select
+                            id="program-educational-level"
+                            name="educational_level_id"
+                            :value="program?.educational_level_id ?? ''"
+                            class="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                        >
+                            <option value="" disabled>Select a level</option>
+                            <option
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="level.id"
+                            >
+                                {{ level.name }}
+                            </option>
+                        </select>
+                        <InputError :message="errors.educational_level_id" />
+                    </div>
+
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="grid gap-2">
                             <Label for="program-code">Code</Label>

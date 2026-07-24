@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\EducationalLevel\ListEducationalLevelOptionsAction;
 use App\Actions\Academics\Section\CreateSectionAction;
 use App\Actions\Academics\Section\DeleteSectionAction;
 use App\Actions\Academics\Section\IndexSectionAction;
@@ -18,14 +19,18 @@ use Inertia\Response;
 
 class SectionController extends Controller
 {
-    public function index(Request $request, IndexSectionAction $indexSections): Response
-    {
+    public function index(
+        Request $request,
+        IndexSectionAction $indexSections,
+        ListEducationalLevelOptionsAction $listEducationalLevelOptions,
+    ): Response {
         Gate::authorize('admin view sections');
 
         $perPage = $request->integer('per_page', 15);
 
         $filters = [
             'search' => $request->string('search')->trim()->toString() ?: null,
+            'educational_level_id' => $request->integer('educational_level_id') ?: null,
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
@@ -36,12 +41,20 @@ class SectionController extends Controller
             ->through(fn (Section $section): array => [
                 'id' => $section->getKey(),
                 'name' => $section->name,
+                'educational_level_id' => $section->educational_level_id,
+                'educational_level' => $section->educationalLevel
+                    ? [
+                        'id' => $section->educationalLevel->getKey(),
+                        'name' => $section->educationalLevel->name,
+                    ]
+                    : null,
                 'created_at' => $section->created_at?->toDateTimeString(),
             ]);
 
         return Inertia::render('admin/academics/sections/Index', [
             'sections' => $sections,
             'filters' => $filters,
+            'educationalLevels' => $listEducationalLevelOptions->execute(),
         ]);
     }
 

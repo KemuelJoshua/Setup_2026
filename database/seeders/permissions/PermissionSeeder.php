@@ -40,6 +40,11 @@ class PermissionSeeder extends Seeder
             'admin update academic periods',
             'admin delete academic periods',
 
+            'admin view educational levels',
+            'admin create educational levels',
+            'admin update educational levels',
+            'admin delete educational levels',
+
             'admin view grade levels',
             'admin create grade levels',
             'admin update grade levels',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\Subject;
 use App\Models\User;
 use Database\Seeders\permissions\PermissionSeeder;
@@ -21,13 +22,20 @@ beforeEach(function () {
             'guard_name' => 'web',
         ]);
     }
+
+    $this->educationalLevel = EducationalLevel::factory()->create([
+        'name' => 'Junior High School',
+    ]);
 });
 
 test('authorized users can view and search subjects', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin view subjects');
 
-    Subject::query()->create(['name' => 'Mathematics']);
+    Subject::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
+        'name' => 'Mathematics',
+    ]);
 
     $this
         ->actingAs($user)
@@ -36,7 +44,9 @@ test('authorized users can view and search subjects', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/academics/subjects/Index')
             ->where('subjects.total', 1)
-            ->where('subjects.data.0.name', 'Mathematics'));
+            ->where('subjects.data.0.name', 'Mathematics')
+            ->where('subjects.data.0.educational_level.name', 'Junior High School')
+            ->where('educationalLevels.0.name', 'Junior High School'));
 });
 
 test('authorized users can create a subject', function () {
@@ -47,25 +57,33 @@ test('authorized users can create a subject', function () {
         ->actingAs($user)
         ->post(route('admin.academics.subject.store'), [
             'name' => 'Mathematics',
+            'educational_level_id' => $this->educationalLevel->getKey(),
         ])
         ->assertRedirect(route('admin.academics.subject.index'))
         ->assertSessionHas('success', 'Subject created successfully.');
 
     $subject = Subject::query()->where('name', 'Mathematics')->firstOrFail();
 
-    expect($subject->created_at)->not->toBeNull()
+    expect($subject->educational_level_id)
+        ->toBe($this->educationalLevel->getKey())
+        ->and($subject->educationalLevel->is($this->educationalLevel))->toBeTrue()
+        ->and($subject->created_at)->not->toBeNull()
         ->and($subject->updated_at)->not->toBeNull();
 });
 
 test('authorized users can update a subject', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin update subjects');
-    $subject = Subject::query()->create(['name' => 'Mathematics']);
+    $subject = Subject::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
+        'name' => 'Mathematics',
+    ]);
 
     $this
         ->actingAs($user)
         ->put(route('admin.academics.subject.update', $subject), [
             'name' => 'Science',
+            'educational_level_id' => $this->educationalLevel->getKey(),
         ])
         ->assertRedirect(route('admin.academics.subject.index'))
         ->assertSessionHas('success', 'Subject updated successfully.');
@@ -76,7 +94,10 @@ test('authorized users can update a subject', function () {
 test('authorized users can delete a subject', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin delete subjects');
-    $subject = Subject::query()->create(['name' => 'Mathematics']);
+    $subject = Subject::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
+        'name' => 'Mathematics',
+    ]);
 
     $this
         ->actingAs($user)
@@ -94,9 +115,25 @@ test('subject name is required', function () {
     $this
         ->actingAs($user)
         ->from(route('admin.academics.subject.index'))
-        ->post(route('admin.academics.subject.store'), ['name' => ''])
+        ->post(route('admin.academics.subject.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
+            'name' => '',
+        ])
         ->assertRedirect(route('admin.academics.subject.index'))
         ->assertSessionHasErrors(['name']);
+});
+
+test('subject educational level is required and must exist', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin create subjects');
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.subject.store'), [
+            'educational_level_id' => 999999,
+            'name' => 'Mathematics',
+        ])
+        ->assertSessionHasErrors(['educational_level_id']);
 });
 
 test('users without permission cannot create a subject', function () {
@@ -106,6 +143,7 @@ test('users without permission cannot create a subject', function () {
         ->actingAs($user)
         ->post(route('admin.academics.subject.store'), [
             'name' => 'Mathematics',
+            'educational_level_id' => $this->educationalLevel->getKey(),
         ])
         ->assertForbidden();
 

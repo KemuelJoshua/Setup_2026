@@ -22,6 +22,7 @@ import type { Section } from './columns';
 
 const props = defineProps<{
     section: Section | null;
+    educationalLevels: Array<{ id: number; name: string }>;
 }>();
 
 const isOpen = defineModel<boolean>('open', { default: false });
@@ -69,16 +70,39 @@ const handleError = (): void => {
                     </DialogDescription>
                 </DialogHeader>
 
-                <div class="grid gap-2">
-                    <Label for="section-name">Name</Label>
-                    <Input
-                        id="section-name"
-                        name="name"
-                        :default-value="section?.name"
-                        placeholder="Section A"
-                        autofocus
-                    />
-                    <InputError :message="errors.name" />
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="grid gap-2">
+                        <Label for="section-educational-level">
+                            Educational Level
+                        </Label>
+                        <select
+                            id="section-educational-level"
+                            name="educational_level_id"
+                            :value="section?.educational_level_id ?? ''"
+                            class="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                        >
+                            <option value="" disabled>Select a level</option>
+                            <option
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="level.id"
+                            >
+                                {{ level.name }}
+                            </option>
+                        </select>
+                        <InputError :message="errors.educational_level_id" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="section-name">Name</Label>
+                        <Input
+                            id="section-name"
+                            name="name"
+                            :default-value="section?.name"
+                            placeholder="Section A"
+                            autofocus
+                        />
+                        <InputError :message="errors.name" />
+                    </div>
                 </div>
 
                 <DialogFooter>

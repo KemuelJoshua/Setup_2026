@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\GradeLevel;
 use App\Models\User;
 use Database\Seeders\permissions\PermissionSeeder;
@@ -21,13 +22,20 @@ beforeEach(function () {
             'guard_name' => 'web',
         ]);
     }
+
+    $this->educationalLevel = EducationalLevel::factory()->create([
+        'name' => 'Junior High School',
+    ]);
 });
 
 test('authorized users can view and search grade levels', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin view grade levels');
 
-    GradeLevel::query()->create(['name' => 'Grade 7']);
+    GradeLevel::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
+        'name' => 'Grade 7',
+    ]);
 
     $this
         ->actingAs($user)
@@ -36,7 +44,9 @@ test('authorized users can view and search grade levels', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/academics/grade-levels/Index')
             ->where('gradeLevels.total', 1)
-            ->where('gradeLevels.data.0.name', 'Grade 7'));
+            ->where('gradeLevels.data.0.name', 'Grade 7')
+            ->where('gradeLevels.data.0.educational_level.name', 'Junior High School')
+            ->where('educationalLevels.0.name', 'Junior High School'));
 });
 
 test('authorized users can create a grade level', function () {
@@ -47,6 +57,7 @@ test('authorized users can create a grade level', function () {
         ->actingAs($user)
         ->post(route('admin.academics.grade-level.store'), [
             'name' => 'Grade 7',
+            'educational_level_id' => $this->educationalLevel->getKey(),
         ])
         ->assertRedirect(route('admin.academics.grade-level.index'))
         ->assertSessionHas('success', 'Grade level created successfully.');
@@ -55,19 +66,26 @@ test('authorized users can create a grade level', function () {
 
     $gradeLevel = GradeLevel::query()->where('name', 'Grade 7')->firstOrFail();
 
-    expect($gradeLevel->created_at)->not->toBeNull()
+    expect($gradeLevel->educational_level_id)
+        ->toBe($this->educationalLevel->getKey())
+        ->and($gradeLevel->educationalLevel->is($this->educationalLevel))->toBeTrue()
+        ->and($gradeLevel->created_at)->not->toBeNull()
         ->and($gradeLevel->updated_at)->not->toBeNull();
 });
 
 test('authorized users can update a grade level', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin update grade levels');
-    $gradeLevel = GradeLevel::query()->create(['name' => 'Grade 7']);
+    $gradeLevel = GradeLevel::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
+        'name' => 'Grade 7',
+    ]);
 
     $this
         ->actingAs($user)
         ->put(route('admin.academics.grade-level.update', $gradeLevel), [
             'name' => 'Grade 8',
+            'educational_level_id' => $this->educationalLevel->getKey(),
         ])
         ->assertRedirect(route('admin.academics.grade-level.index'))
         ->assertSessionHas('success', 'Grade level updated successfully.');
@@ -78,7 +96,10 @@ test('authorized users can update a grade level', function () {
 test('authorized users can delete a grade level', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin delete grade levels');
-    $gradeLevel = GradeLevel::query()->create(['name' => 'Grade 7']);
+    $gradeLevel = GradeLevel::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
+        'name' => 'Grade 7',
+    ]);
 
     $this
         ->actingAs($user)
@@ -96,9 +117,25 @@ test('grade level name is required', function () {
     $this
         ->actingAs($user)
         ->from(route('admin.academics.grade-level.index'))
-        ->post(route('admin.academics.grade-level.store'), ['name' => ''])
+        ->post(route('admin.academics.grade-level.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
+            'name' => '',
+        ])
         ->assertRedirect(route('admin.academics.grade-level.index'))
         ->assertSessionHasErrors(['name']);
+});
+
+test('grade level educational level is required and must exist', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin create grade levels');
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.grade-level.store'), [
+            'educational_level_id' => 999999,
+            'name' => 'Grade 7',
+        ])
+        ->assertSessionHasErrors(['educational_level_id']);
 });
 
 test('users without permission cannot create a grade level', function () {
@@ -108,6 +145,7 @@ test('users without permission cannot create a grade level', function () {
         ->actingAs($user)
         ->post(route('admin.academics.grade-level.store'), [
             'name' => 'Grade 7',
+            'educational_level_id' => $this->educationalLevel->getKey(),
         ])
         ->assertForbidden();
 

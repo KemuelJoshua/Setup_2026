@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\EducationalLevel\ListEducationalLevelOptionsAction;
 use App\Actions\Academics\GradeLevel\CreateGradeLevelAction;
 use App\Actions\Academics\GradeLevel\DeleteGradeLevelAction;
 use App\Actions\Academics\GradeLevel\IndexGradeLevelAction;
@@ -18,14 +19,18 @@ use Inertia\Response;
 
 class GradeLevelController extends Controller
 {
-    public function index(Request $request, IndexGradeLevelAction $indexGradeLevels): Response
-    {
+    public function index(
+        Request $request,
+        IndexGradeLevelAction $indexGradeLevels,
+        ListEducationalLevelOptionsAction $listEducationalLevelOptions,
+    ): Response {
         Gate::authorize('admin view grade levels');
 
         $perPage = $request->integer('per_page', 15);
 
         $filters = [
             'search' => $request->string('search')->trim()->toString() ?: null,
+            'educational_level_id' => $request->integer('educational_level_id') ?: null,
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
@@ -36,12 +41,20 @@ class GradeLevelController extends Controller
             ->through(fn (GradeLevel $gradeLevel): array => [
                 'id' => $gradeLevel->getKey(),
                 'name' => $gradeLevel->name,
+                'educational_level_id' => $gradeLevel->educational_level_id,
+                'educational_level' => $gradeLevel->educationalLevel
+                    ? [
+                        'id' => $gradeLevel->educationalLevel->getKey(),
+                        'name' => $gradeLevel->educationalLevel->name,
+                    ]
+                    : null,
                 'created_at' => $gradeLevel->created_at?->toDateTimeString(),
             ]);
 
         return Inertia::render('admin/academics/grade-levels/Index', [
             'gradeLevels' => $gradeLevels,
             'filters' => $filters,
+            'educationalLevels' => $listEducationalLevelOptions->execute(),
         ]);
     }
 

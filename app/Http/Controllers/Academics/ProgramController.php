@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\EducationalLevel\ListEducationalLevelOptionsAction;
 use App\Actions\Academics\Program\CreateProgramAction;
 use App\Actions\Academics\Program\DeleteProgramAction;
 use App\Actions\Academics\Program\IndexProgramAction;
@@ -18,14 +19,18 @@ use Inertia\Response;
 
 class ProgramController extends Controller
 {
-    public function index(Request $request, IndexProgramAction $indexPrograms): Response
-    {
+    public function index(
+        Request $request,
+        IndexProgramAction $indexPrograms,
+        ListEducationalLevelOptionsAction $listEducationalLevelOptions,
+    ): Response {
         Gate::authorize('admin view programs');
 
         $perPage = $request->integer('per_page', 15);
 
         $filters = [
             'search' => $request->string('search')->trim()->toString() ?: null,
+            'educational_level_id' => $request->integer('educational_level_id') ?: null,
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
@@ -35,6 +40,13 @@ class ProgramController extends Controller
             ->withQueryString()
             ->through(fn (Program $program): array => [
                 'id' => $program->getKey(),
+                'educational_level_id' => $program->educational_level_id,
+                'educational_level' => $program->educationalLevel
+                    ? [
+                        'id' => $program->educationalLevel->getKey(),
+                        'name' => $program->educationalLevel->name,
+                    ]
+                    : null,
                 'code' => $program->code,
                 'name' => $program->name,
                 'description' => $program->description,
@@ -45,6 +57,7 @@ class ProgramController extends Controller
         return Inertia::render('admin/academics/programs/Index', [
             'programs' => $programs,
             'filters' => $filters,
+            'educationalLevels' => $listEducationalLevelOptions->execute(),
         ]);
     }
 

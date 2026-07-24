@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Academics;
 
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\Program;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,6 +28,11 @@ class UpdateProgramRequest extends FormRequest
         $program = $this->route('program');
 
         return [
+            'educational_level_id' => [
+                'required',
+                'integer',
+                Rule::exists(EducationalLevel::class, 'id'),
+            ],
             'code' => [
                 'required',
                 'string',

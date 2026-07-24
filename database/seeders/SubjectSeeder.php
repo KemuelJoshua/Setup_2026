@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\Subject;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +13,10 @@ class SubjectSeeder extends Seeder
      */
     public function run(): void
     {
+        $educationalLevel = EducationalLevel::query()
+            ->where('name', 'Junior High School')
+            ->firstOrFail();
+
         foreach ([
             'English',
             'Filipino',
@@ -22,7 +27,10 @@ class SubjectSeeder extends Seeder
             'Technology and Livelihood Education',
             'Values Education',
         ] as $name) {
-            Subject::query()->firstOrCreate(['name' => $name]);
+            Subject::query()->updateOrCreate(
+                ['name' => $name],
+                ['educational_level_id' => $educationalLevel->getKey()],
+            );
         }
     }
 }

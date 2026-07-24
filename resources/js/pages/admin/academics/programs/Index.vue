@@ -40,9 +40,13 @@ defineOptions({
 const props = defineProps<{
     programs: LengthAwarePaginator<Program>;
     filters: ProgramFilters;
+    educationalLevels: Array<{ id: number; name: string }>;
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
+const educationalLevelFilter = ref(
+    props.filters.educational_level_id?.toString() ?? '',
+);
 const isFormDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const selectedProgram = ref<Program | null>(null);
@@ -56,6 +60,7 @@ const fetchPrograms = (
         index({
             query: {
                 search: searchQuery.value || undefined,
+                educational_level_id: educationalLevelFilter.value || undefined,
                 per_page: perPage,
             },
         }),
@@ -105,7 +110,7 @@ const handleDeleteError = (): void => {
     toast.error('Unable to delete the program. Please try again.');
 };
 
-watch(searchQuery, handleSearch);
+watch([searchQuery, educationalLevelFilter], handleSearch);
 
 watch([isFormDialogOpen, isDeleteDialogOpen], ([formOpen, deleteOpen]) => {
     if (!formOpen && !deleteOpen) {
@@ -132,6 +137,20 @@ onBeforeUnmount(() => {
             search-label="Search programs"
         >
             <template #filters>
+                <select
+                    v-model="educationalLevelFilter"
+                    class="h-9 rounded-lg border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                    aria-label="Filter by educational level"
+                >
+                    <option value="">All educational levels</option>
+                    <option
+                        v-for="level in educationalLevels"
+                        :key="level.id"
+                        :value="level.id"
+                    >
+                        {{ level.name }}
+                    </option>
+                </select>
                 <label
                     class="flex items-center gap-2 text-sm text-muted-foreground"
                 >
@@ -185,7 +204,11 @@ onBeforeUnmount(() => {
         </div>
     </div>
 
-    <CreateUpdate v-model:open="isFormDialogOpen" :program="selectedProgram" />
+    <CreateUpdate
+        v-model:open="isFormDialogOpen"
+        :program="selectedProgram"
+        :educational-levels="educationalLevels"
+    />
 
     <Dialog v-model:open="isDeleteDialogOpen">
         <DialogContent v-if="selectedProgram">

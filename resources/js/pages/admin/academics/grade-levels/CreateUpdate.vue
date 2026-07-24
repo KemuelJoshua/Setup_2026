@@ -22,6 +22,7 @@ import type { GradeLevel } from './columns';
 
 const props = defineProps<{
     gradeLevel: GradeLevel | null;
+    educationalLevels: Array<{ id: number; name: string }>;
 }>();
 
 const isOpen = defineModel<boolean>('open', { default: false });
@@ -75,16 +76,39 @@ const handleError = (): void => {
                     </DialogDescription>
                 </DialogHeader>
 
-                <div class="grid gap-2">
-                    <Label for="grade-level-name">Name</Label>
-                    <Input
-                        id="grade-level-name"
-                        name="name"
-                        :default-value="gradeLevel?.name"
-                        placeholder="Grade 7"
-                        autofocus
-                    />
-                    <InputError :message="errors.name" />
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="grid gap-2">
+                        <Label for="grade-level-educational-level">
+                            Educational Level
+                        </Label>
+                        <select
+                            id="grade-level-educational-level"
+                            name="educational_level_id"
+                            :value="gradeLevel?.educational_level_id ?? ''"
+                            class="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 dark:bg-input/20"
+                        >
+                            <option value="" disabled>Select a level</option>
+                            <option
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="level.id"
+                            >
+                                {{ level.name }}
+                            </option>
+                        </select>
+                        <InputError :message="errors.educational_level_id" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="grade-level-name">Name</Label>
+                        <Input
+                            id="grade-level-name"
+                            name="name"
+                            :default-value="gradeLevel?.name"
+                            placeholder="Grade 7"
+                            autofocus
+                        />
+                        <InputError :message="errors.name" />
+                    </div>
                 </div>
 
                 <DialogFooter>

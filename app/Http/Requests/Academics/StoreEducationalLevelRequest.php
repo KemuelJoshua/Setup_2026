@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreSubjectRequest extends FormRequest
+class StoreEducationalLevelRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +25,12 @@ class StoreSubjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'educational_level_id' => [
+            'name' => [
                 'required',
-                'integer',
-                Rule::exists(EducationalLevel::class, 'id'),
+                'string',
+                'max:255',
+                Rule::unique(EducationalLevel::class, 'name'),
             ],
-            'name' => ['required', 'string', 'max:255'],
         ];
     }
 }

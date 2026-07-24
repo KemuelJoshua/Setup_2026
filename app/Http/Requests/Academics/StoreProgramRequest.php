@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Academics;
 
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\Program;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,6 +26,11 @@ class StoreProgramRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'educational_level_id' => [
+                'required',
+                'integer',
+                Rule::exists(EducationalLevel::class, 'id'),
+            ],
             'code' => ['required', 'string', 'max:255', Rule::unique(Program::class, 'code')],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],

@@ -10,94 +10,43 @@ import {
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { formatDate } from '@/lib/formatDate';
 
-export interface Program {
+export interface EducationalLevel {
     id: number;
-    educational_level_id: number | null;
-    educational_level: { id: number; name: string } | null;
-    code: string;
     name: string;
-    description: string | null;
-    status: string;
     created_at: string;
 }
 
-export interface ProgramFilters {
+export interface EducationalLevelFilters {
     search?: string;
-    educational_level_id?: string | number;
     per_page?: string | number;
 }
 
-interface ProgramColumnActions {
-    edit: (program: Program) => void;
-    delete: (program: Program) => void;
+interface EducationalLevelColumnActions {
+    edit: (educationalLevel: EducationalLevel) => void;
+    delete: (educationalLevel: EducationalLevel) => void;
 }
 
 export const createColumns = (
-    actions: ProgramColumnActions,
-): ColumnDef<Program>[] => [
+    actions: EducationalLevelColumnActions,
+): ColumnDef<EducationalLevel>[] => [
     {
         accessorKey: 'name',
-        meta: {
-            className: 'min-w-[240px]',
-        },
+        meta: { className: 'min-w-[220px]' },
         header: ({ column }) =>
             h(DataTableColumnHeader as Component, {
                 column,
-                title: 'Program',
-            }),
-        cell: ({ row }) =>
-            h('div', { class: 'flex flex-col gap-0.5 py-1' }, [
-                h(
-                    'span',
-                    { class: 'font-medium text-foreground' },
-                    row.original.name,
-                ),
-                h(
-                    'span',
-                    { class: 'text-xs text-muted-foreground' },
-                    row.original.code,
-                ),
-            ]),
-    },
-    {
-        accessorKey: 'educational_level.name',
-        meta: {
-            className: 'min-w-[190px]',
-        },
-        header: ({ column }) =>
-            h(DataTableColumnHeader as Component, {
-                column,
-                title: 'Educational Level',
+                title: 'Name',
             }),
         cell: ({ row }) =>
             h(
                 'span',
-                { class: 'text-sm text-muted-foreground' },
-                row.original.educational_level?.name ?? 'Not assigned',
-            ),
-    },
-    {
-        accessorKey: 'status',
-        meta: {
-            className: 'min-w-[120px]',
-        },
-        header: ({ column }) =>
-            h(DataTableColumnHeader as Component, {
-                column,
-                title: 'Status',
-            }),
-        cell: ({ row }) =>
-            h(
-                'span',
-                { class: 'text-sm text-muted-foreground' },
-                row.original.status,
+                { class: 'font-medium text-foreground' },
+                row.original.name,
             ),
     },
     {
         accessorKey: 'created_at',
-        meta: {
-            className: 'min-w-[150px]',
-        },
+        meta: { className: 'min-w-[150px]' },
         header: ({ column }) =>
             h(DataTableColumnHeader as Component, {
                 column,
@@ -116,9 +65,7 @@ export const createColumns = (
         id: 'actions',
         enableHiding: false,
         enableSorting: false,
-        meta: {
-            className: 'w-[100px] text-right',
-        },
+        meta: { className: 'w-[100px] text-right' },
         header: ({ column }) =>
             h(DataTableColumnHeader as Component, {
                 column,
@@ -129,9 +76,7 @@ export const createColumns = (
             h('div', { class: 'flex justify-end' }, [
                 h(
                     DataTableRowActions,
-                    {
-                        label: `Open actions for ${row.original.name}`,
-                    },
+                    { label: `Open actions for ${row.original.name}` },
                     {
                         default: () => [
                             h(

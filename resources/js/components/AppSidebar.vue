@@ -11,6 +11,7 @@ import {
     BookOpen,
     ScrollText,
     CalendarDays,
+    Layers3,
 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
@@ -27,6 +28,7 @@ import {
 import { dashboard } from '@/routes/admin';
 import { index as IndexAcademicTermStructure } from '@/routes/admin/academics/academic-term-structures';
 import { index as IndexCurriculum } from '@/routes/admin/academics/curriculum';
+import { index as IndexEducationalLevel } from '@/routes/admin/academics/educational-level';
 import { index as IndexGradeLevel } from '@/routes/admin/academics/grade-level';
 import { index as IndexProgram } from '@/routes/admin/academics/program';
 import { index as IndexSection } from '@/routes/admin/academics/section';
@@ -60,6 +62,11 @@ const primaryNavItems: NavItem[] = [
                 title: 'Academic Periods',
                 href: IndexAcademicTermStructure(),
                 icon: CalendarRange,
+            },
+            {
+                title: 'Educational Levels',
+                href: IndexEducationalLevel(),
+                icon: Layers3,
             },
             {
                 title: 'Grade Levels',

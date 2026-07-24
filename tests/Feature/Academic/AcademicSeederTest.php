@@ -5,6 +5,7 @@ use App\Models\Academics\AcademicPeriod;
 use App\Models\Academics\AcademicTermStructure;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\CurriculumSubject;
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\GradeLevel;
 use App\Models\Academics\Program;
 use App\Models\Academics\Section;
@@ -22,6 +23,7 @@ test('database seeder creates a complete repeatable academic dataset', function 
     expect(SchoolYear::query()->count())->toBe(3)
         ->and(AcademicTermStructure::query()->count())->toBe(6)
         ->and(AcademicPeriod::query()->count())->toBe(38)
+        ->and(EducationalLevel::query()->count())->toBe(4)
         ->and(GradeLevel::query()->count())->toBe(16)
         ->and(Section::query()->count())->toBe(3)
         ->and(Subject::query()->count())->toBe(8)
@@ -29,6 +31,21 @@ test('database seeder creates a complete repeatable academic dataset', function 
         ->and(Curriculum::query()->count())->toBe(1)
         ->and(CurriculumSubject::query()->count())->toBe(32)
         ->and(User::query()->where('email', 'admin@gmail.com')->count())->toBe(1);
+
+    expect(GradeLevel::query()
+        ->where('name', 'Grade 7')
+        ->whereHas('educationalLevel', fn ($query) => $query
+            ->where('name', 'Junior High School'))
+        ->exists())->toBeTrue()
+        ->and(Program::query()
+            ->where('code', 'STEM')
+            ->whereHas('educationalLevel', fn ($query) => $query
+                ->where('name', 'Senior High School'))
+            ->exists())->toBeTrue()
+        ->and(Subject::query()
+            ->whereHas('educationalLevel', fn ($query) => $query
+                ->where('name', 'Junior High School'))
+            ->count())->toBe(8);
 
     expect(CurriculumSubject::query()->where('is_required', true)->count())
         ->toBe(32);

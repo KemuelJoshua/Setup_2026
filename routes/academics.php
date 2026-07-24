@@ -4,6 +4,7 @@ use App\Http\Controllers\Academics\AcademicPeriodController;
 use App\Http\Controllers\Academics\AcademicTermStructureController;
 use App\Http\Controllers\Academics\CurriculumController;
 use App\Http\Controllers\Academics\CurriculumSubjectController;
+use App\Http\Controllers\Academics\EducationalLevelController;
 use App\Http\Controllers\Academics\GradeLevelController;
 use App\Http\Controllers\Academics\ProgramController;
 use App\Http\Controllers\Academics\SectionController;
@@ -17,6 +18,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy']);
         Route::resource('academic-periods', AcademicPeriodController::class)
             ->only(['store', 'update', 'destroy']);
+
+        Route::prefix('educational-level')->name('educational-level.')->group(function () {
+            Route::get('/', [EducationalLevelController::class, 'index'])->name('index');
+            Route::post('/', [EducationalLevelController::class, 'store'])->name('store');
+            Route::put('/{educationalLevel}', [EducationalLevelController::class, 'update'])->name('update');
+            Route::delete('/{educationalLevel}', [EducationalLevelController::class, 'destroy'])->name('destroy');
+        });
 
         Route::prefix('grade-level')->name('grade-level.')->group(function () {
             Route::get('/', [GradeLevelController::class, 'index'])->name('index');

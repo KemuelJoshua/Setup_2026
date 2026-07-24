@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Academics;
 
+use App\Actions\Academics\EducationalLevel\ListEducationalLevelOptionsAction;
 use App\Actions\Academics\Subject\CreateSubjectAction;
 use App\Actions\Academics\Subject\DeleteSubjectAction;
 use App\Actions\Academics\Subject\IndexSubjectAction;
@@ -18,14 +19,18 @@ use Inertia\Response;
 
 class SubjectController extends Controller
 {
-    public function index(Request $request, IndexSubjectAction $indexSubjects): Response
-    {
+    public function index(
+        Request $request,
+        IndexSubjectAction $indexSubjects,
+        ListEducationalLevelOptionsAction $listEducationalLevelOptions,
+    ): Response {
         Gate::authorize('admin view subjects');
 
         $perPage = $request->integer('per_page', 15);
 
         $filters = [
             'search' => $request->string('search')->trim()->toString() ?: null,
+            'educational_level_id' => $request->integer('educational_level_id') ?: null,
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
@@ -36,12 +41,20 @@ class SubjectController extends Controller
             ->through(fn (Subject $subject): array => [
                 'id' => $subject->getKey(),
                 'name' => $subject->name,
+                'educational_level_id' => $subject->educational_level_id,
+                'educational_level' => $subject->educationalLevel
+                    ? [
+                        'id' => $subject->educationalLevel->getKey(),
+                        'name' => $subject->educationalLevel->name,
+                    ]
+                    : null,
                 'created_at' => $subject->created_at?->toDateTimeString(),
             ]);
 
         return Inertia::render('admin/academics/subjects/Index', [
             'subjects' => $subjects,
             'filters' => $filters,
+            'educationalLevels' => $listEducationalLevelOptions->execute(),
         ]);
     }
 

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Academics;
 
+use App\Models\Academics\EducationalLevel;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSectionRequest extends FormRequest
 {
@@ -23,6 +25,11 @@ class StoreSectionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'educational_level_id' => [
+                'required',
+                'integer',
+                Rule::exists(EducationalLevel::class, 'id'),
+            ],
             'name' => ['required', 'string', 'max:255'],
         ];
     }

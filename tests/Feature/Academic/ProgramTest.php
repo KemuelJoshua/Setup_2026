@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\Program;
 use App\Models\User;
 use Database\Seeders\permissions\PermissionSeeder;
@@ -21,6 +22,10 @@ beforeEach(function () {
             'guard_name' => 'web',
         ]);
     }
+
+    $this->educationalLevel = EducationalLevel::factory()->create([
+        'name' => 'Higher Education',
+    ]);
 });
 
 test('authorized users can view and search programs', function () {
@@ -28,6 +33,7 @@ test('authorized users can view and search programs', function () {
     $user->givePermissionTo('admin view programs');
 
     Program::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
         'code' => 'BSCS',
         'name' => 'Computer Science',
         'description' => 'Computing program',
@@ -42,7 +48,9 @@ test('authorized users can view and search programs', function () {
             ->component('admin/academics/programs/Index')
             ->where('programs.total', 1)
             ->where('programs.data.0.code', 'BSCS')
-            ->where('programs.data.0.name', 'Computer Science'));
+            ->where('programs.data.0.name', 'Computer Science')
+            ->where('programs.data.0.educational_level.name', 'Higher Education')
+            ->where('educationalLevels.0.name', 'Higher Education'));
 });
 
 test('authorized users can create a program', function () {
@@ -52,6 +60,7 @@ test('authorized users can create a program', function () {
     $this
         ->actingAs($user)
         ->post(route('admin.academics.program.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
             'code' => 'BSCS',
             'name' => 'Computer Science',
             'description' => null,
@@ -63,6 +72,9 @@ test('authorized users can create a program', function () {
     $program = Program::query()->where('code', 'BSCS')->firstOrFail();
 
     expect($program->name)->toBe('Computer Science')
+        ->and($program->educational_level_id)
+        ->toBe($this->educationalLevel->getKey())
+        ->and($program->educationalLevel->is($this->educationalLevel))->toBeTrue()
         ->and($program->description)->toBeNull()
         ->and($program->created_at)->not->toBeNull()
         ->and($program->updated_at)->not->toBeNull();
@@ -72,6 +84,7 @@ test('authorized users can update a program', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin update programs');
     $program = Program::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
         'code' => 'BSCS',
         'name' => 'Computer Science',
         'description' => null,
@@ -81,6 +94,7 @@ test('authorized users can update a program', function () {
     $this
         ->actingAs($user)
         ->put(route('admin.academics.program.update', $program), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
             'code' => 'BSCS',
             'name' => 'Bachelor of Science in Computer Science',
             'description' => 'Updated description',
@@ -99,6 +113,7 @@ test('authorized users can delete a program', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin delete programs');
     $program = Program::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
         'code' => 'BSCS',
         'name' => 'Computer Science',
         'description' => null,
@@ -119,6 +134,7 @@ test('program forms validate required fields and unique codes', function () {
     $user->givePermissionTo('admin create programs');
 
     Program::query()->create([
+        'educational_level_id' => $this->educationalLevel->getKey(),
         'code' => 'BSCS',
         'name' => 'Computer Science',
         'description' => null,
@@ -129,6 +145,7 @@ test('program forms validate required fields and unique codes', function () {
         ->actingAs($user)
         ->from(route('admin.academics.program.index'))
         ->post(route('admin.academics.program.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
             'code' => 'BSCS',
             'name' => '',
             'description' => null,
@@ -138,12 +155,29 @@ test('program forms validate required fields and unique codes', function () {
         ->assertSessionHasErrors(['code', 'name', 'status']);
 });
 
+test('program educational level is required and must exist', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin create programs');
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.program.store'), [
+            'educational_level_id' => 999999,
+            'code' => 'BSCS',
+            'name' => 'Computer Science',
+            'description' => null,
+            'status' => 'Active',
+        ])
+        ->assertSessionHasErrors(['educational_level_id']);
+});
+
 test('users without permission cannot create a program', function () {
     $user = User::factory()->create();
 
     $this
         ->actingAs($user)
         ->post(route('admin.academics.program.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
             'code' => 'BSCS',
             'name' => 'Computer Science',
             'description' => null,
