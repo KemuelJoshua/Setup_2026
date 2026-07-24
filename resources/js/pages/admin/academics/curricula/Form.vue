@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { Check, LockKeyhole } from '@lucide/vue';
+import { computed, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
 import InputError from '@/components/InputError.vue';
@@ -11,13 +12,32 @@ import { index, store } from '@/routes/admin/academics/curriculum';
 
 import type {
     AcademicStructureOption,
+    ProgramOption,
     SelectOption,
 } from './columns';
 
-defineProps<{
-    programs: SelectOption[];
+const props = defineProps<{
+    educationalLevels: SelectOption[];
+    programs: ProgramOption[];
     academicStructures: AcademicStructureOption[];
 }>();
+
+const educationalLevelId = ref('');
+const programId = ref('');
+const filteredPrograms = computed(() => {
+    if (!educationalLevelId.value) {
+        return [];
+    }
+
+    return props.programs.filter(
+        (program) =>
+            program.educational_level_id === Number(educationalLevelId.value),
+    );
+});
+
+watch(educationalLevelId, () => {
+    programId.value = '';
+});
 
 defineOptions({
     layout: {
@@ -87,15 +107,43 @@ defineOptions({
                 </div>
 
                 <div class="grid gap-2">
+                    <Label for="educational-level">Educational level *</Label>
+                    <select
+                        id="educational-level"
+                        v-model="educationalLevelId"
+                        class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
+                    >
+                        <option value="">Select educational level</option>
+                        <option
+                            v-for="level in educationalLevels"
+                            :key="level.id"
+                            :value="level.id"
+                        >
+                            {{ level.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="grid gap-2">
                     <Label for="program">Program *</Label>
                     <select
                         id="program"
+                        v-model="programId"
                         name="program_id"
+                        :disabled="!educationalLevelId"
                         class="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"
                     >
-                        <option value="">Select program</option>
+                        <option value="">
+                            {{
+                                educationalLevelId
+                                    ? filteredPrograms.length
+                                        ? 'Select program'
+                                        : 'No programs available'
+                                    : 'Select educational level first'
+                            }}
+                        </option>
                         <option
-                            v-for="program in programs"
+                            v-for="program in filteredPrograms"
                             :key="program.id"
                             :value="program.id"
                         >

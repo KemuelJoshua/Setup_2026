@@ -3,6 +3,7 @@
 use App\Models\Academics\AcademicPeriod;
 use App\Models\Academics\AcademicTermStructure;
 use App\Models\Academics\Curriculum;
+use App\Models\Academics\EducationalLevel;
 use App\Models\Academics\GradeLevel;
 use App\Models\Academics\Program;
 use App\Models\Academics\Subject;
@@ -32,6 +33,7 @@ beforeEach(function () {
  * @return array{
  *     structure: AcademicTermStructure,
  *     period: AcademicPeriod,
+ *     educationalLevel: EducationalLevel,
  *     yearLevel: GradeLevel,
  *     program: Program,
  *     subject: Subject
@@ -39,6 +41,9 @@ beforeEach(function () {
  */
 function curriculumOptions(): array
 {
+    $educationalLevel = EducationalLevel::factory()->create([
+        'name' => 'Junior High School',
+    ]);
     $structure = AcademicTermStructure::factory()->quarterly()->create([
         'name' => 'JHS — Quarter',
         'code' => 'JHS4Q',
@@ -53,8 +58,13 @@ function curriculumOptions(): array
     return [
         'structure' => $structure,
         'period' => $period,
-        'yearLevel' => GradeLevel::query()->create(['name' => 'Grade 7']),
+        'educationalLevel' => $educationalLevel,
+        'yearLevel' => GradeLevel::query()->create([
+            'educational_level_id' => $educationalLevel->getKey(),
+            'name' => 'Grade 7',
+        ]),
         'program' => Program::query()->create([
+            'educational_level_id' => $educationalLevel->getKey(),
             'code' => 'JHS',
             'name' => 'Junior High School',
             'status' => 'Active',
@@ -107,7 +117,16 @@ test('authorized users can view and search curricula', function () {
 test('authorized users can open the create curriculum page', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin create curricula');
-    curriculumOptions();
+    $options = curriculumOptions();
+    $seniorHighSchool = EducationalLevel::factory()->create([
+        'name' => 'Senior High School',
+    ]);
+    Program::query()->create([
+        'educational_level_id' => $seniorHighSchool->getKey(),
+        'code' => 'SHS',
+        'name' => 'Senior High School',
+        'status' => 'Active',
+    ]);
 
     $this
         ->actingAs($user)
@@ -115,7 +134,20 @@ test('authorized users can open the create curriculum page', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/academics/curricula/Form')
+            ->where(
+                'educationalLevels.0.id',
+                $options['educationalLevel']->getKey(),
+            )
             ->where('programs.0.code', 'JHS')
+            ->where(
+                'programs.0.educational_level_id',
+                $options['educationalLevel']->getKey(),
+            )
+            ->where('programs.1.code', 'SHS')
+            ->where(
+                'programs.1.educational_level_id',
+                $seniorHighSchool->getKey(),
+            )
             ->where('academicStructures.0.code', 'JHS4Q')
             ->where('academicStructures.0.root_periods.0.code', 'Q1')
             ->missing('schoolYears'));

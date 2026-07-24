@@ -89,6 +89,10 @@ export interface SelectOption {
     };
 }
 
+export interface ProgramOption extends SelectOption {
+    educational_level_id: number | null;
+}
+
 interface CurriculumColumnActions {
     edit: (curriculum: Curriculum) => void;
     delete: (curriculum: Curriculum) => void;
