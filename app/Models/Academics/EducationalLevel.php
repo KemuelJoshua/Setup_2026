@@ -35,4 +35,9 @@ class EducationalLevel extends Model
     {
         return $this->hasMany(Program::class);
     }
+
+    public function academicTermStructures(): HasMany
+    {
+        return $this->hasMany(AcademicTermStructure::class);
+    }
 }

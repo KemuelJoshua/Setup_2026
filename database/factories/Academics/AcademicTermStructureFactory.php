@@ -5,6 +5,7 @@ namespace Database\Factories\Academics;
 use App\Enums\AcademicStatus;
 use App\Enums\AcademicTermStructureType;
 use App\Models\Academics\AcademicTermStructure;
+use App\Models\Academics\EducationalLevel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,6 +21,7 @@ class AcademicTermStructureFactory extends Factory
     public function definition(): array
     {
         return [
+            'educational_level_id' => EducationalLevel::factory(),
             'name' => fake()->unique()->words(3, true),
             'code' => fake()->unique()->bothify('STRUCT-###'),
             'type' => AcademicTermStructureType::Semester,

@@ -32,6 +32,7 @@ const props = defineProps<{
 
 const educationalLevelId = ref('');
 const programId = ref('');
+const academicStructureId = ref('');
 const filteredPrograms = computed(() => {
     if (!educationalLevelId.value) {
         return [];
@@ -42,9 +43,20 @@ const filteredPrograms = computed(() => {
             program.educational_level_id === Number(educationalLevelId.value),
     );
 });
+const filteredAcademicStructures = computed(() => {
+    if (!educationalLevelId.value) {
+        return [];
+    }
+
+    return props.academicStructures.filter(
+        (structure) =>
+            structure.educational_level_id === Number(educationalLevelId.value),
+    );
+});
 
 watch(educationalLevelId, () => {
     programId.value = '';
+    academicStructureId.value = '';
 });
 
 defineOptions({
@@ -227,13 +239,17 @@ defineOptions({
                     </p>
                 </div>
 
-                <div class="grid gap-3 sm:grid-cols-2">
+                <div
+                    v-if="filteredAcademicStructures.length"
+                    class="grid gap-3 sm:grid-cols-2"
+                >
                     <label
-                        v-for="structure in academicStructures"
+                        v-for="structure in filteredAcademicStructures"
                         :key="structure.id"
                         class="group flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors hover:border-primary/60 has-[:checked]:border-primary has-[:checked]:bg-primary/5"
                     >
                         <input
+                            v-model="academicStructureId"
                             type="radio"
                             name="academic_term_structure_id"
                             :value="structure.id"
@@ -252,6 +268,16 @@ defineOptions({
                         </span>
                     </label>
                 </div>
+                <p
+                    v-else
+                    class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground"
+                >
+                    {{
+                        educationalLevelId
+                            ? 'No academic structures are available for this educational level.'
+                            : 'Select an educational level to view academic structures.'
+                    }}
+                </p>
                 <InputError :message="errors.academic_term_structure_id" />
 
                 <div

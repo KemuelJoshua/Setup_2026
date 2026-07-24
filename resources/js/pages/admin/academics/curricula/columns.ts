@@ -41,6 +41,7 @@ export interface AcademicPeriodOption {
 
 export interface AcademicStructureOption {
     id: number;
+    educational_level_id: number | null;
     name: string;
     code: string;
     type: string;

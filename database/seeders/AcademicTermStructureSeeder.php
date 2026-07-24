@@ -6,6 +6,7 @@ use App\Enums\AcademicStatus;
 use App\Enums\AcademicTermStructureType;
 use App\Models\Academics\AcademicPeriod;
 use App\Models\Academics\AcademicTermStructure;
+use App\Models\Academics\EducationalLevel;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,13 @@ class AcademicTermStructureSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function (): void {
+            $educationalLevels = EducationalLevel::query()
+                ->whereIn('name', [
+                    'Junior High School',
+                    'Senior High School',
+                    'Higher Education',
+                ])
+                ->pluck('id', 'name');
             $fourGradingPeriods = [
                 ['name' => 'Prelim', 'code' => 'PRE'],
                 ['name' => 'Midterm', 'code' => 'MID'],
@@ -41,6 +49,7 @@ class AcademicTermStructureSeeder extends Seeder
                     'name' => 'College — Semester (2 Terms, 4 Grading Periods)',
                     'code' => 'C24GP',
                     'type' => AcademicTermStructureType::Semester,
+                    'educational_level' => 'Higher Education',
                     'terms' => $semesterTerms,
                     'grading_periods' => $fourGradingPeriods,
                 ],
@@ -48,6 +57,7 @@ class AcademicTermStructureSeeder extends Seeder
                     'name' => 'College — Semester (2 Terms)',
                     'code' => 'C23GP',
                     'type' => AcademicTermStructureType::Semester,
+                    'educational_level' => 'Higher Education',
                     'terms' => $semesterTerms,
                     'grading_periods' => [],
                 ],
@@ -55,6 +65,7 @@ class AcademicTermStructureSeeder extends Seeder
                     'name' => 'College — Trimester (3 Terms, 4 Grading Periods)',
                     'code' => 'C34GP',
                     'type' => AcademicTermStructureType::Trisem,
+                    'educational_level' => 'Higher Education',
                     'terms' => $trimesterTerms,
                     'grading_periods' => $fourGradingPeriods,
                 ],
@@ -62,6 +73,7 @@ class AcademicTermStructureSeeder extends Seeder
                     'name' => 'College — Trimester (3 Terms)',
                     'code' => 'C33GP',
                     'type' => AcademicTermStructureType::Trisem,
+                    'educational_level' => 'Higher Education',
                     'terms' => $trimesterTerms,
                     'grading_periods' => [],
                 ],
@@ -69,6 +81,7 @@ class AcademicTermStructureSeeder extends Seeder
                     'name' => 'JHS — Quarter',
                     'code' => 'JHS4Q',
                     'type' => AcademicTermStructureType::Quarterly,
+                    'educational_level' => 'Junior High School',
                     'terms' => $quarterTerms,
                     'grading_periods' => [],
                 ],
@@ -76,6 +89,7 @@ class AcademicTermStructureSeeder extends Seeder
                     'name' => 'SHS — Quarter',
                     'code' => 'SHS4Q',
                     'type' => AcademicTermStructureType::Quarterly,
+                    'educational_level' => 'Senior High School',
                     'terms' => $quarterTerms,
                     'grading_periods' => [],
                 ],
@@ -85,6 +99,9 @@ class AcademicTermStructureSeeder extends Seeder
                 $structure = AcademicTermStructure::query()->updateOrCreate(
                     ['code' => $structureData['code']],
                     [
+                        'educational_level_id' => $educationalLevels[
+                            $structureData['educational_level']
+                        ],
                         'name' => $structureData['name'],
                         'type' => $structureData['type'],
                         'status' => AcademicStatus::Active,

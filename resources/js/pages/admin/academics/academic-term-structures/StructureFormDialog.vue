@@ -28,10 +28,15 @@ import {
     update,
 } from '@/routes/admin/academics/academic-term-structures';
 
-import type { AcademicTermStructure, AcademicTermStructureType } from './types';
+import type {
+    AcademicTermStructure,
+    AcademicTermStructureType,
+    EducationalLevelOption,
+} from './types';
 
 const props = defineProps<{
     structure: AcademicTermStructure | null;
+    educationalLevels: EducationalLevelOption[];
 }>();
 
 const isOpen = defineModel<boolean>('open', { default: false });
@@ -87,6 +92,39 @@ const handleSuccess = (): void => {
                 </DialogHeader>
 
                 <div class="grid gap-5 sm:grid-cols-2">
+                    <div class="grid gap-2 sm:col-span-2">
+                        <Label for="structure-educational-level">
+                            Educational level
+                        </Label>
+                        <Select
+                            name="educational_level_id"
+                            :default-value="
+                                structure?.educational_level_id
+                                    ? String(structure.educational_level_id)
+                                    : undefined
+                            "
+                        >
+                            <SelectTrigger
+                                id="structure-educational-level"
+                                class="w-full"
+                            >
+                                <SelectValue
+                                    placeholder="Select educational level"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="level in educationalLevels"
+                                    :key="level.id"
+                                    :value="String(level.id)"
+                                >
+                                    {{ level.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <InputError :message="errors.educational_level_id" />
+                    </div>
+
                     <div class="grid gap-2">
                         <Label for="structure-name">Name</Label>
                         <Input

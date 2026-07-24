@@ -19,6 +19,8 @@ export interface AcademicPeriod {
 
 export interface AcademicTermStructure {
     id: number;
+    educational_level_id: number | null;
+    educational_level: EducationalLevelOption | null;
     name: string;
     code: string;
     type: AcademicTermStructureType;
@@ -28,5 +30,11 @@ export interface AcademicTermStructure {
 
 export interface AcademicTermStructureFilters {
     search?: string;
+    educational_level_id?: number;
     per_page?: string | number;
+}
+
+export interface EducationalLevelOption {
+    id: number;
+    name: string;
 }

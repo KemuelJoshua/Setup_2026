@@ -29,6 +29,9 @@ class UpdateCurriculumRequest extends FormRequest
         $structureCode = $curriculum instanceof Curriculum
             ? $curriculum->academicTermStructure()->value('code')
             : null;
+        $educationalLevelId = $curriculum instanceof Curriculum
+            ? $curriculum->academicTermStructure()->value('educational_level_id')
+            : null;
 
         return [
             'code' => [
@@ -38,7 +41,12 @@ class UpdateCurriculumRequest extends FormRequest
                 Rule::unique(Curriculum::class, 'code')->ignore($curriculum),
             ],
             'name' => ['required', 'string', 'max:255'],
-            'program_id' => ['required', 'integer', Rule::exists(Program::class, 'id')],
+            'program_id' => [
+                'required',
+                'integer',
+                Rule::exists(Program::class, 'id')
+                    ->where('educational_level_id', $educationalLevelId),
+            ],
             'academic_term_structure_id' => ['prohibited'],
             'effective_year' => ['required', 'integer', 'min:1900', 'max:9999'],
             'number_of_years' => [

@@ -8,10 +8,12 @@ use Database\Factories\Academics\AcademicTermStructureFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
+ * @property int|null $educational_level_id
  * @property string $name
  * @property string $code
  * @property AcademicTermStructureType $type
@@ -28,11 +30,20 @@ class AcademicTermStructure extends Model
     ];
 
     protected $fillable = [
+        'educational_level_id',
         'name',
         'code',
         'type',
         'status',
     ];
+
+    /**
+     * @return BelongsTo<EducationalLevel, $this>
+     */
+    public function educationalLevel(): BelongsTo
+    {
+        return $this->belongsTo(EducationalLevel::class);
+    }
 
     /**
      * @return HasMany<AcademicPeriod, $this>
@@ -48,6 +59,14 @@ class AcademicTermStructure extends Model
     public function rootPeriods(): HasMany
     {
         return $this->periods()->roots()->ordered();
+    }
+
+    /**
+     * @return HasMany<Curriculum, $this>
+     */
+    public function curricula(): HasMany
+    {
+        return $this->hasMany(Curriculum::class);
     }
 
     /**

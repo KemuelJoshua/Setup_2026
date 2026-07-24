@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 class UpdateAcademicTermStructureAction
 {
     /**
-     * @param  array{name: string, code: string, type: string, status: string}  $data
+     * @param  array{educational_level_id: int, name: string, code: string, type: string, status: string}  $data
      */
     public function execute(
         AcademicTermStructure $academicTermStructure,
@@ -23,6 +23,15 @@ class UpdateAcademicTermStructureAction
                 ->findOrFail($academicTermStructure->getKey());
 
             $type = AcademicTermStructureType::from($data['type']);
+
+            if (
+                $lockedStructure->educational_level_id !== $data['educational_level_id']
+                && $lockedStructure->curricula()->exists()
+            ) {
+                throw ValidationException::withMessages([
+                    'educational_level_id' => 'The educational level cannot be changed while curricula use this structure.',
+                ]);
+            }
 
             if (
                 ! $type->allowsChildPeriods()

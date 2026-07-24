@@ -26,6 +26,9 @@ class StoreCurriculumRequest extends FormRequest
      */
     public function rules(): array
     {
+        $programEducationalLevelId = Program::query()
+            ->whereKey($this->integer('program_id'))
+            ->value('educational_level_id');
         $structureCode = AcademicTermStructure::query()
             ->whereKey($this->integer('academic_term_structure_id'))
             ->value('code');
@@ -37,7 +40,9 @@ class StoreCurriculumRequest extends FormRequest
             'academic_term_structure_id' => [
                 'required',
                 'integer',
-                Rule::exists(AcademicTermStructure::class, 'id')->where('status', 'active'),
+                Rule::exists(AcademicTermStructure::class, 'id')
+                    ->where('status', 'active')
+                    ->where('educational_level_id', $programEducationalLevelId),
             ],
             'effective_year' => ['required', 'integer', 'min:1900', 'max:9999'],
             'number_of_years' => [

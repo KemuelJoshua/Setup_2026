@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class CreateAcademicTermStructureAction
 {
     /**
-     * @param  array{name: string, code: string, type: string, status: string}  $data
+     * @param  array{educational_level_id: int, name: string, code: string, type: string, status: string}  $data
      */
     public function execute(array $data): AcademicTermStructure
     {

@@ -27,6 +27,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { destroy as destroyPeriod } from '@/routes/admin/academics/academic-periods';
 import {
     destroy as destroyStructure,
@@ -40,6 +47,7 @@ import type {
     AcademicPeriod,
     AcademicTermStructure,
     AcademicTermStructureFilters,
+    EducationalLevelOption,
 } from './types';
 
 defineOptions({
@@ -56,9 +64,13 @@ defineOptions({
 const props = defineProps<{
     academicTermStructures: LengthAwarePaginator<AcademicTermStructure>;
     filters: AcademicTermStructureFilters;
+    educationalLevels: EducationalLevelOption[];
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
+const educationalLevelFilter = ref(
+    props.filters.educational_level_id?.toString() ?? 'all',
+);
 const structureDialogOpen = ref(false);
 const periodDialogOpen = ref(false);
 const deleteDialogOpen = ref(false);
@@ -75,6 +87,10 @@ const fetchStructures = (
         index({
             query: {
                 search: searchQuery.value || undefined,
+                educational_level_id:
+                    educationalLevelFilter.value === 'all'
+                        ? undefined
+                        : educationalLevelFilter.value,
                 per_page: perPage,
             },
         }),
@@ -128,7 +144,7 @@ const clearSelection = (): void => {
     selectedParent.value = null;
 };
 
-watch(searchQuery, () => {
+watch([searchQuery, educationalLevelFilter], () => {
     window.clearTimeout(searchTimer);
     searchTimer = window.setTimeout(fetchStructures, 300);
 });
@@ -159,6 +175,23 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             search-label="Search academic term structures"
         >
             <template #filters>
+                <Select v-model="educationalLevelFilter">
+                    <SelectTrigger aria-label="Filter by educational level">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">
+                            All educational levels
+                        </SelectItem>
+                        <SelectItem
+                            v-for="level in educationalLevels"
+                            :key="level.id"
+                            :value="String(level.id)"
+                        >
+                            {{ level.name }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
                 <DataTablePageSizeSelect
                     :model-value="academicTermStructures.per_page"
                     @update:model-value="fetchStructures"
@@ -214,6 +247,9 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
                             </div>
                             <p class="text-sm text-muted-foreground">
                                 {{ structure.code }}
+                                <template v-if="structure.educational_level">
+                                    · {{ structure.educational_level.name }}
+                                </template>
                             </p>
                         </div>
                     </div>
@@ -443,6 +479,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <StructureFormDialog
         v-model:open="structureDialogOpen"
         :structure="selectedStructure"
+        :educational-levels="educationalLevels"
     />
     <PeriodFormDialog
         v-model:open="periodDialogOpen"

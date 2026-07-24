@@ -4,6 +4,9 @@ use App\Enums\AcademicStatus;
 use App\Enums\AcademicTermStructureType;
 use App\Models\Academics\AcademicPeriod;
 use App\Models\Academics\AcademicTermStructure;
+use App\Models\Academics\Curriculum;
+use App\Models\Academics\EducationalLevel;
+use App\Models\Academics\Program;
 use App\Models\User;
 use Database\Seeders\permissions\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,6 +16,8 @@ use Spatie\Permission\Models\Permission;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->educationalLevel = EducationalLevel::factory()->create();
+
     foreach ([
         'admin view academic term structures',
         'admin create academic term structures',
@@ -26,7 +31,11 @@ beforeEach(function () {
 test('authorized users can list structures with ordered root periods and children', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin view academic term structures');
+    $educationalLevel = EducationalLevel::factory()->create([
+        'name' => 'Higher Education',
+    ]);
     $structure = AcademicTermStructure::factory()->create([
+        'educational_level_id' => $educationalLevel->getKey(),
         'name' => 'College',
         'code' => 'COLLEGE',
     ]);
@@ -48,15 +57,24 @@ test('authorized users can list structures with ordered root periods and childre
         'name' => 'Prelim',
         'sequence' => 1,
     ]);
+    AcademicTermStructure::factory()->create();
 
     $this
         ->actingAs($user)
-        ->get(route('admin.academics.academic-term-structures.index'))
+        ->get(route('admin.academics.academic-term-structures.index', [
+            'educational_level_id' => $educationalLevel->getKey(),
+        ]))
         ->assertSuccessful()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/academics/academic-term-structures/Index')
             ->where('academicTermStructures.total', 1)
+            ->where('filters.educational_level_id', $educationalLevel->getKey())
+            ->has('educationalLevels', 3)
             ->where('academicTermStructures.data.0.name', 'College')
+            ->where(
+                'academicTermStructures.data.0.educational_level.name',
+                'Higher Education',
+            )
             ->where('academicTermStructures.data.0.type', 'semester')
             ->where('academicTermStructures.data.0.root_periods.0.name', 'First Semester')
             ->where('academicTermStructures.data.0.root_periods.0.children.0.name', 'Prelim')
@@ -67,10 +85,12 @@ test('authorized users can list structures with ordered root periods and childre
 test('authorized users can create a structure', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin create academic term structures');
+    $educationalLevel = EducationalLevel::factory()->create();
 
     $this
         ->actingAs($user)
         ->post(route('admin.academics.academic-term-structures.store'), [
+            'educational_level_id' => $educationalLevel->getKey(),
             'name' => 'Senior High School',
             'code' => 'SHS',
             'type' => AcademicTermStructureType::Quarterly->value,
@@ -81,6 +101,7 @@ test('authorized users can create a structure', function () {
     $structure = AcademicTermStructure::query()->where('code', 'SHS')->firstOrFail();
 
     expect($structure->name)->toBe('Senior High School')
+        ->and($structure->educational_level_id)->toBe($educationalLevel->getKey())
         ->and($structure->type)->toBe(AcademicTermStructureType::Quarterly)
         ->and($structure->status)->toBe(AcademicStatus::Active);
 });
@@ -89,10 +110,12 @@ test('authorized users can update a structure including its status', function ()
     $user = User::factory()->create();
     $user->givePermissionTo('admin update academic term structures');
     $structure = AcademicTermStructure::factory()->create();
+    $educationalLevel = EducationalLevel::factory()->create();
 
     $this
         ->actingAs($user)
         ->put(route('admin.academics.academic-term-structures.update', $structure), [
+            'educational_level_id' => $educationalLevel->getKey(),
             'name' => 'Updated Structure',
             'code' => 'UPDATED',
             'type' => AcademicTermStructureType::Trisem->value,
@@ -101,6 +124,7 @@ test('authorized users can update a structure including its status', function ()
         ->assertRedirect(route('admin.academics.academic-term-structures.index'));
 
     expect($structure->refresh()->name)->toBe('Updated Structure')
+        ->and($structure->educational_level_id)->toBe($educationalLevel->getKey())
         ->and($structure->code)->toBe('UPDATED')
         ->and($structure->type)->toBe(AcademicTermStructureType::Trisem)
         ->and($structure->status)->toBe(AcademicStatus::Inactive);
@@ -134,6 +158,7 @@ test('structure code must be unique', function () {
     $this
         ->actingAs($user)
         ->post(route('admin.academics.academic-term-structures.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
             'name' => 'Another College',
             'code' => 'COLLEGE',
             'type' => AcademicTermStructureType::Semester->value,
@@ -164,6 +189,7 @@ test('invalid structure type is rejected', function () {
     $this
         ->actingAs($user)
         ->post(route('admin.academics.academic-term-structures.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
             'name' => 'College',
             'code' => 'COLLEGE',
             'type' => 'monthly',
@@ -172,12 +198,28 @@ test('invalid structure type is rejected', function () {
         ->assertSessionHasErrors('type');
 });
 
+test('educational level is required for a structure', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin create academic term structures');
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.academic-term-structures.store'), [
+            'name' => 'College',
+            'code' => 'COLLEGE',
+            'type' => AcademicTermStructureType::Semester->value,
+            'status' => AcademicStatus::Active->value,
+        ])
+        ->assertSessionHasErrors('educational_level_id');
+});
+
 test('users without permission cannot manage structures', function () {
     $user = User::factory()->create();
 
     $this
         ->actingAs($user)
         ->post(route('admin.academics.academic-term-structures.store'), [
+            'educational_level_id' => $this->educationalLevel->getKey(),
             'name' => 'College',
             'code' => 'COLLEGE',
             'type' => AcademicTermStructureType::Semester->value,
@@ -199,6 +241,7 @@ test('a structure with grading periods cannot be changed to quarterly', function
     $this
         ->actingAs($user)
         ->put(route('admin.academics.academic-term-structures.update', $structure), [
+            'educational_level_id' => $structure->educational_level_id,
             'name' => $structure->name,
             'code' => $structure->code,
             'type' => AcademicTermStructureType::Quarterly->value,
@@ -207,6 +250,42 @@ test('a structure with grading periods cannot be changed to quarterly', function
         ->assertSessionHasErrors('type');
 
     expect($structure->refresh()->type)->toBe(AcademicTermStructureType::Semester);
+});
+
+test('a structure educational level cannot change while curricula use it', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin update academic term structures');
+    $structure = AcademicTermStructure::factory()->create();
+    $program = Program::query()->create([
+        'educational_level_id' => $structure->educational_level_id,
+        'code' => 'COLLEGE',
+        'name' => 'College',
+        'status' => 'Active',
+    ]);
+    Curriculum::query()->create([
+        'code' => 'COLLEGE-2026',
+        'name' => 'College Curriculum',
+        'program_id' => $program->getKey(),
+        'academic_term_structure_id' => $structure->getKey(),
+        'effective_year' => 2026,
+        'number_of_years' => 4,
+        'status' => 'Active',
+    ]);
+    $otherEducationalLevel = EducationalLevel::factory()->create();
+
+    $this
+        ->actingAs($user)
+        ->put(route('admin.academics.academic-term-structures.update', $structure), [
+            'educational_level_id' => $otherEducationalLevel->getKey(),
+            'name' => $structure->name,
+            'code' => $structure->code,
+            'type' => $structure->type->value,
+            'status' => $structure->status->value,
+        ])
+        ->assertSessionHasErrors('educational_level_id');
+
+    expect($structure->refresh()->educational_level_id)
+        ->not->toBe($otherEducationalLevel->getKey());
 });
 
 test('academic structure and period permissions are seeded', function () {

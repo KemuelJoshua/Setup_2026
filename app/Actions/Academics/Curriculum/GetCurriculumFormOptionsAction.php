@@ -43,7 +43,7 @@ class GetCurriculumFormOptionsAction
                         ]),
                 ])
                 ->orderBy('name')
-                ->get(['id', 'name', 'code', 'type']),
+                ->get(['id', 'educational_level_id', 'name', 'code', 'type']),
             'subjects' => Subject::query()->orderBy('name')->get(['id', 'name']),
             'yearLevels' => GradeLevel::query()->orderBy('name')->get(['id', 'name']),
         ];

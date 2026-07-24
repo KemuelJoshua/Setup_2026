@@ -45,6 +45,7 @@ function curriculumOptions(): array
         'name' => 'Junior High School',
     ]);
     $structure = AcademicTermStructure::factory()->quarterly()->create([
+        'educational_level_id' => $educationalLevel->getKey(),
         'name' => 'JHS — Quarter',
         'code' => 'JHS4Q',
     ]);
@@ -121,6 +122,11 @@ test('authorized users can open the create curriculum page', function () {
     $seniorHighSchool = EducationalLevel::factory()->create([
         'name' => 'Senior High School',
     ]);
+    $seniorHighStructure = AcademicTermStructure::factory()->quarterly()->create([
+        'educational_level_id' => $seniorHighSchool->getKey(),
+        'name' => 'SHS — Quarter',
+        'code' => 'SHS4Q',
+    ]);
     Program::query()->create([
         'educational_level_id' => $seniorHighSchool->getKey(),
         'code' => 'SHS',
@@ -149,7 +155,16 @@ test('authorized users can open the create curriculum page', function () {
                 $seniorHighSchool->getKey(),
             )
             ->where('academicStructures.0.code', 'JHS4Q')
+            ->where(
+                'academicStructures.0.educational_level_id',
+                $options['educationalLevel']->getKey(),
+            )
             ->where('academicStructures.0.root_periods.0.code', 'Q1')
+            ->where('academicStructures.1.code', $seniorHighStructure->code)
+            ->where(
+                'academicStructures.1.educational_level_id',
+                $seniorHighSchool->getKey(),
+            )
             ->missing('schoolYears'));
 });
 
@@ -209,6 +224,29 @@ test('authorized users create basic curriculum information before adding subject
         ->and($curriculum->number_of_years)->toBe(4)
         ->and($curriculum->curriculumSubjects)->toBeEmpty();
 
+});
+
+test('curriculum program and academic structure must use the same educational level', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin create curricula');
+    $options = curriculumOptions();
+    $otherEducationalLevel = EducationalLevel::factory()->create();
+    $otherStructure = AcademicTermStructure::factory()->create([
+        'educational_level_id' => $otherEducationalLevel->getKey(),
+    ]);
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.curriculum.store'), [
+            'code' => 'INVALID-LEVEL',
+            'name' => 'Invalid Level Curriculum',
+            'program_id' => $options['program']->getKey(),
+            'academic_term_structure_id' => $otherStructure->getKey(),
+            'effective_year' => 2026,
+            'number_of_years' => 4,
+            'status' => 'Draft',
+        ])
+        ->assertSessionHasErrors('academic_term_structure_id');
 });
 
 test('authorized users can update curriculum details but not its academic structure', function () {

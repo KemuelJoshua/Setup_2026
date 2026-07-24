@@ -5,6 +5,7 @@ namespace App\Http\Requests\Academics;
 use App\Enums\AcademicStatus;
 use App\Enums\AcademicTermStructureType;
 use App\Models\Academics\AcademicTermStructure;
+use App\Models\Academics\EducationalLevel;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,6 +28,11 @@ class StoreAcademicTermStructureRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'educational_level_id' => [
+                'required',
+                'integer',
+                Rule::exists(EducationalLevel::class, 'id'),
+            ],
             'name' => ['required', 'string', 'max:255'],
             'code' => [
                 'required',

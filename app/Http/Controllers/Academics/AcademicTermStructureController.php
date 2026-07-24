@@ -6,6 +6,7 @@ use App\Actions\Academics\AcademicTermStructure\CreateAcademicTermStructureActio
 use App\Actions\Academics\AcademicTermStructure\DeleteAcademicTermStructureAction;
 use App\Actions\Academics\AcademicTermStructure\IndexAcademicTermStructureAction;
 use App\Actions\Academics\AcademicTermStructure\UpdateAcademicTermStructureAction;
+use App\Actions\Academics\EducationalLevel\ListEducationalLevelOptionsAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreAcademicTermStructureRequest;
 use App\Http\Requests\Academics\UpdateAcademicTermStructureRequest;
@@ -21,12 +22,14 @@ class AcademicTermStructureController extends Controller
     public function index(
         Request $request,
         IndexAcademicTermStructureAction $indexAcademicTermStructures,
+        ListEducationalLevelOptionsAction $listEducationalLevelOptions,
     ): Response {
         Gate::authorize('admin view academic term structures');
 
         $perPage = $request->integer('per_page', 15);
         $filters = [
             'search' => $request->string('search')->trim()->toString() ?: null,
+            'educational_level_id' => $request->integer('educational_level_id') ?: null,
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
@@ -36,6 +39,7 @@ class AcademicTermStructureController extends Controller
                 ->paginate($filters['per_page'])
                 ->withQueryString(),
             'filters' => $filters,
+            'educationalLevels' => $listEducationalLevelOptions->execute(),
         ]);
     }
 
@@ -44,7 +48,7 @@ class AcademicTermStructureController extends Controller
         CreateAcademicTermStructureAction $createAcademicTermStructure,
     ): RedirectResponse {
         Gate::authorize('admin create academic term structures');
-        /** @var array{name: string, code: string, type: string, status: string} $data */
+        /** @var array{educational_level_id: int, name: string, code: string, type: string, status: string} $data */
         $data = $request->validated();
         $createAcademicTermStructure->execute($data);
 
@@ -58,7 +62,7 @@ class AcademicTermStructureController extends Controller
         UpdateAcademicTermStructureAction $updateAcademicTermStructure,
     ): RedirectResponse {
         Gate::authorize('admin update academic term structures');
-        /** @var array{name: string, code: string, type: string, status: string} $data */
+        /** @var array{educational_level_id: int, name: string, code: string, type: string, status: string} $data */
         $data = $request->validated();
         $updateAcademicTermStructure->execute($academicTermStructure, $data);
 
