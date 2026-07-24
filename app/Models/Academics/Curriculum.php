@@ -2,25 +2,27 @@
 
 namespace App\Models\Academics;
 
+use Attribute;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(
+    'code',
+    'name',
+    'program_id',
+    'academic_term_structure_id',
+    'effective_year',
+    'number_of_years',
+    'description',
+    'status',
+)]
+
 class Curriculum extends Model
 {
-    protected $fillable = [
-        'code',
-        'name',
-        'program_id',
-        'academic_term_structure_id',
-        'effective_year',
-        'number_of_years',
-        'description',
-        'status',
-    ];
-
     protected $attributes = [
-        'number_of_years' => 1,
+        'number_of_years' => 4,
     ];
 
     /**

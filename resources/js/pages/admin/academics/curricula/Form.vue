@@ -18,6 +18,7 @@ import InputError from '@/components/InputError.vue';
 import PageHero from '@/components/PageHero.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
 import {
     Card,
     CardContent,
@@ -97,7 +98,7 @@ defineOptions({
 <template>
     <Head title="Create curriculum" />
 
-    <div class="mx-auto flex w-full flex-1 flex-col gap-6 p-4 md:p-8">
+    <DefaultContainer>
         <PageHero>
             <template #icon>
                 <FilePlus2 class="size-5" aria-hidden="true" />
@@ -521,5 +522,5 @@ defineOptions({
                 </Card>
             </aside>
         </Form>
-    </div>
+    </DefaultContainer>
 </template>

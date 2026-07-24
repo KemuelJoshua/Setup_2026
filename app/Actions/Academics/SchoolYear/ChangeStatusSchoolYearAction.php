@@ -3,7 +3,7 @@
 namespace App\Actions\Academics\SchoolYear;
 
 use App\Enums\SchoolYearStatus;
-use App\Models\SchoolYear;
+use App\Models\Academics\SchoolYear;
 use Illuminate\Support\Facades\DB;
 
 class ChangeStatusSchoolYearAction

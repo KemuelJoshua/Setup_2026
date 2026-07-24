@@ -4,6 +4,7 @@ namespace App\Models\Academics;
 
 use App\Enums\AcademicStatus;
 use Database\Factories\Academics\AcademicPeriodFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $sequence
  * @property AcademicStatus $status
  */
+#[Fillable(
+    'academic_term_structure_id',
+    'parent_id',
+    'name',
+    'code',
+    'sequence',
+    'status',
+)]
 class AcademicPeriod extends Model
 {
     /** @use HasFactory<AcademicPeriodFactory> */
@@ -27,15 +36,6 @@ class AcademicPeriod extends Model
     protected $attributes = [
         'sequence' => 1,
         'status' => AcademicStatus::Active->value,
-    ];
-
-    protected $fillable = [
-        'academic_term_structure_id',
-        'parent_id',
-        'name',
-        'code',
-        'sequence',
-        'status',
     ];
 
     /**

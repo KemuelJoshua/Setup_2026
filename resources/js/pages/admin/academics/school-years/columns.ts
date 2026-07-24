@@ -1,11 +1,15 @@
+import { Pencil, Trash2 } from '@lucide/vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import type { Component } from 'vue';
 import { h } from 'vue';
 
 import { Badge } from '@/components/ui/badge';
-import { DataTableColumnHeader } from '@/components/ui/data-table';
-import SchoolYearRowActions from './SchoolYearRowActions.vue';
-import { formatDate } from '@/lib/formatDate.js';
+import {
+    DataTableColumnHeader,
+    DataTableRowActions,
+} from '@/components/ui/data-table';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { formatDate } from '@/lib/formatDate';
 
 export interface SchoolYear {
     id: number;
@@ -14,6 +18,11 @@ export interface SchoolYear {
     sc_start_date: string;
     sc_end_date: string;
     sc_status: 'active' | 'planned' | 'closed';
+}
+
+export interface SchoolYearFilters {
+    search?: string;
+    per_page?: string | number;
 }
 
 interface SchoolYearColumnActions {
@@ -32,7 +41,7 @@ const getStatusClasses = (status: SchoolYear['sc_status']): string => {
     return statusClasses[status];
 };
 
-const formatStatus = (status: string): string => {
+const formatStatus = (status: SchoolYear['sc_status']): string => {
     return status.charAt(0).toUpperCase() + status.slice(1);
 };
 
@@ -143,18 +152,43 @@ export const createColumns = (
                 title: 'Actions',
             }),
         cell: ({ row }) =>
-            h(
-                'div',
-                {
-                    class: 'flex justify-end',
-                },
-                [
-                    h(SchoolYearRowActions, {
-                        schoolYear: row.original,
-                        onEdit: () => actions.edit(row.original),
-                        onDelete: () => actions.delete(row.original),
-                    }),
-                ],
-            ),
+            h('div', { class: 'flex justify-end' }, [
+                h(
+                    DataTableRowActions,
+                    {
+                        label: `Open actions for ${row.original.sc_name}`,
+                    },
+                    {
+                        default: () => [
+                            h(
+                                DropdownMenuItem,
+                                {
+                                    onSelect: () => actions.edit(row.original),
+                                },
+                                {
+                                    default: () => [
+                                        h(Pencil, { 'aria-hidden': true }),
+                                        'Edit',
+                                    ],
+                                },
+                            ),
+                            h(
+                                DropdownMenuItem,
+                                {
+                                    variant: 'destructive',
+                                    onSelect: () =>
+                                        actions.delete(row.original),
+                                },
+                                {
+                                    default: () => [
+                                        h(Trash2, { 'aria-hidden': true }),
+                                        'Delete',
+                                    ],
+                                },
+                            ),
+                        ],
+                    },
+                ),
+            ]),
     },
 ];

@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
 import {
     Dialog,
     DialogClose,
@@ -231,9 +232,7 @@ const handleDeleted = (): void => {
 <template>
     <Head :title="`${curriculum.name} subjects`" />
 
-    <div
-        class="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-6 p-4 md:p-8"
-    >
+    <DefaultContainer>
         <PageHero>
             <template #icon>
                 <BookOpen class="size-5" aria-hidden="true" />
@@ -501,7 +500,7 @@ const handleDeleted = (): void => {
                 </section>
             </div>
         </details>
-    </div>
+    </DefaultContainer>
 
     <Dialog v-model:open="isDialogOpen">
         <DialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-3xl">

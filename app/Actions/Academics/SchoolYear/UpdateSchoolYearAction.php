@@ -2,7 +2,7 @@
 
 namespace App\Actions\Academics\SchoolYear;
 
-use App\Models\SchoolYear;
+use App\Models\Academics\SchoolYear;
 
 class UpdateSchoolYearAction
 {

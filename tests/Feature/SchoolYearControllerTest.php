@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\SchoolYearStatus;
-use App\Models\SchoolYear;
+use App\Models\Academics\SchoolYear;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -25,7 +25,7 @@ beforeEach(function () {
 
 test('school year form is presented in a dialog', function () {
     $form = file_get_contents(resource_path(
-        'js/modules/academics/school-year/components/SchoolYearFormDialog.vue',
+        'js/pages/admin/academics/school-years/CreateUpdate.vue',
     ));
 
     expect($form)
@@ -52,7 +52,7 @@ test('authorized users can view the school years page', function () {
         ->get(route('admin.school-years.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('admin/school-years/Index')
+            ->component('admin/academics/school-years/Index')
             ->has('schoolYears.data')
             ->where('schoolYears.data.0.sc_name', 'School Year 2026-2027')
             ->where('schoolYears.data.0.sc_code', 'SY-2026')

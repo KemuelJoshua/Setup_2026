@@ -2,24 +2,24 @@
 
 namespace App\Models\Academics;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[Fillable(
+     'subject_id',
+    'year_level_id',
+    'academic_period_id',
+    'units',
+    'lecture_hours',
+    'laboratory_hours',
+    'is_required',
+    'sort_order',
+    'remarks',
+)]
 class CurriculumSubject extends Model
 {
-    protected $fillable = [
-        'subject_id',
-        'year_level_id',
-        'academic_period_id',
-        'units',
-        'lecture_hours',
-        'laboratory_hours',
-        'is_required',
-        'sort_order',
-        'remarks',
-    ];
-
     protected function casts(): array
     {
         return [

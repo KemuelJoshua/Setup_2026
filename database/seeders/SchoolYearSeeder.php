@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\SchoolYearStatus;
-use App\Models\SchoolYear;
+use App\Models\Academics\SchoolYear;
 use Illuminate\Database\Seeder;
 
 class SchoolYearSeeder extends Seeder

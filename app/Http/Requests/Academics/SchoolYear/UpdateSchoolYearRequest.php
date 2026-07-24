@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Academics\SchoolYear;
 
 use App\Enums\SchoolYearStatus;
-use App\Models\SchoolYear;
+use App\Models\Academics\SchoolYear;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

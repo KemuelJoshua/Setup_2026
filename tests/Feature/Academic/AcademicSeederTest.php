@@ -10,7 +10,7 @@ use App\Models\Academics\GradeLevel;
 use App\Models\Academics\Program;
 use App\Models\Academics\Section;
 use App\Models\Academics\Subject;
-use App\Models\SchoolYear;
+use App\Models\Academics\SchoolYear;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

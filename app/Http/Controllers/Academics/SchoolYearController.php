@@ -9,7 +9,7 @@ use App\Actions\Academics\SchoolYear\UpdateSchoolYearAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\SchoolYear\StoreSchoolYearRequest;
 use App\Http\Requests\Academics\SchoolYear\UpdateSchoolYearRequest;
-use App\Models\SchoolYear;
+use App\Models\Academics\SchoolYear;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -41,7 +41,7 @@ class SchoolYearController extends Controller
                 'sc_status' => $schoolYear->sc_status->value,
             ]);
 
-        return Inertia::render('admin/school-years/Index', [
+        return Inertia::render('admin/academics/school-years/Index', [
             'schoolYears' => $schoolYears,
             'filters' => $filters,
         ]);
