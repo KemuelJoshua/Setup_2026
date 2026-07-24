@@ -2,14 +2,13 @@
 
 namespace App\Actions\Academics\AcademicPeriod;
 
+use App\Concerns\ValidatesAcademicPeriods;
 use App\Models\Academics\AcademicPeriod;
 use Illuminate\Support\Facades\DB;
 
 class CreateAcademicPeriodAction
 {
-    public function __construct(
-        private AcademicPeriodValidator $validator,
-    ) {}
+    use ValidatesAcademicPeriods;
 
     /**
      * @param  array{
@@ -24,7 +23,7 @@ class CreateAcademicPeriodAction
     public function execute(array $data): AcademicPeriod
     {
         return DB::transaction(function () use ($data): AcademicPeriod {
-            $this->validator->validate($data);
+            $this->validateAcademicPeriod($data);
 
             return AcademicPeriod::query()->create($data);
         });

@@ -2,14 +2,13 @@
 
 namespace App\Actions\Academics\AcademicPeriod;
 
+use App\Concerns\ValidatesAcademicPeriods;
 use App\Models\Academics\AcademicPeriod;
 use Illuminate\Support\Facades\DB;
 
 class UpdateAcademicPeriodAction
 {
-    public function __construct(
-        private AcademicPeriodValidator $validator,
-    ) {}
+    use ValidatesAcademicPeriods;
 
     /**
      * @param  array{
@@ -29,7 +28,7 @@ class UpdateAcademicPeriodAction
                 ->lockForUpdate()
                 ->findOrFail($academicPeriod->getKey());
 
-            $this->validator->validate($data, $lockedAcademicPeriod);
+            $this->validateAcademicPeriod($data, $lockedAcademicPeriod);
             $lockedAcademicPeriod->update($data);
 
             return $lockedAcademicPeriod->refresh();
