@@ -16,6 +16,10 @@ class IndexCurriculumAction
         $search = trim((string) ($filters['search'] ?? ''));
 
         return Curriculum::query()
+            ->with([
+                'program:id,name',
+                'academicTermStructure:id,name',
+            ])
             ->withCount('curriculumSubjects')
             ->when(
                 $search !== '',
@@ -25,6 +29,8 @@ class IndexCurriculumAction
                         ->orWhere('name', 'like', "%{$search}%")
                         ->orWhere('effective_year', 'like', "%{$search}%")
                         ->orWhere('status', 'like', "%{$search}%")
+                        ->orWhereHas('program', fn (Builder $query) => $query
+                            ->where('name', 'like', "%{$search}%"))
                 )
             )
             ->latest();

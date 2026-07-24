@@ -3,8 +3,8 @@
 use App\Models\Academics\AcademicPeriod;
 use App\Models\Academics\AcademicTermStructure;
 use App\Models\Academics\Curriculum;
-use App\Models\Academics\CurriculumSubject;
 use App\Models\Academics\GradeLevel;
+use App\Models\Academics\Program;
 use App\Models\Academics\Subject;
 use App\Models\User;
 use Database\Seeders\permissions\PermissionSeeder;
@@ -28,38 +28,65 @@ beforeEach(function () {
     }
 });
 
-function curriculumSubjectOptions(): array
+/**
+ * @return array{
+ *     structure: AcademicTermStructure,
+ *     period: AcademicPeriod,
+ *     yearLevel: GradeLevel,
+ *     program: Program,
+ *     subject: Subject
+ * }
+ */
+function curriculumOptions(): array
 {
-    $structure = AcademicTermStructure::factory()->quarterly()->create();
+    $structure = AcademicTermStructure::factory()->quarterly()->create([
+        'name' => 'JHS — Quarter',
+        'code' => 'JHS4Q',
+    ]);
+    $period = AcademicPeriod::factory()->create([
+        'academic_term_structure_id' => $structure->getKey(),
+        'name' => 'First Quarter',
+        'code' => 'Q1',
+        'sequence' => 1,
+    ]);
 
     return [
-        Subject::query()->create(['name' => 'Mathematics']),
-        GradeLevel::query()->create(['name' => 'Grade 7']),
-        AcademicPeriod::factory()->create([
-            'academic_term_structure_id' => $structure->getKey(),
-            'name' => '1st Quarter',
-            'code' => 'Q1',
-            'sequence' => 1,
+        'structure' => $structure,
+        'period' => $period,
+        'yearLevel' => GradeLevel::query()->create(['name' => 'Grade 7']),
+        'program' => Program::query()->create([
+            'code' => 'JHS',
+            'name' => 'Junior High School',
+            'status' => 'Active',
         ]),
+        'subject' => Subject::query()->create(['name' => 'Mathematics']),
     ];
+}
+
+function createCurriculum(array $options, array $overrides = []): Curriculum
+{
+    return Curriculum::query()->create([
+        'code' => 'JHS-2026',
+        'name' => 'Junior High School Curriculum',
+        'program_id' => $options['program']->getKey(),
+        'academic_term_structure_id' => $options['structure']->getKey(),
+        'effective_year' => 2026,
+        'number_of_years' => 4,
+        'description' => null,
+        'status' => 'Active',
+        ...$overrides,
+    ]);
 }
 
 test('authorized users can view and search curricula', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin view curricula');
-    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
-
-    $curriculum = Curriculum::query()->create([
-        'code' => 'JHS-2026',
-        'name' => 'Junior High School Curriculum',
-        'effective_year' => 2026,
-        'description' => 'Current curriculum',
-        'status' => 'Active',
-    ]);
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
     $curriculum->curriculumSubjects()->create([
-        'subject_id' => $subject->getKey(),
-        'year_level_id' => $yearLevel->getKey(),
-        'academic_period_id' => $academicPeriod->getKey(),
+        'subject_id' => $options['subject']->getKey(),
+        'year_level_id' => $options['yearLevel']->getKey(),
+        'academic_period_id' => $options['period']->getKey(),
         'is_required' => true,
         'sort_order' => 1,
     ]);
@@ -71,17 +98,16 @@ test('authorized users can view and search curricula', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/academics/curricula/Index')
             ->where('curricula.total', 1)
-            ->where('curricula.data.0.code', 'JHS-2026')
+            ->where('curricula.data.0.program', 'Junior High School')
+            ->where('curricula.data.0.academic_structure', 'JHS — Quarter')
             ->where('curricula.data.0.curriculum_subjects_count', 1)
-            ->missing('subjects')
-            ->missing('yearLevels')
-            ->missing('academicPeriods'));
+            ->missing('subjects'));
 });
 
 test('authorized users can open the create curriculum page', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin create curricula');
-    curriculumSubjectOptions();
+    curriculumOptions();
 
     $this
         ->actingAs($user)
@@ -89,29 +115,24 @@ test('authorized users can open the create curriculum page', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/academics/curricula/Form')
-            ->where('curriculum', null)
-            ->where('subjects.0.name', 'Mathematics')
-            ->where('yearLevels.0.name', 'Grade 7')
-            ->where('academicPeriods.0.code', 'Q1')
-            ->where('academicPeriods.0.structure.type', 'quarterly'));
+            ->where('programs.0.code', 'JHS')
+            ->where('academicStructures.0.code', 'JHS4Q')
+            ->where('academicStructures.0.root_periods.0.code', 'Q1')
+            ->missing('schoolYears'));
 });
 
-test('authorized users can open the edit curriculum page', function () {
+test('authorized users can open the curriculum subject builder', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin update curricula');
-    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
-
-    $curriculum = Curriculum::query()->create([
-        'code' => 'JHS-2026',
-        'name' => 'Junior High School Curriculum',
-        'effective_year' => 2026,
-        'description' => null,
-        'status' => 'Active',
-    ]);
-    $curriculum->curriculumSubjects()->create([
-        'subject_id' => $subject->getKey(),
-        'year_level_id' => $yearLevel->getKey(),
-        'academic_period_id' => $academicPeriod->getKey(),
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
+    $assignment = $curriculum->curriculumSubjects()->create([
+        'subject_id' => $options['subject']->getKey(),
+        'year_level_id' => $options['yearLevel']->getKey(),
+        'academic_period_id' => $options['period']->getKey(),
+        'units' => 3,
+        'lecture_hours' => 2,
+        'laboratory_hours' => 1,
         'is_required' => true,
         'sort_order' => 1,
     ]);
@@ -121,119 +142,160 @@ test('authorized users can open the edit curriculum page', function () {
         ->get(route('admin.academics.curriculum.edit', $curriculum))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('admin/academics/curricula/Form')
+            ->component('admin/academics/curricula/Subjects')
             ->where('curriculum.id', $curriculum->getKey())
-            ->where('curriculum.code', 'JHS-2026')
-            ->where('curriculum.curriculum_subjects.0.subject_id', $subject->getKey())
-            ->where('curriculum.curriculum_subjects.0.year_level_id', $yearLevel->getKey())
-            ->where('curriculum.curriculum_subjects.0.academic_period_id', $academicPeriod->getKey()));
+            ->where('curriculum.academic_structure.code', 'JHS4Q')
+            ->where('curriculum.curriculum_subjects.0.id', $assignment->getKey())
+            ->where('curriculum.curriculum_subjects.0.subject_name', 'Mathematics')
+            ->where('curriculum.curriculum_subjects.0.units', '3.00'));
 });
 
-test('authorized users can create a curriculum with subjects', function () {
+test('authorized users create basic curriculum information before adding subjects', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin create curricula');
-    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
+    $options = curriculumOptions();
 
-    $this
+    $response = $this
         ->actingAs($user)
         ->post(route('admin.academics.curriculum.store'), [
             'code' => 'JHS-2026',
             'name' => 'Junior High School Curriculum',
+            'program_id' => $options['program']->getKey(),
+            'academic_term_structure_id' => $options['structure']->getKey(),
             'effective_year' => 2026,
+            'number_of_years' => 4,
             'description' => null,
             'status' => 'Active',
-            'curriculum_subjects' => [[
-                'subject_id' => $subject->getKey(),
-                'year_level_id' => $yearLevel->getKey(),
-                'academic_period_id' => $academicPeriod->getKey(),
-                'is_required' => true,
-                'sort_order' => 1,
-            ]],
-        ])
-        ->assertRedirect(route('admin.academics.curriculum.index'))
-        ->assertSessionHas('success', 'Curriculum created successfully.');
+        ]);
 
     $curriculum = Curriculum::query()->where('code', 'JHS-2026')->firstOrFail();
-    $curriculumSubject = $curriculum->curriculumSubjects()->firstOrFail();
+    $response->assertRedirect(route('admin.academics.curriculum.edit', $curriculum));
 
-    expect($curriculum->effective_year)->toBe(2026)
-        ->and($curriculum->description)->toBeNull()
-        ->and($curriculum->created_at)->not->toBeNull()
-        ->and($curriculumSubject->subject_id)->toBe($subject->getKey())
-        ->and($curriculumSubject->is_required)->toBeTrue()
-        ->and($curriculumSubject->sort_order)->toBe(1)
-        ->and($curriculumSubject->created_at)->not->toBeNull();
+    expect($curriculum->program_id)->toBe($options['program']->getKey())
+        ->and($curriculum->academic_term_structure_id)->toBe($options['structure']->getKey())
+        ->and($curriculum->effective_year)->toBe(2026)
+        ->and($curriculum->number_of_years)->toBe(4)
+        ->and($curriculum->curriculumSubjects)->toBeEmpty();
+
 });
 
-test('authorized users can update a curriculum and replace its subjects', function () {
+test('authorized users can update curriculum details but not its academic structure', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin update curricula');
-    [$originalSubject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
-    $replacementSubject = Subject::query()->create(['name' => 'Science']);
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
+    $otherStructure = AcademicTermStructure::factory()->create();
 
-    $curriculum = Curriculum::query()->create([
-        'code' => 'JHS-2026',
-        'name' => 'Junior High School Curriculum',
-        'effective_year' => 2026,
-        'description' => null,
-        'status' => 'Active',
+    $this
+        ->actingAs($user)
+        ->put(route('admin.academics.curriculum.update', $curriculum), [
+            'code' => 'JHS-UPDATED',
+            'name' => 'Updated Curriculum',
+            'program_id' => $options['program']->getKey(),
+            'academic_term_structure_id' => $otherStructure->getKey(),
+            'effective_year' => 2027,
+            'number_of_years' => 4,
+            'description' => null,
+            'status' => 'Draft',
+        ])
+        ->assertSessionHasErrors('academic_term_structure_id');
+
+    expect($curriculum->refresh()->academic_term_structure_id)
+        ->toBe($options['structure']->getKey());
+});
+
+test('subjects can reference prerequisites and corequisites in the same curriculum', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin update curricula');
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
+    $programmingOne = $curriculum->curriculumSubjects()->create([
+        'subject_id' => $options['subject']->getKey(),
+        'year_level_id' => $options['yearLevel']->getKey(),
+        'academic_period_id' => $options['period']->getKey(),
+        'is_required' => true,
+        'sort_order' => 1,
     ]);
-    $originalAssignment = $curriculum->curriculumSubjects()->create([
-        'subject_id' => $originalSubject->getKey(),
-        'year_level_id' => $yearLevel->getKey(),
-        'academic_period_id' => $academicPeriod->getKey(),
+    $programmingTwo = Subject::query()->create(['name' => 'Programming 2']);
+    $discreteMathematics = Subject::query()->create(['name' => 'Discrete Mathematics']);
+    $corequisite = $curriculum->curriculumSubjects()->create([
+        'subject_id' => $discreteMathematics->getKey(),
+        'year_level_id' => $options['yearLevel']->getKey(),
+        'academic_period_id' => $options['period']->getKey(),
+        'is_required' => true,
+        'sort_order' => 2,
+    ]);
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.curriculum.subjects.store', $curriculum), [
+            'subject_id' => $programmingTwo->getKey(),
+            'year_level_id' => $options['yearLevel']->getKey(),
+            'academic_period_id' => $options['period']->getKey(),
+            'units' => 3,
+            'lecture_hours' => 2,
+            'laboratory_hours' => 1,
+            'sort_order' => 3,
+            'remarks' => 'Major course',
+            'prerequisite_ids' => [$programmingOne->getKey()],
+            'corequisite_ids' => [$corequisite->getKey()],
+        ])
+        ->assertRedirect();
+
+    $assignment = $curriculum->curriculumSubjects()
+        ->whereBelongsTo($programmingTwo, 'subject')
+        ->firstOrFail();
+
+    expect($assignment->units)->toBe('3.00')
+        ->and($assignment->prerequisites()->pluck('curriculum_subjects.id')->all())
+        ->toBe([$programmingOne->getKey()])
+        ->and($assignment->corequisites()->pluck('curriculum_subjects.id')->all())
+        ->toBe([$corequisite->getKey()]);
+});
+
+test('curriculum subject references cannot cross curricula or reference themselves', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin update curricula');
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
+    $assignment = $curriculum->curriculumSubjects()->create([
+        'subject_id' => $options['subject']->getKey(),
+        'year_level_id' => $options['yearLevel']->getKey(),
+        'academic_period_id' => $options['period']->getKey(),
+        'is_required' => true,
+        'sort_order' => 1,
+    ]);
+    $otherCurriculum = createCurriculum($options, ['code' => 'OTHER']);
+    $otherAssignment = $otherCurriculum->curriculumSubjects()->create([
+        'subject_id' => $options['subject']->getKey(),
+        'year_level_id' => $options['yearLevel']->getKey(),
+        'academic_period_id' => $options['period']->getKey(),
         'is_required' => true,
         'sort_order' => 1,
     ]);
 
     $this
         ->actingAs($user)
-        ->put(route('admin.academics.curriculum.update', $curriculum), [
-            'code' => 'JHS-2027',
-            'name' => 'Updated Junior High School Curriculum',
-            'effective_year' => 2027,
-            'description' => 'Revised curriculum',
-            'status' => 'Draft',
-            'curriculum_subjects' => [[
-                'subject_id' => $replacementSubject->getKey(),
-                'year_level_id' => $yearLevel->getKey(),
-                'academic_period_id' => $academicPeriod->getKey(),
-                'is_required' => false,
-                'sort_order' => 2,
-            ]],
+        ->put(route('admin.academics.curriculum.subjects.update', [$curriculum, $assignment]), [
+            'subject_id' => $options['subject']->getKey(),
+            'year_level_id' => $options['yearLevel']->getKey(),
+            'academic_period_id' => $options['period']->getKey(),
+            'sort_order' => 1,
+            'prerequisite_ids' => [(string) $assignment->getKey()],
+            'corequisite_ids' => [(string) $otherAssignment->getKey()],
         ])
-        ->assertRedirect(route('admin.academics.curriculum.index'))
-        ->assertSessionHas('success', 'Curriculum updated successfully.');
-
-    $replacementAssignment = $curriculum->refresh()
-        ->curriculumSubjects()
-        ->firstOrFail();
-
-    expect($curriculum->code)->toBe('JHS-2027')
-        ->and($curriculum->effective_year)->toBe(2027)
-        ->and($curriculum->status)->toBe('Draft')
-        ->and($replacementAssignment->subject_id)->toBe($replacementSubject->getKey())
-        ->and($replacementAssignment->is_required)->toBeFalse()
-        ->and(CurriculumSubject::query()->whereKey($originalAssignment)->exists())
-        ->toBeFalse();
+        ->assertSessionHasErrors(['prerequisite_ids', 'corequisite_ids.0']);
 });
 
-test('deleting a curriculum also deletes its subject assignments', function () {
+test('deleting a curriculum also deletes assignments and dependency links', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin delete curricula');
-    [$subject, $yearLevel, $academicPeriod] = curriculumSubjectOptions();
-
-    $curriculum = Curriculum::query()->create([
-        'code' => 'JHS-2026',
-        'name' => 'Junior High School Curriculum',
-        'effective_year' => 2026,
-        'description' => null,
-        'status' => 'Active',
-    ]);
-    $assignment = $curriculum->curriculumSubjects()->create([
-        'subject_id' => $subject->getKey(),
-        'year_level_id' => $yearLevel->getKey(),
-        'academic_period_id' => $academicPeriod->getKey(),
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
+    $first = $curriculum->curriculumSubjects()->create([
+        'subject_id' => $options['subject']->getKey(),
+        'year_level_id' => $options['yearLevel']->getKey(),
+        'academic_period_id' => $options['period']->getKey(),
         'is_required' => true,
         'sort_order' => 1,
     ]);
@@ -244,77 +306,84 @@ test('deleting a curriculum also deletes its subject assignments', function () {
         ->assertRedirect(route('admin.academics.curriculum.index'));
 
     $this->assertModelMissing($curriculum);
-    $this->assertModelMissing($assignment);
+    $this->assertModelMissing($first);
 });
 
-test('curriculum forms validate curriculum and subject fields', function () {
+test('curriculum forms validate basic information and subject placement', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('admin create curricula');
-
-    Curriculum::query()->create([
-        'code' => 'JHS-2026',
-        'name' => 'Existing Curriculum',
-        'effective_year' => 2026,
-        'description' => null,
-        'status' => 'Active',
+    $user->givePermissionTo(['admin create curricula', 'admin update curricula']);
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
+    $otherStructure = AcademicTermStructure::factory()->create();
+    $wrongPeriod = AcademicPeriod::factory()->create([
+        'academic_term_structure_id' => $otherStructure->getKey(),
     ]);
 
     $this
         ->actingAs($user)
-        ->from(route('admin.academics.curriculum.create'))
         ->post(route('admin.academics.curriculum.store'), [
-            'code' => 'JHS-2026',
+            'code' => '',
             'name' => '',
+            'program_id' => 999,
+            'academic_term_structure_id' => 999,
             'effective_year' => 1000,
-            'status' => '',
-            'curriculum_subjects' => [[
-                'subject_id' => 999,
-                'year_level_id' => 999,
-                'academic_period_id' => 999,
-                'is_required' => 'invalid',
-                'sort_order' => -1,
-            ]],
+            'number_of_years' => 0,
+            'status' => 'Unknown',
         ])
-        ->assertRedirect(route('admin.academics.curriculum.create'))
         ->assertSessionHasErrors([
             'code',
             'name',
+            'program_id',
+            'academic_term_structure_id',
             'effective_year',
+            'number_of_years',
             'status',
-            'curriculum_subjects.0.subject_id',
-            'curriculum_subjects.0.year_level_id',
-            'curriculum_subjects.0.academic_period_id',
-            'curriculum_subjects.0.is_required',
-            'curriculum_subjects.0.sort_order',
         ]);
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.curriculum.subjects.store', $curriculum), [
+            'subject_id' => $options['subject']->getKey(),
+            'year_level_id' => $options['yearLevel']->getKey(),
+            'academic_period_id' => $wrongPeriod->getKey(),
+            'sort_order' => -1,
+        ])
+        ->assertSessionHasErrors(['academic_period_id', 'sort_order']);
 });
 
-test('users without permission cannot create a curriculum', function () {
+test('users without permission cannot create a curriculum or add subjects', function () {
     $user = User::factory()->create();
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
 
     $this
         ->actingAs($user)
         ->post(route('admin.academics.curriculum.store'), [
-            'code' => 'JHS-2026',
-            'name' => 'Junior High School Curriculum',
+            'code' => 'UNAUTHORIZED',
+            'name' => 'Unauthorized Curriculum',
+            'program_id' => $options['program']->getKey(),
+            'academic_term_structure_id' => $options['structure']->getKey(),
             'effective_year' => 2026,
-            'description' => null,
-            'status' => 'Active',
+            'number_of_years' => 4,
+            'status' => 'Draft',
         ])
         ->assertForbidden();
 
-    expect(Curriculum::query()->where('code', 'JHS-2026')->exists())->toBeFalse();
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.curriculum.subjects.store', $curriculum), [
+            'subject_id' => $options['subject']->getKey(),
+            'year_level_id' => $options['yearLevel']->getKey(),
+            'academic_period_id' => $options['period']->getKey(),
+            'sort_order' => 1,
+        ])
+        ->assertForbidden();
 });
 
 test('users without permission cannot open curriculum form pages', function () {
     $user = User::factory()->create();
-    $curriculum = Curriculum::query()->create([
-        'code' => 'JHS-2026',
-        'name' => 'Junior High School Curriculum',
-        'effective_year' => 2026,
-        'description' => null,
-        'status' => 'Active',
-    ]);
+    $options = curriculumOptions();
+    $curriculum = createCurriculum($options);
 
     $this->actingAs($user)
         ->get(route('admin.academics.curriculum.create'))

@@ -6,6 +6,7 @@ use App\Models\Academics\AcademicPeriod;
 use App\Models\Academics\AcademicTermStructure;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\GradeLevel;
+use App\Models\Academics\Program;
 use App\Models\Academics\Subject;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -18,16 +19,6 @@ class CurriculumSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function (): void {
-            $curriculum = Curriculum::query()->updateOrCreate(
-                ['code' => 'JHS-2026'],
-                [
-                    'name' => 'Junior High School Curriculum 2026',
-                    'effective_year' => 2026,
-                    'description' => 'Standard Junior High School curriculum.',
-                    'status' => 'Active',
-                ],
-            );
-
             $gradeLevel = GradeLevel::query()
                 ->where('name', 'Grade 7')
                 ->firstOrFail();
@@ -35,6 +26,19 @@ class CurriculumSeeder extends Seeder
             $juniorHighSchool = AcademicTermStructure::query()
                 ->where('code', 'JHS4Q')
                 ->firstOrFail();
+            $program = Program::query()->where('code', 'JHS')->firstOrFail();
+            $curriculum = Curriculum::query()->updateOrCreate(
+                ['code' => 'JHS-2026'],
+                [
+                    'name' => 'Junior High School Curriculum 2026',
+                    'program_id' => $program->getKey(),
+                    'academic_term_structure_id' => $juniorHighSchool->getKey(),
+                    'effective_year' => 2026,
+                    'number_of_years' => 4,
+                    'description' => 'Standard Junior High School curriculum.',
+                    'status' => 'Active',
+                ],
+            );
 
             $academicPeriods = AcademicPeriod::query()
                 ->whereBelongsTo($juniorHighSchool, 'structure')
@@ -67,6 +71,9 @@ class CurriculumSeeder extends Seeder
                         ],
                         [
                             'is_required' => true,
+                            'units' => 1,
+                            'lecture_hours' => 1,
+                            'laboratory_hours' => 0,
                             'sort_order' => $sortOrder + 1,
                         ],
                     );

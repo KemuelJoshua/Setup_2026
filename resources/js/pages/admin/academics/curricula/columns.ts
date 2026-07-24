@@ -13,17 +13,48 @@ import { formatDate } from '@/lib/formatDate';
 export interface CurriculumSubject {
     id: number;
     subject_id: number;
+    subject_name: string;
     year_level_id: number;
+    year_level_name: string;
     academic_period_id: number;
-    is_required: boolean;
+    academic_period_name: string;
+    units: string | null;
+    lecture_hours: string | null;
+    laboratory_hours: string | null;
     sort_order: number;
+    remarks: string | null;
+    prerequisites: CurriculumSubjectReference[];
+    corequisites: CurriculumSubjectReference[];
+}
+
+export interface CurriculumSubjectReference {
+    id: number;
+    name: string;
+}
+
+export interface AcademicPeriodOption {
+    id: number;
+    name: string;
+    code: string | null;
+    sequence: number;
+}
+
+export interface AcademicStructureOption {
+    id: number;
+    name: string;
+    code: string;
+    type: string;
+    root_periods: AcademicPeriodOption[];
 }
 
 export interface Curriculum {
     id: number;
     code: string;
     name: string;
+    program: string | null;
+    academic_structure: string | null;
     effective_year: number;
+    number_of_years: number;
     description: string | null;
     status: string;
     curriculum_subjects_count: number;
@@ -34,7 +65,10 @@ export interface CurriculumFormData {
     id: number;
     code: string;
     name: string;
+    program: SelectOption | null;
+    academic_structure: AcademicStructureOption | null;
     effective_year: number;
+    number_of_years: number;
     description: string | null;
     status: string;
     curriculum_subjects: CurriculumSubject[];
@@ -88,6 +122,28 @@ export const createColumns = (
             ]),
     },
     {
+        accessorKey: 'program',
+        meta: {
+            className: 'min-w-[170px]',
+        },
+        header: ({ column }) =>
+            h(DataTableColumnHeader as Component, {
+                column,
+                title: 'Program',
+            }),
+    },
+    {
+        accessorKey: 'academic_structure',
+        meta: {
+            className: 'min-w-[220px]',
+        },
+        header: ({ column }) =>
+            h(DataTableColumnHeader as Component, {
+                column,
+                title: 'Academic Structure',
+            }),
+    },
+    {
         accessorKey: 'effective_year',
         meta: {
             className: 'min-w-[130px]',
@@ -97,6 +153,19 @@ export const createColumns = (
                 column,
                 title: 'Effective Year',
             }),
+    },
+    {
+        accessorKey: 'number_of_years',
+        meta: {
+            className: 'min-w-[120px]',
+        },
+        header: ({ column }) =>
+            h(DataTableColumnHeader as Component, {
+                column,
+                title: 'Duration',
+            }),
+        cell: ({ row }) =>
+            `${row.original.number_of_years} ${row.original.number_of_years === 1 ? 'year' : 'years'}`,
     },
     {
         accessorKey: 'curriculum_subjects_count',

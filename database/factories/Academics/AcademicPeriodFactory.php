@@ -23,7 +23,7 @@ class AcademicPeriodFactory extends Factory
             'academic_term_structure_id' => AcademicTermStructure::factory(),
             'parent_id' => null,
             'name' => fake()->unique()->words(2, true),
-            'code' => fake()->optional()->unique()->bothify('PER-###'),
+            'code' => fake()->optional()->bothify('PER-###'),
             'sequence' => fake()->numberBetween(1, 20),
             'status' => AcademicStatus::Active,
         ];

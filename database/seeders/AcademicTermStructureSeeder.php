@@ -14,11 +14,6 @@ class AcademicTermStructureSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function (): void {
-            $threeGradingPeriods = [
-                ['name' => 'Prelim', 'code' => 'PRE'],
-                ['name' => 'Midterm', 'code' => 'MID'],
-                ['name' => 'Final', 'code' => 'FIN'],
-            ];
             $fourGradingPeriods = [
                 ['name' => 'Prelim', 'code' => 'PRE'],
                 ['name' => 'Midterm', 'code' => 'MID'],
@@ -43,42 +38,42 @@ class AcademicTermStructureSeeder extends Seeder
 
             $structures = [
                 [
-                    'name' => 'College — 2 Semesters — 4 Grading Periods',
+                    'name' => 'College — Semester (2 Terms, 4 Grading Periods)',
                     'code' => 'C24GP',
                     'type' => AcademicTermStructureType::Semester,
                     'terms' => $semesterTerms,
                     'grading_periods' => $fourGradingPeriods,
                 ],
                 [
-                    'name' => 'College — 2 Semesters — 3 Grading Periods',
+                    'name' => 'College — Semester (2 Terms)',
                     'code' => 'C23GP',
                     'type' => AcademicTermStructureType::Semester,
                     'terms' => $semesterTerms,
-                    'grading_periods' => $threeGradingPeriods,
+                    'grading_periods' => [],
                 ],
                 [
-                    'name' => 'College — 3 Trimesters — 4 Grading Periods',
+                    'name' => 'College — Trimester (3 Terms, 4 Grading Periods)',
                     'code' => 'C34GP',
                     'type' => AcademicTermStructureType::Trisem,
                     'terms' => $trimesterTerms,
                     'grading_periods' => $fourGradingPeriods,
                 ],
                 [
-                    'name' => 'College — 3 Trimesters — 3 Grading Periods',
+                    'name' => 'College — Trimester (3 Terms)',
                     'code' => 'C33GP',
                     'type' => AcademicTermStructureType::Trisem,
                     'terms' => $trimesterTerms,
-                    'grading_periods' => $threeGradingPeriods,
+                    'grading_periods' => [],
                 ],
                 [
-                    'name' => 'Junior High School — 4 Quarters',
+                    'name' => 'JHS — Quarter',
                     'code' => 'JHS4Q',
                     'type' => AcademicTermStructureType::Quarterly,
                     'terms' => $quarterTerms,
                     'grading_periods' => [],
                 ],
                 [
-                    'name' => 'Senior High School — 4 Quarters',
+                    'name' => 'SHS — Quarter',
                     'code' => 'SHS4Q',
                     'type' => AcademicTermStructureType::Quarterly,
                     'terms' => $quarterTerms,
@@ -109,6 +104,10 @@ class AcademicTermStructureSeeder extends Seeder
                             'status' => AcademicStatus::Active,
                         ],
                     );
+
+                    if ($structureData['grading_periods'] === []) {
+                        $term->children()->delete();
+                    }
 
                     foreach ($structureData['grading_periods'] as $periodIndex => $periodData) {
                         AcademicPeriod::query()->updateOrCreate(

@@ -30,6 +30,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('curriculum_subject_corequisites');
+        Schema::dropIfExists('curriculum_subject_prerequisites');
         Schema::dropIfExists('curriculum_subjects');
     }
 };

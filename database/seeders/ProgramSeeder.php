@@ -14,6 +14,12 @@ class ProgramSeeder extends Seeder
     {
         $programs = [
             [
+                'code' => 'BSIT',
+                'name' => 'Bachelor of Science in Information Technology',
+                'description' => 'Four-year information technology program.',
+                'status' => 'Active',
+            ],
+            [
                 'code' => 'JHS',
                 'name' => 'Junior High School',
                 'description' => 'Grades 7 to 10 basic education program.',

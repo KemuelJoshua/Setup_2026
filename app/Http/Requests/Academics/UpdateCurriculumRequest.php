@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Academics;
 
 use App\Models\Academics\Curriculum;
+use App\Models\Academics\Program;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -25,6 +26,9 @@ class UpdateCurriculumRequest extends FormRequest
     public function rules(): array
     {
         $curriculum = $this->route('curriculum');
+        $structureCode = $curriculum instanceof Curriculum
+            ? $curriculum->academicTermStructure()->value('code')
+            : null;
 
         return [
             'code' => [
@@ -34,15 +38,26 @@ class UpdateCurriculumRequest extends FormRequest
                 Rule::unique(Curriculum::class, 'code')->ignore($curriculum),
             ],
             'name' => ['required', 'string', 'max:255'],
+            'program_id' => ['required', 'integer', Rule::exists(Program::class, 'id')],
+            'academic_term_structure_id' => ['prohibited'],
             'effective_year' => ['required', 'integer', 'min:1900', 'max:9999'],
+            'number_of_years' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:'.$this->maximumYearsFor($structureCode),
+            ],
             'description' => ['nullable', 'string'],
-            'status' => ['required', 'string', 'max:255'],
-            'curriculum_subjects' => ['nullable', 'array'],
-            'curriculum_subjects.*.subject_id' => ['required', 'integer', 'exists:subjects,id'],
-            'curriculum_subjects.*.year_level_id' => ['required', 'integer', 'exists:grade_levels,id'],
-            'curriculum_subjects.*.academic_period_id' => ['required', 'integer', 'exists:academic_periods,id'],
-            'curriculum_subjects.*.is_required' => ['required', 'boolean'],
-            'curriculum_subjects.*.sort_order' => ['required', 'integer', 'min:0'],
+            'status' => ['required', Rule::in(['Draft', 'Active', 'Inactive'])],
         ];
+    }
+
+    private function maximumYearsFor(?string $structureCode): int
+    {
+        return match ($structureCode) {
+            'JHS4Q' => 4,
+            'SHS4Q' => 2,
+            default => 10,
+        };
     }
 }

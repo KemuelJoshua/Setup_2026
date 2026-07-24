@@ -10,12 +10,9 @@ class UpdateCurriculumAction
     public function execute(Curriculum $curriculum, array $data): Curriculum
     {
         return DB::transaction(function () use ($curriculum, $data): Curriculum {
-            $curriculumSubjects = $data['curriculum_subjects'] ?? [];
-            unset($data['curriculum_subjects']);
+            unset($data['academic_term_structure_id']);
 
             $curriculum->update($data);
-            $curriculum->curriculumSubjects()->delete();
-            $curriculum->curriculumSubjects()->createMany($curriculumSubjects);
 
             return $curriculum->refresh();
         });

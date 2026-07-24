@@ -39,7 +39,10 @@ class CurriculumController extends Controller
                 'id' => $curriculum->getKey(),
                 'code' => $curriculum->code,
                 'name' => $curriculum->name,
+                'program' => $curriculum->program?->name,
+                'academic_structure' => $curriculum->academicTermStructure?->name,
                 'effective_year' => $curriculum->effective_year,
+                'number_of_years' => $curriculum->number_of_years,
                 'description' => $curriculum->description,
                 'status' => $curriculum->status,
                 'curriculum_subjects_count' => $curriculum->curriculum_subjects_count,
@@ -68,11 +71,11 @@ class CurriculumController extends Controller
     ): RedirectResponse {
         Gate::authorize('admin create curricula');
 
-        $createCurriculum->execute($request->validated());
+        $curriculum = $createCurriculum->execute($request->validated());
 
         return redirect()
-            ->route('admin.academics.curriculum.index')
-            ->with('success', 'Curriculum created successfully.');
+            ->route('admin.academics.curriculum.edit', $curriculum)
+            ->with('success', 'Basic curriculum information saved. Add its subjects next.');
     }
 
     public function edit(
@@ -82,25 +85,51 @@ class CurriculumController extends Controller
         Gate::authorize('admin update curricula');
 
         $curriculum->load([
-            'curriculumSubjects:id,curriculum_id,subject_id,year_level_id,academic_period_id,is_required,sort_order',
+            'program:id,code,name',
+            'academicTermStructure:id,name,code,type',
+            'academicTermStructure.rootPeriods:id,academic_term_structure_id,name,code,sequence',
+            'curriculumSubjects.subject:id,name',
+            'curriculumSubjects.yearLevel:id,name',
+            'curriculumSubjects.academicPeriod:id,name,code',
+            'curriculumSubjects.prerequisites.subject:id,name',
+            'curriculumSubjects.corequisites.subject:id,name',
         ]);
 
-        return Inertia::render('admin/academics/curricula/Form', [
+        return Inertia::render('admin/academics/curricula/Subjects', [
             'curriculum' => [
                 'id' => $curriculum->getKey(),
                 'code' => $curriculum->code,
                 'name' => $curriculum->name,
+                'program' => $curriculum->program,
+                'academic_structure' => $curriculum->academicTermStructure,
                 'effective_year' => $curriculum->effective_year,
+                'number_of_years' => $curriculum->number_of_years,
                 'description' => $curriculum->description,
                 'status' => $curriculum->status,
                 'curriculum_subjects' => $curriculum->curriculumSubjects
                     ->map(fn (CurriculumSubject $curriculumSubject): array => [
                         'id' => $curriculumSubject->getKey(),
                         'subject_id' => $curriculumSubject->subject_id,
+                        'subject_name' => $curriculumSubject->subject->name,
                         'year_level_id' => $curriculumSubject->year_level_id,
+                        'year_level_name' => $curriculumSubject->yearLevel->name,
                         'academic_period_id' => $curriculumSubject->academic_period_id,
-                        'is_required' => $curriculumSubject->is_required,
+                        'academic_period_name' => $curriculumSubject->academicPeriod->name,
+                        'units' => $curriculumSubject->units,
+                        'lecture_hours' => $curriculumSubject->lecture_hours,
+                        'laboratory_hours' => $curriculumSubject->laboratory_hours,
                         'sort_order' => $curriculumSubject->sort_order,
+                        'remarks' => $curriculumSubject->remarks,
+                        'prerequisites' => $curriculumSubject->prerequisites
+                            ->map(fn (CurriculumSubject $prerequisite): array => [
+                                'id' => $prerequisite->getKey(),
+                                'name' => $prerequisite->subject->name,
+                            ])->all(),
+                        'corequisites' => $curriculumSubject->corequisites
+                            ->map(fn (CurriculumSubject $corequisite): array => [
+                                'id' => $corequisite->getKey(),
+                                'name' => $corequisite->subject->name,
+                            ])->all(),
                     ])->all(),
             ],
             ...$getFormOptions->execute(),

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Academics\AcademicPeriodController;
 use App\Http\Controllers\Academics\AcademicTermStructureController;
 use App\Http\Controllers\Academics\CurriculumController;
+use App\Http\Controllers\Academics\CurriculumSubjectController;
 use App\Http\Controllers\Academics\GradeLevelController;
 use App\Http\Controllers\Academics\ProgramController;
 use App\Http\Controllers\Academics\SectionController;
@@ -52,6 +53,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{curriculum}/edit', [CurriculumController::class, 'edit'])->name('edit');
             Route::put('/{curriculum}', [CurriculumController::class, 'update'])->name('update');
             Route::delete('/{curriculum}', [CurriculumController::class, 'destroy'])->name('destroy');
+            Route::post('/{curriculum}/subjects', [CurriculumSubjectController::class, 'store'])
+                ->name('subjects.store');
+            Route::put('/{curriculum}/subjects/{curriculumSubject}', [CurriculumSubjectController::class, 'update'])
+                ->name('subjects.update');
+            Route::delete('/{curriculum}/subjects/{curriculumSubject}', [CurriculumSubjectController::class, 'destroy'])
+                ->name('subjects.destroy');
         });
 
     });

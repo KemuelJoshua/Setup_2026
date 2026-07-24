@@ -4,6 +4,7 @@ namespace App\Models\Academics;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class CurriculumSubject extends Model
 {
@@ -11,8 +12,12 @@ class CurriculumSubject extends Model
         'subject_id',
         'year_level_id',
         'academic_period_id',
+        'units',
+        'lecture_hours',
+        'laboratory_hours',
         'is_required',
         'sort_order',
+        'remarks',
     ];
 
     protected function casts(): array
@@ -20,6 +25,9 @@ class CurriculumSubject extends Model
         return [
             'is_required' => 'boolean',
             'sort_order' => 'integer',
+            'units' => 'decimal:2',
+            'lecture_hours' => 'decimal:2',
+            'laboratory_hours' => 'decimal:2',
         ];
     }
 
@@ -53,5 +61,31 @@ class CurriculumSubject extends Model
     public function academicPeriod(): BelongsTo
     {
         return $this->belongsTo(AcademicPeriod::class);
+    }
+
+    /**
+     * @return BelongsToMany<CurriculumSubject, $this>
+     */
+    public function prerequisites(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            self::class,
+            'curriculum_subject_prerequisites',
+            'curriculum_subject_id',
+            'prerequisite_curriculum_subject_id',
+        )->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany<CurriculumSubject, $this>
+     */
+    public function corequisites(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            self::class,
+            'curriculum_subject_corequisites',
+            'curriculum_subject_id',
+            'corequisite_curriculum_subject_id',
+        )->withTimestamps();
     }
 }
