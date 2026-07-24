@@ -24,7 +24,7 @@ const props = defineProps<{
     groups: NavGroup[];
 }>();
 
-const { isCurrentUrl } = useCurrentUrl();
+const { isCurrentOrParentUrl, isCurrentUrl } = useCurrentUrl();
 
 const menuButtonClass =
     'h-10.5 rounded-md px-3 text-sm font-medium text-sidebar-foreground/65 transition-[background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-sidebar-accent/70 hover:text-sidebar-primary data-[active=true]:bg-sidebar-primary data-[active=true]:font-semibold data-[active=true]:text-sidebar-primary-foreground data-[active=true]:shadow-sm data-[active=true]:shadow-sidebar-primary/20 data-[active=true]:hover:bg-sidebar-primary data-[active=true]:hover:text-sidebar-primary-foreground group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-0!';
@@ -35,6 +35,11 @@ const getItemKey = (item: NavItem): string => item.title;
 
 const hasChildren = (item: NavItem): boolean =>
     (item.children?.length ?? 0) > 0;
+
+const isNavItemCurrent = (item: NavItem): boolean =>
+    item.matchesNestedRoutes
+        ? isCurrentOrParentUrl(item.href)
+        : isCurrentUrl(item.href);
 
 const activeParentKeys = computed(() =>
     props.groups.flatMap((group) =>
@@ -58,10 +63,10 @@ const isItemExpanded = (item: NavItem): boolean => {
 };
 
 const hasActiveChild = (item: NavItem): boolean =>
-    item.children?.some((child) => isCurrentUrl(child.href)) ?? false;
+    item.children?.some((child) => isNavItemCurrent(child)) ?? false;
 
 const isItemActive = (item: NavItem): boolean =>
-    isCurrentUrl(item.href) || hasActiveChild(item);
+    isNavItemCurrent(item) || hasActiveChild(item);
 
 watch(
     activeParentKeys,
@@ -141,7 +146,7 @@ watch(
                             <SidebarMenuSubButton
                                 as-child
                                 size="sm"
-                                :is-active="isCurrentUrl(child.href)"
+                                :is-active="isNavItemCurrent(child)"
                                 class="h-8.5 rounded-md px-2.5 text-[13px] text-sidebar-foreground/60 transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-sidebar-accent/60 hover:text-sidebar-foreground data-[active=true]:bg-transparent data-[active=true]:font-semibold data-[active=true]:text-sidebar-primary"
                             >
                                 <Link :href="child.href">

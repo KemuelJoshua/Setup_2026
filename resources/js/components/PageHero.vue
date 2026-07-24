@@ -6,7 +6,9 @@ type Props = {
     class?: HTMLAttributes['class'];
 };
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    class: '',
+});
 </script>
 
 <template>

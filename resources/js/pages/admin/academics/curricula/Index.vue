@@ -8,6 +8,8 @@ import DataTableContainer from '@/components/DataTableContainer.vue';
 import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
+
 import {
     DataTable,
     DataTablePageSizeSelect,
@@ -134,8 +136,8 @@ onBeforeUnmount(() => {
 <template>
     <Head title="Curricula" />
 
-    <div
-        class="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-6 p-4 md:p-8"
+    <DefaultContainer
+        class="flex flex-1 flex-col gap-5 p-4 md:p-8"
     >
         <PageHero>
             <template #icon>
@@ -249,7 +251,7 @@ onBeforeUnmount(() => {
                 />
             </template>
         </DataTableContainer>
-    </div>
+    </DefaultContainer>
 
     <Dialog v-model:open="isDeleteDialogOpen">
         <DialogContent v-if="selectedCurriculum">

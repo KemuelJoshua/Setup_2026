@@ -3,6 +3,7 @@ import { Form, Head, router } from '@inertiajs/vue3';
 import { Plus, School, Sparkles } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
+import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
 
 import DataTableContainer from '@/components/DataTableContainer.vue';
 import PageHero from '@/components/PageHero.vue';
@@ -102,7 +103,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
 <template>
     <Head title="Educational Levels" />
 
-    <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
+    <DefaultContainer>
         <PageHero>
             <template #icon>
                 <School class="size-5" aria-hidden="true" />
@@ -158,7 +159,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
                 />
             </template>
         </DataTableContainer>
-    </div>
+    </DefaultContainer>
 
     <CreateUpdate
         v-model:open="isFormDialogOpen"

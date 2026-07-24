@@ -7,6 +7,8 @@ import { toast } from 'vue-sonner';
 import DataTableContainer from '@/components/DataTableContainer.vue';
 import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
+import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
+
 import {
     DataTable,
     DataTablePageSizeSelect,
@@ -157,7 +159,7 @@ onBeforeUnmount(() => {
 <template>
     <Head title="Grade Levels" />
 
-    <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
+    <DefaultContainer>
         <PageHero>
             <template #icon>
                 <Layers3 class="size-5" aria-hidden="true" />
@@ -240,7 +242,7 @@ onBeforeUnmount(() => {
                 />
             </template>
         </DataTableContainer>
-    </div>
+    </DefaultContainer>
 
     <CreateUpdate
         v-model:open="isFormDialogOpen"

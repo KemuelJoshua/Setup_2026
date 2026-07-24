@@ -92,11 +92,7 @@ const primaryNavItems: NavItem[] = [
                 title: 'Curriculum',
                 href: IndexCurriculum(),
                 icon: ScrollText,
-            },
-            {
-                title: 'Class Scheduling',
-                href: '#',
-                icon: CalendarDays,
+                matchesNestedRoutes: true,
             },
         ],
     },
