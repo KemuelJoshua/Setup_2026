@@ -60,6 +60,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/', [CurriculumController::class, 'store'])->name('store');
             Route::get('/{curriculum}/edit', [CurriculumController::class, 'edit'])->name('edit');
             Route::put('/{curriculum}', [CurriculumController::class, 'update'])->name('update');
+            Route::patch('/{curriculum}/status', [CurriculumController::class, 'updateStatus'])
+                ->name('update-status');
             Route::delete('/{curriculum}', [CurriculumController::class, 'destroy'])->name('destroy');
             Route::post('/{curriculum}/subjects', [CurriculumSubjectController::class, 'store'])
                 ->name('subjects.store');

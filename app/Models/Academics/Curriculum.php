@@ -2,7 +2,6 @@
 
 namespace App\Models\Academics;
 
-use Attribute;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,11 +17,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'description',
     'status',
 )]
-
 class Curriculum extends Model
 {
     protected $attributes = [
         'number_of_years' => 4,
+        'status' => 4,
     ];
 
     /**

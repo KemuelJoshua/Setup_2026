@@ -2,6 +2,7 @@ import {
     ArrowRight,
     BookOpen,
     CalendarDays,
+    CircleDotDashed,
     GraduationCap,
     Trash2,
 } from '@lucide/vue';
@@ -81,6 +82,9 @@ export interface CurriculumFormData {
 
 export interface CurriculumFilters {
     search?: string;
+    educational_level_id?: number;
+    program_id?: number;
+    status?: string;
     per_page?: string | number;
 }
 
@@ -100,6 +104,7 @@ export interface ProgramOption extends SelectOption {
 
 interface CurriculumColumnActions {
     manage: (curriculum: Curriculum) => void;
+    changeStatus: (curriculum: Curriculum) => void;
     delete: (curriculum: Curriculum) => void;
 }
 
@@ -236,8 +241,7 @@ export const createColumns = (
                                 'max-w-[240px] truncate',
                                 'text-sm font-medium text-foreground',
                             ].join(' '),
-                            title:
-                                curriculum.academic_structure ?? undefined,
+                            title: curriculum.academic_structure ?? undefined,
                         },
                         curriculum.academic_structure ??
                             'No structure assigned',
@@ -249,9 +253,7 @@ export const createColumns = (
                             class: 'text-xs text-muted-foreground',
                         },
                         `${curriculum.number_of_years} ${
-                            curriculum.number_of_years === 1
-                                ? 'year'
-                                : 'years'
+                            curriculum.number_of_years === 1 ? 'year' : 'years'
                         } duration`,
                     ),
                 ]),
@@ -408,6 +410,22 @@ export const createColumns = (
                             }),
                             'Manage',
                         ],
+                    ),
+
+                    h(
+                        Button,
+                        {
+                            variant: 'outline',
+                            size: 'icon-sm',
+                            title: 'Change status',
+                            'aria-label': `Change status for ${curriculum.name}`,
+                            onClick: () => actions.changeStatus(curriculum),
+                        },
+                        () =>
+                            h(CircleDotDashed, {
+                                'aria-hidden': true,
+                                class: 'size-4',
+                            }),
                     ),
 
                     h(

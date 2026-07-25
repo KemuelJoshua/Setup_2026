@@ -115,6 +115,102 @@ test('authorized users can view and search curricula', function () {
             ->missing('subjects'));
 });
 
+test('authorized users can filter curricula by educational level program and status', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin view curricula');
+    $options = curriculumOptions();
+    $target = createCurriculum($options, ['status' => 'Draft']);
+    createCurriculum($options, [
+        'code' => 'JHS-INACTIVE',
+        'status' => 'Inactive',
+    ]);
+    $otherEducationalLevel = EducationalLevel::factory()->create([
+        'name' => 'Senior High School',
+    ]);
+    $otherProgram = Program::query()->create([
+        'educational_level_id' => $otherEducationalLevel->getKey(),
+        'code' => 'SHS',
+        'name' => 'Senior High School',
+        'status' => 'Active',
+    ]);
+    $otherStructure = AcademicTermStructure::factory()->create([
+        'educational_level_id' => $otherEducationalLevel->getKey(),
+    ]);
+    createCurriculum($options, [
+        'code' => 'SHS-2026',
+        'program_id' => $otherProgram->getKey(),
+        'academic_term_structure_id' => $otherStructure->getKey(),
+        'status' => 'Draft',
+    ]);
+
+    $this
+        ->actingAs($user)
+        ->get(route('admin.academics.curriculum.index', [
+            'educational_level_id' => $options['educationalLevel']->getKey(),
+            'program_id' => $options['program']->getKey(),
+            'status' => 'Draft',
+        ]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('curricula.total', 1)
+            ->where('curricula.data.0.id', $target->getKey())
+            ->where(
+                'filters.educational_level_id',
+                $options['educationalLevel']->getKey(),
+            )
+            ->where('filters.program_id', $options['program']->getKey())
+            ->where('filters.status', 'Draft')
+            ->has('educationalLevels', 2)
+            ->has('programs', 2)
+            ->where(
+                'programs.0.educational_level_id',
+                $options['educationalLevel']->getKey(),
+            ));
+});
+
+test('authorized users can change a curriculum status', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin update curricula');
+    $curriculum = createCurriculum(curriculumOptions(), ['status' => 'Draft']);
+
+    $this
+        ->actingAs($user)
+        ->from(route('admin.academics.curriculum.index'))
+        ->patch(
+            route('admin.academics.curriculum.update-status', $curriculum),
+            ['status' => 'Active'],
+        )
+        ->assertRedirect(route('admin.academics.curriculum.index'));
+
+    expect($curriculum->refresh()->status)->toBe('Active');
+});
+
+test('curriculum status changes are validated and authorized', function () {
+    $authorizedUser = User::factory()->create();
+    $authorizedUser->givePermissionTo('admin update curricula');
+    $curriculum = createCurriculum(curriculumOptions(), ['status' => 'Draft']);
+
+    $this
+        ->actingAs($authorizedUser)
+        ->patch(
+            route('admin.academics.curriculum.update-status', $curriculum),
+            ['status' => 'Unknown'],
+        )
+        ->assertSessionHasErrors('status');
+
+    expect($curriculum->refresh()->status)->toBe('Draft');
+
+    $this
+        ->actingAs(User::factory()->create())
+        ->patch(
+            route('admin.academics.curriculum.update-status', $curriculum),
+            ['status' => 'Active'],
+        )
+        ->assertForbidden();
+
+    expect($curriculum->refresh()->status)->toBe('Draft');
+});
+
 test('authorized users can open the create curriculum page', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('admin create curricula');

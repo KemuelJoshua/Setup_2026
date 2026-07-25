@@ -7,11 +7,15 @@ use App\Actions\Academics\Curriculum\DeleteCurriculumAction;
 use App\Actions\Academics\Curriculum\GetCurriculumFormOptionsAction;
 use App\Actions\Academics\Curriculum\IndexCurriculumAction;
 use App\Actions\Academics\Curriculum\UpdateCurriculumAction;
+use App\Actions\Academics\Curriculum\UpdateCurriculumStatusAction;
+use App\Actions\Academics\EducationalLevel\ListEducationalLevelOptionsAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Academics\StoreCurriculumRequest;
 use App\Http\Requests\Academics\UpdateCurriculumRequest;
+use App\Http\Requests\Academics\UpdateCurriculumStatusRequest;
 use App\Models\Academics\Curriculum;
 use App\Models\Academics\CurriculumSubject;
+use App\Models\Academics\Program;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,14 +24,23 @@ use Inertia\Response;
 
 class CurriculumController extends Controller
 {
-    public function index(Request $request, IndexCurriculumAction $indexCurricula): Response
-    {
+    public function index(
+        Request $request,
+        IndexCurriculumAction $indexCurricula,
+        ListEducationalLevelOptionsAction $listEducationalLevelOptions,
+    ): Response {
         Gate::authorize('admin view curricula');
 
         $perPage = $request->integer('per_page', 15);
+        $status = $request->string('status')->toString();
 
         $filters = [
             'search' => $request->string('search')->trim()->toString() ?: null,
+            'educational_level_id' => $request->integer('educational_level_id') ?: null,
+            'program_id' => $request->integer('program_id') ?: null,
+            'status' => in_array($status, ['Draft', 'Active', 'Inactive'], true)
+                ? $status
+                : null,
             'per_page' => in_array($perPage, [10, 15, 25, 50], true) ? $perPage : 15,
         ];
 
@@ -52,6 +65,10 @@ class CurriculumController extends Controller
         return Inertia::render('admin/academics/curricula/Index', [
             'curricula' => $curricula,
             'filters' => $filters,
+            'educationalLevels' => $listEducationalLevelOptions->execute(),
+            'programs' => Program::query()
+                ->orderBy('name')
+                ->get(['id', 'educational_level_id', 'code', 'name']),
         ]);
     }
 
@@ -148,6 +165,21 @@ class CurriculumController extends Controller
         return redirect()
             ->route('admin.academics.curriculum.index')
             ->with('success', 'Curriculum updated successfully.');
+    }
+
+    public function updateStatus(
+        UpdateCurriculumStatusRequest $request,
+        Curriculum $curriculum,
+        UpdateCurriculumStatusAction $updateCurriculumStatus,
+    ): RedirectResponse {
+        Gate::authorize('admin update curricula');
+
+        $updateCurriculumStatus->execute(
+            $curriculum,
+            $request->string('status')->toString(),
+        );
+
+        return back()->with('success', 'Curriculum status updated successfully.');
     }
 
     public function destroy(

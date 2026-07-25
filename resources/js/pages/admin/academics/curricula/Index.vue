@@ -26,15 +26,28 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     create,
     destroy,
     edit,
     index,
+    updateStatus,
 } from '@/routes/admin/academics/curriculum';
 import type { LengthAwarePaginator } from '@/types';
 
 import { createColumns } from './columns';
-import type { Curriculum, CurriculumFilters } from './columns';
+import type {
+    Curriculum,
+    CurriculumFilters,
+    ProgramOption,
+    SelectOption,
+} from './columns';
 
 defineOptions({
     layout: {
@@ -50,11 +63,31 @@ defineOptions({
 const props = defineProps<{
     curricula: LengthAwarePaginator<Curriculum>;
     filters: CurriculumFilters;
+    educationalLevels: SelectOption[];
+    programs: ProgramOption[];
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
+const educationalLevelFilter = ref(
+    props.filters.educational_level_id?.toString() ?? 'all',
+);
+const programFilter = ref(props.filters.program_id?.toString() ?? 'all');
+const statusFilter = ref(props.filters.status ?? 'all');
 const isDeleteDialogOpen = ref(false);
+const isStatusDialogOpen = ref(false);
 const selectedCurriculum = ref<Curriculum | null>(null);
+const selectedStatus = ref('');
+const filteredPrograms = computed(() => {
+    if (educationalLevelFilter.value === 'all') {
+        return props.programs;
+    }
+
+    return props.programs.filter(
+        (program) =>
+            program.educational_level_id ===
+            Number(educationalLevelFilter.value),
+    );
+});
 const visibleSubjectCount = computed(() =>
     props.curricula.data.reduce(
         (total, curriculum) => total + curriculum.curriculum_subjects_count,
@@ -77,6 +110,18 @@ const fetchCurricula = (
         index({
             query: {
                 search: searchQuery.value || undefined,
+                educational_level_id:
+                    educationalLevelFilter.value === 'all'
+                        ? undefined
+                        : educationalLevelFilter.value,
+                program_id:
+                    programFilter.value === 'all'
+                        ? undefined
+                        : programFilter.value,
+                status:
+                    statusFilter.value === 'all'
+                        ? undefined
+                        : statusFilter.value,
                 per_page: perPage,
             },
         }),
@@ -106,8 +151,15 @@ const openDeleteDialog = (curriculum: Curriculum): void => {
     isDeleteDialogOpen.value = true;
 };
 
+const openStatusDialog = (curriculum: Curriculum): void => {
+    selectedCurriculum.value = curriculum;
+    selectedStatus.value = curriculum.status;
+    isStatusDialogOpen.value = true;
+};
+
 const columns = createColumns({
     manage: openEditPage,
+    changeStatus: openStatusDialog,
     delete: openDeleteDialog,
 });
 
@@ -120,11 +172,30 @@ const handleDeleteError = (): void => {
     toast.error('Unable to delete the curriculum. Please try again.');
 };
 
-watch(searchQuery, handleSearch);
+const handleStatusUpdated = (): void => {
+    toast.success('Curriculum status updated successfully.');
+    isStatusDialogOpen.value = false;
+};
 
-watch(isDeleteDialogOpen, (open) => {
-    if (!open) {
+watch(educationalLevelFilter, () => {
+    const selectedProgramIsAvailable = filteredPrograms.value.some(
+        (program) => String(program.id) === programFilter.value,
+    );
+
+    if (!selectedProgramIsAvailable) {
+        programFilter.value = 'all';
+    }
+});
+
+watch(
+    [searchQuery, educationalLevelFilter, programFilter, statusFilter],
+    handleSearch,
+);
+
+watch([isDeleteDialogOpen, isStatusDialogOpen], ([deleteOpen, statusOpen]) => {
+    if (!deleteOpen && !statusOpen) {
         selectedCurriculum.value = null;
+        selectedStatus.value = '';
     }
 });
 
@@ -136,9 +207,7 @@ onBeforeUnmount(() => {
 <template>
     <Head title="Curricula" />
 
-    <DefaultContainer
-        class="flex flex-1 flex-col gap-5 p-4 md:p-8"
-    >
+    <DefaultContainer class="flex flex-1 flex-col gap-5 p-4 md:p-8">
         <PageHero>
             <template #icon>
                 <Layers3 class="size-5" aria-hidden="true" />
@@ -226,6 +295,49 @@ onBeforeUnmount(() => {
                 class="border-b px-4 py-4 sm:px-5"
             >
                 <template #filters>
+                    <Select v-model="educationalLevelFilter">
+                        <SelectTrigger aria-label="Filter by educational level">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">
+                                All educational levels
+                            </SelectItem>
+                            <SelectItem
+                                v-for="level in educationalLevels"
+                                :key="level.id"
+                                :value="String(level.id)"
+                            >
+                                {{ level.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select v-model="programFilter">
+                        <SelectTrigger aria-label="Filter by program">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All programs</SelectItem>
+                            <SelectItem
+                                v-for="program in filteredPrograms"
+                                :key="program.id"
+                                :value="String(program.id)"
+                            >
+                                {{ program.code }} — {{ program.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select v-model="statusFilter">
+                        <SelectTrigger aria-label="Filter by status">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All statuses</SelectItem>
+                            <SelectItem value="Draft">Draft</SelectItem>
+                            <SelectItem value="Active">Active</SelectItem>
+                            <SelectItem value="Inactive">Inactive</SelectItem>
+                        </SelectContent>
+                    </Select>
                     <DataTablePageSizeSelect
                         :model-value="curricula.per_page"
                         @update:model-value="fetchCurricula"
@@ -284,6 +396,62 @@ onBeforeUnmount(() => {
                         :disabled="processing"
                     >
                         {{ processing ? 'Deleting...' : 'Delete curriculum' }}
+                    </Button>
+                </DialogFooter>
+            </Form>
+        </DialogContent>
+    </Dialog>
+
+    <Dialog v-model:open="isStatusDialogOpen">
+        <DialogContent v-if="selectedCurriculum">
+            <Form
+                v-bind="updateStatus.form(selectedCurriculum.id)"
+                v-slot="{ processing, errors }"
+                class="space-y-6"
+                :options="{ preserveScroll: true }"
+                @success="handleStatusUpdated"
+                @error="
+                    toast.error(
+                        'Unable to update the curriculum status. Please try again.',
+                    )
+                "
+            >
+                <DialogHeader>
+                    <DialogTitle>Change curriculum status</DialogTitle>
+                    <DialogDescription>
+                        Update the status of {{ selectedCurriculum.name }}.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div class="grid gap-2">
+                    <Select v-model="selectedStatus" name="status">
+                        <SelectTrigger class="w-full" aria-label="Curriculum status">
+                            <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Draft">Draft</SelectItem>
+                            <SelectItem value="Active">Active</SelectItem>
+                            <SelectItem value="Inactive">Inactive</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <p v-if="errors.status" class="text-sm text-destructive">
+                        {{ errors.status }}
+                    </p>
+                </div>
+
+                <DialogFooter>
+                    <DialogClose as-child>
+                        <Button type="button" variant="outline">Cancel</Button>
+                    </DialogClose>
+
+                    <Button
+                        type="submit"
+                        :disabled="
+                            processing ||
+                            selectedStatus === selectedCurriculum.status
+                        "
+                    >
+                        {{ processing ? 'Updating...' : 'Update status' }}
                     </Button>
                 </DialogFooter>
             </Form>
