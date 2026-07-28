@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpenCheck, User2 } from '@lucide/vue';
+import { BookOpenCheck, Rocket, User2 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -14,6 +14,7 @@ import {
     SidebarRail,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes/admin';
+import { index as startupTrackingIndex } from '@/routes/admin/startup-tracking';
 import { index as userIndex } from '@/routes/admin/users';
 import type { NavItem } from '@/types';
 
@@ -28,14 +29,18 @@ const primaryNavItems: NavItem[] = [
         href: userIndex(),
         icon: User2,
     },
+    {
+        title: 'Startup Tracking',
+        href: startupTrackingIndex(),
+        icon: Rocket,
+    },
 ];
-
 
 const navigationGroups: NavGroup[] = [
     {
         title: 'Learning',
         items: primaryNavItems,
-    }
+    },
 ];
 </script>
 
