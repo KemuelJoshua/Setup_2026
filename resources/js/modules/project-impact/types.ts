@@ -1,0 +1,32 @@
+export interface ProjectImpactRecord {
+    id: number;
+    source_sheet: string;
+    record_number: string | null;
+    project_title: string;
+    proponent: string | null;
+    classification: string | null;
+    sub_classification: string | null;
+    ip_type: string | null;
+    field_of_technology: string | null;
+    program_intervention: string | null;
+    amount_assistance: string | null;
+    date_assistance: string | null;
+    project_status: string | null;
+    date_completed: string | null;
+    readiness_before: string | null;
+    readiness_after: string | null;
+    other_interventions: string | null;
+    revenue_amount: string | null;
+    technology_commercialized: string | null;
+    jobs_created: string | null;
+    investment_leveraged: string | null;
+    efficiency_improved: string | null;
+    communities_served: string | null;
+    priority_sectors_benefited: string | null;
+    ip_assets_utilized: string | null;
+    spin_offs_formed: string | null;
+    human_capital_developed: string | null;
+    other_impacts: string | null;
+    impact_narrative: string | null;
+    additional_data: Record<string, unknown> | null;
+}

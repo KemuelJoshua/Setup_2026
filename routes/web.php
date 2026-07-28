@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ProjectImpact\ProjectImpactController;
 use App\Http\Controllers\Admin\StartupTracking\StartupTrackingController;
 use App\Http\Controllers\Admin\Users\UserController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('startup-tracking.import');
         Route::resource('startup-tracking', StartupTrackingController::class)
             ->parameters(['startup-tracking' => 'startup_tracking'])
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::post('project-impact-tracking/import', [ProjectImpactController::class, 'import'])
+            ->name('project-impact-tracking.import');
+        Route::resource('project-impact-tracking', ProjectImpactController::class)
+            ->parameters(['project-impact-tracking' => 'project_impact'])
             ->only(['index', 'store', 'update', 'destroy']);
 
         require __DIR__.'/settings.php';
