@@ -20,7 +20,7 @@ const page = usePage();
         <span
             class="truncate text-[11px] leading-tight font-medium text-sidebar-foreground/50"
         >
-            Learning management system
+            Project Evaluation Management System
         </span>
     </div>
 </template>

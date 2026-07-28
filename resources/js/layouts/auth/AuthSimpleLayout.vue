@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import {
-    Award,
-    BookOpen,
-    BrainCircuit,
-    Building2,
-    GraduationCap,
-    NotebookTabs,
+    ArrowLeft,
+    BarChart3,
+    CheckCircle2,
+    ClipboardCheck,
+    FileChartColumn,
+    ShieldCheck,
 } from '@lucide/vue';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { home } from '@/routes';
-
-const page = usePage();
 
 defineProps<{
     title?: string;
@@ -21,104 +18,92 @@ defineProps<{
 
 <template>
     <div
-        class="min-h-svh bg-background lg:grid lg:grid-cols-[minmax(25rem,0.9fr)_1.1fr]"
+        class="grid min-h-svh bg-background text-foreground lg:grid-cols-[minmax(28rem,1.08fr)_minmax(28rem,0.92fr)]"
     >
         <aside
-            class="relative hidden min-h-svh overflow-hidden border-r border-sidebar-border bg-sidebar p-10 text-sidebar-foreground lg:flex lg:flex-col xl:p-14"
+            class="relative hidden min-h-svh overflow-hidden bg-foreground p-10 text-background lg:flex lg:flex-col xl:p-14 dark:bg-card dark:text-card-foreground"
         >
             <div
-                class="absolute -top-24 -left-20 size-80 rounded-full bg-primary/8 blur-3xl"
+                class="pointer-events-none absolute inset-0 opacity-[0.045] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:3.75rem_3.75rem]"
             />
             <div
-                class="absolute -right-32 -bottom-28 size-96 rounded-full bg-primary/10 blur-3xl"
+                class="pointer-events-none absolute -right-28 -bottom-36 size-[30rem] rounded-full bg-primary/25 blur-3xl"
             />
 
-            <div
-                class="pointer-events-none absolute inset-0 text-sidebar-foreground/[0.055]"
-                aria-hidden="true"
+            <Link
+                :href="home()"
+                class="relative z-10 flex w-fit items-center gap-3 rounded-xl focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-foreground focus-visible:outline-none"
             >
-                <BookOpen
-                    class="absolute top-[14%] right-[10%] size-24 -rotate-12"
-                    :stroke-width="1.25"
-                />
-                <GraduationCap
-                    class="absolute top-[38%] left-[8%] size-28 rotate-12"
-                    :stroke-width="1.1"
-                />
-                <BrainCircuit
-                    class="absolute top-[48%] right-[5%] size-32 -rotate-6"
-                    :stroke-width="1"
-                />
-                <NotebookTabs
-                    class="absolute bottom-[8%] left-[16%] size-24 -rotate-12"
-                    :stroke-width="1.2"
-                />
-                <Award
-                    class="absolute right-[16%] bottom-[13%] size-16 rotate-12"
-                    :stroke-width="1.25"
-                />
-            </div>
-
-            <div class="relative z-10 flex items-center justify-between gap-6">
-                <Link
-                    :href="home()"
-                    class="flex w-fit items-center gap-3 rounded-lg focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-4 focus-visible:ring-offset-sidebar"
+                <span
+                    class="grid size-11 place-items-center rounded-xl bg-primary text-sm font-black tracking-tighter text-primary-foreground shadow-lg shadow-primary/20"
                 >
+                    PE
+                </span>
+                <span>
+                    <span class="block text-base font-bold tracking-tight">
+                        PEMS
+                    </span>
                     <span
-                        class="flex size-11 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shadow-[var(--shadow-primary)] shadow-lg"
+                        class="block text-[10px] font-medium tracking-[0.08em] opacity-50 uppercase"
                     >
-                        <GraduationCap class="size-6" :stroke-width="1.8" />
+                        Project Evaluation Management System
                     </span>
-                    <span class="grid gap-0.5">
-                        <span class="text-base leading-tight font-semibold">
-                            {{ page.props.name }}
-                        </span>
-                        <span class="text-xs text-sidebar-foreground/50">
-                            Learning management system
-                        </span>
-                    </span>
-                </Link>
+                </span>
+            </Link>
+
+            <div class="relative z-10 my-auto max-w-xl py-14">
+                <div
+                    class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
+                >
+                    <ShieldCheck class="size-3.5" />
+                    Authorized personnel only
+                </div>
+                <h2
+                    class="mt-6 max-w-lg text-4xl leading-[1.06] font-semibold tracking-[-0.04em] text-balance xl:text-5xl"
+                >
+                    Every project tells a story.
+                    <span class="text-primary">PEMS makes it measurable.</span>
+                </h2>
+                <p class="mt-5 max-w-lg text-base leading-7 opacity-55">
+                    Access one secure workspace for project monitoring,
+                    evaluation evidence, and decision-ready reporting.
+                </p>
 
                 <div
-                    class="flex size-14 shrink-0 items-center justify-center rounded-xl border border-dashed border-sidebar-border bg-sidebar-accent/60 text-sidebar-foreground/45"
-                    title="School logo"
+                    class="mt-10 grid max-w-lg grid-cols-3 gap-3"
+                    aria-hidden="true"
                 >
-                    <Building2 class="size-6" :stroke-width="1.5" />
-                    <span class="sr-only">School logo placeholder</span>
+                    <div
+                        class="rounded-xl border border-background/10 bg-background/5 p-4 dark:border-border dark:bg-background/40"
+                    >
+                        <ClipboardCheck class="size-5 text-primary" />
+                        <p class="mt-5 text-2xl font-semibold">24</p>
+                        <p class="mt-1 text-[10px] opacity-45">
+                            Active projects
+                        </p>
+                    </div>
+                    <div
+                        class="rounded-xl border border-background/10 bg-background/5 p-4 dark:border-border dark:bg-background/40"
+                    >
+                        <FileChartColumn class="size-5 text-primary" />
+                        <p class="mt-5 text-2xl font-semibold">18</p>
+                        <p class="mt-1 text-[10px] opacity-45">On track</p>
+                    </div>
+                    <div
+                        class="rounded-xl border border-background/10 bg-background/5 p-4 dark:border-border dark:bg-background/40"
+                    >
+                        <BarChart3 class="size-5 text-primary" />
+                        <p class="mt-5 text-2xl font-semibold">75%</p>
+                        <p class="mt-1 text-[10px] opacity-45">Reviewed</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="relative z-10 my-auto max-w-lg py-16">
-                <p
-                    class="mb-4 text-xs font-semibold tracking-[0.2em] text-sidebar-primary uppercase"
-                >
-                    Your learning space
-                </p>
-                <h2
-                    class="max-w-md text-4xl leading-[1.12] font-semibold tracking-tight xl:text-5xl"
-                >
-                    Learn, grow, and achieve at your own pace.
-                </h2>
-                <p
-                    class="mt-5 max-w-md text-base leading-7 text-sidebar-foreground/60"
-                >
-                    Everything you need for your courses, progress, and learning
-                    journey—all in one comfortable place.
-                </p>
-            </div>
-
             <div
-                class="relative z-10 flex items-center justify-between gap-6 text-xs text-sidebar-foreground/40"
+                class="relative z-10 flex items-center gap-2 text-xs opacity-45"
             >
-                <p class="font-medium">
-                    A focused space built for better learning.
-                </p>
-                <p class="shrink-0">
-                    Powered by
-                    <span class="font-semibold text-sidebar-foreground/65"
-                        >BlitzDev</span
-                    >
-                </p>
+                <CheckCircle2 class="size-4 text-primary opacity-100" />
+                Secure access. Clear accountability. Better decisions.
             </div>
         </aside>
 
@@ -126,60 +111,57 @@ defineProps<{
             class="relative flex min-h-svh items-center justify-center overflow-hidden px-5 py-10 sm:px-8 lg:px-12"
         >
             <div
-                class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--primary-glow),transparent_32%)] opacity-40 lg:opacity-25"
+                class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--primary-glow),transparent_28%)] opacity-60"
             />
-            <BookOpen
-                class="pointer-events-none absolute -top-5 -right-6 size-32 rotate-12 text-foreground/[0.025] lg:hidden"
-                :stroke-width="1"
-                aria-hidden="true"
-            />
-
-            <div class="relative z-10 w-full max-w-md">
-                <Link
-                    :href="home()"
-                    class="mx-auto mb-8 flex w-fit items-center gap-2.5 rounded-lg font-semibold focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:hidden"
-                >
-                    <span
-                        class="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-[var(--shadow-primary)] shadow-md"
+            <div
+                class="relative z-10 w-full max-w-[29rem] rounded-[1.75rem] border border-border/80 bg-card p-6 shadow-[0_32px_90px_-35px_var(--shadow-color)] sm:p-9"
+            >
+                <div class="mb-8 flex items-center justify-between gap-4">
+                    <Link
+                        :href="home()"
+                        class="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground transition hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:hidden"
                     >
-                        <AppLogoIcon class="size-5 fill-current" />
-                    </span>
-                    <span>{{ page.props.name }}</span>
-                </Link>
-
-                <section
-                    class="rounded-2xl border border-border/80 bg-card p-6 text-card-foreground shadow-[0_24px_70px_-28px_var(--shadow-color)] sm:p-9"
-                >
-                    <div class="mb-8 space-y-2.5">
-                        <div
-                            class="bg-primary-soft mb-5 flex size-16 items-center justify-center rounded-xl border border-dashed border-border text-primary lg:hidden"
-                            title="School logo"
+                        <ArrowLeft class="size-4" />
+                        Back to home
+                    </Link>
+                    <div class="ml-auto flex items-center gap-2 lg:hidden">
+                        <span
+                            class="grid size-9 place-items-center rounded-lg bg-foreground text-[10px] font-black tracking-tighter text-background dark:bg-primary dark:text-primary-foreground"
                         >
-                            <Building2 class="size-7" :stroke-width="1.5" />
-                            <span class="sr-only">School logo placeholder</span>
-                        </div>
-                        <h1 class="text-2xl font-semibold tracking-tight">
-                            {{ title }}
-                        </h1>
-                        <p class="text-sm leading-6 text-muted-foreground">
-                            {{ description }}
-                        </p>
+                            PE
+                        </span>
+                        <span class="text-sm font-bold">PEMS</span>
                     </div>
+                </div>
 
-                    <slot />
-                </section>
-
-                <div
-                    class="mt-6 grid gap-1 text-center text-xs leading-5 text-muted-foreground"
-                >
-                    <p>Secure access to your learning dashboard</p>
-                    <p class="lg:hidden">
-                        Powered by
-                        <span class="font-semibold text-foreground/65"
-                            >BlitzDev</span
-                        >
+                <div class="mb-8">
+                    <p
+                        class="mb-3 text-[11px] font-bold tracking-[0.18em] text-primary uppercase"
+                    >
+                        Secure portal
+                    </p>
+                    <h1
+                        v-if="title"
+                        class="text-3xl font-semibold tracking-[-0.035em]"
+                    >
+                        {{ title }}
+                    </h1>
+                    <p
+                        v-if="description"
+                        class="mt-2 text-sm leading-6 text-muted-foreground"
+                    >
+                        {{ description }}
                     </p>
                 </div>
+
+                <slot />
+
+                <p
+                    class="mt-8 border-t border-border pt-6 text-center text-[11px] leading-5 text-muted-foreground"
+                >
+                    This system is restricted to authorized users. Activity may
+                    be monitored for security and accountability.
+                </p>
             </div>
         </main>
     </div>

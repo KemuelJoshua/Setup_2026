@@ -13,7 +13,7 @@ test('login screen can be rendered', function () {
 
     $response->assertOk()->assertInertia(fn (Assert $page) => $page
         ->component('auth/Login')
-        ->has('canResetPassword')
+        ->where('canResetPassword', fn (mixed $canResetPassword) => is_bool($canResetPassword))
     );
 });
 

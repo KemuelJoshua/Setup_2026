@@ -63,7 +63,7 @@ const outcomeFields = (): DocumentField[] => [
     <Dialog v-model:open="isOpen">
         <DialogScrollContent
             v-if="record"
-            class="max-w-5xl gap-0 overflow-hidden border-0 bg-muted p-0 shadow-2xl"
+            class="max-w-5xl self-start gap-0 overflow-hidden border-0 bg-muted p-0 shadow-2xl"
         >
             <DialogHeader class="sr-only">
                 <DialogTitle>Startup tracking record</DialogTitle>
