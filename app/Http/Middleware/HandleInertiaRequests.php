@@ -40,7 +40,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'tenant' => tenancy()->initialized ? [
+            'tenant' => fn (): ?array => tenancy()->initialized ? [
                 'id' => tenant('id'),
                 'name' => tenant('school_name'),
             ] : null,
