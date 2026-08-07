@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Listeners\InitializePermissionCache;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -20,8 +18,7 @@ class TenancyServiceProvider extends ServiceProvider
     // By default, no namespace is used to support the callable array syntax.
     public static string $controllerNamespace = '';
 
-    /** @return array<class-string, list<class-string|JobPipeline>> */
-    public function events(): array
+    public function events()
     {
         return [
             // Tenant events
@@ -30,7 +27,7 @@ class TenancyServiceProvider extends ServiceProvider
                 JobPipeline::make([
                     Jobs\CreateDatabase::class,
                     Jobs\MigrateDatabase::class,
-                    Jobs\SeedDatabase::class,
+                    // Jobs\SeedDatabase::class,
 
                     // Your own jobs to prepare the tenant.
                     // Provision API keys, create S3 buckets, anything you want!
@@ -81,9 +78,9 @@ class TenancyServiceProvider extends ServiceProvider
             ],
 
             Events\BootstrappingTenancy::class => [],
-            Events\TenancyBootstrapped::class => [InitializePermissionCache::class],
+            Events\TenancyBootstrapped::class => [],
             Events\RevertingToCentralContext::class => [],
-            Events\RevertedToCentralContext::class => [InitializePermissionCache::class],
+            Events\RevertedToCentralContext::class => [],
 
             // Resource syncing
             Events\SyncedResourceSaved::class => [
@@ -100,7 +97,7 @@ class TenancyServiceProvider extends ServiceProvider
         //
     }
 
-    public function boot(): void
+    public function boot()
     {
         $this->bootEvents();
         $this->mapRoutes();
@@ -108,7 +105,7 @@ class TenancyServiceProvider extends ServiceProvider
         $this->makeTenancyMiddlewareHighestPriority();
     }
 
-    protected function bootEvents(): void
+    protected function bootEvents()
     {
         foreach ($this->events() as $event => $listeners) {
             foreach ($listeners as $listener) {
@@ -121,7 +118,7 @@ class TenancyServiceProvider extends ServiceProvider
         }
     }
 
-    protected function mapRoutes(): void
+    protected function mapRoutes()
     {
         $this->app->booted(function () {
             if (file_exists(base_path('routes/tenant.php'))) {
@@ -131,7 +128,7 @@ class TenancyServiceProvider extends ServiceProvider
         });
     }
 
-    protected function makeTenancyMiddlewareHighestPriority(): void
+    protected function makeTenancyMiddlewareHighestPriority()
     {
         $tenancyMiddleware = [
             // Even higher priority than the initialization middleware
@@ -145,7 +142,7 @@ class TenancyServiceProvider extends ServiceProvider
         ];
 
         foreach (array_reverse($tenancyMiddleware) as $middleware) {
-            $this->app->make(Kernel::class)->prependToMiddlewarePriority($middleware);
+            $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority($middleware);
         }
     }
 }

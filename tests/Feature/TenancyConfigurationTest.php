@@ -1,11 +1,10 @@
 <?php
 
 use App\Http\Middleware\EnsureTenantIsActive;
+use App\Http\Middleware\InitializeTenancyByDomainOrCentral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Contracts\LoginResponse;
-use Stancl\Tenancy\Features\UniversalRoutes;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 
 it('uses a central database queue and production-safe tenant seeding', function () {
@@ -15,11 +14,20 @@ it('uses a central database queue and production-safe tenant seeding', function 
         ->toMatchArray(['--class' => 'TenantDatabaseSeeder', '--force' => true]);
 });
 
-it('uses the documented universal route middleware for shared authentication', function () {
-    expect(config('tenancy.features'))
-        ->toContain(UniversalRoutes::class)
-        ->and(config('fortify.middleware'))
-        ->toContain('universal', InitializeTenancyByDomain::class, EnsureTenantIsActive::class);
+it('initializes tenancy for Fortify routes outside central domains', function () {
+    expect(config('fortify.middleware'))
+        ->toBe(['web', InitializeTenancyByDomainOrCentral::class, EnsureTenantIsActive::class]);
+});
+
+it('bypasses tenancy on central domains', function () {
+    $centralDomain = config('tenancy.central_domains')[0];
+    $request = Request::create("http://{$centralDomain}/login");
+
+    $response = app(InitializeTenancyByDomainOrCentral::class)
+        ->handle($request, fn () => response('central'));
+
+    expect($response->getContent())->toBe('central')
+        ->and(tenancy()->initialized)->toBeFalse();
 });
 
 it('scopes tenant sessions', function () {
@@ -27,7 +35,7 @@ it('scopes tenant sessions', function () {
         ->and(config('session.connection'))->toBeNull();
 
     expect(Route::getRoutes()->getByName('tenant.home')?->gatherMiddleware())
-        ->toContain(InitializeTenancyByDomain::class, ScopeSessions::class);
+        ->toContain(InitializeTenancyByDomainOrCentral::class, ScopeSessions::class);
 });
 
 it('redirects central logins to the central tenant dashboard', function () {

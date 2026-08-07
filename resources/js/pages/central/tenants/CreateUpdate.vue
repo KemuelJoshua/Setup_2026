@@ -37,6 +37,8 @@ const formAttributes = computed(() =>
     props.tenant ? update.form(props.tenant.id) : store.form(),
 );
 
+console.log(store.form());
+
 const handleSuccess = (): void => {
     toast.success(
         props.tenant

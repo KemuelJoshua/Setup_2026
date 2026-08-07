@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\PermissionRegistrar;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 
 uses(RefreshDatabase::class);
 
@@ -69,6 +70,13 @@ it('keeps central and tenant routes in their own application areas', function ()
     $this->get('http://school-a.test/central/tenants')->assertNotFound();
     tenancy()->end();
     $this->get('http://localhost/admin/users')->assertNotFound();
+});
+
+it('rejects unknown tenant domains', function () {
+    $this->withoutExceptionHandling();
+
+    expect(fn () => $this->get('http://unknown.test/login'))
+        ->toThrow(TenantCouldNotBeIdentifiedOnDomainException::class);
 });
 
 it('blocks an inactive school domain', function () {
