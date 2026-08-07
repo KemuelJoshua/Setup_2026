@@ -13,6 +13,7 @@ use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class TenancyServiceProvider extends ServiceProvider
 {
@@ -133,8 +134,8 @@ class TenancyServiceProvider extends ServiceProvider
     {
         $tenancyMiddleware = [
             // Even higher priority than the initialization middleware
+            PreventAccessFromCentralDomains::class,
             Middleware\PreventAccessFromCentralDomains::class,
-
             Middleware\InitializeTenancyByDomain::class,
             Middleware\InitializeTenancyBySubdomain::class,
             Middleware\InitializeTenancyByDomainOrSubdomain::class,

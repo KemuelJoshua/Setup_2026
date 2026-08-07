@@ -104,8 +104,8 @@ return [
     */
 
     'middleware' => [
-        'web',
         InitializeTenancyByDomainOrCentral::class,
+        'web',
         EnsureTenantIsActive::class,
     ],
 
