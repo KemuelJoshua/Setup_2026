@@ -19,8 +19,7 @@ class CreateRole
 
             $this->assignPermissions($role, $data['permissions'] ?? []);
 
-            // Notify all Superadmins
-            User::role('Superadmin')
+            User::role('School Admin')
                 ->get()
                 ->each(function (User $user) use ($role) {
                     $user->notify(new RoleCreatedNotification($role));

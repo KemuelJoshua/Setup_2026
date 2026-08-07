@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Database\Seeders\permissions\PermissionSeeder;
-use Database\Seeders\permissions\RoleSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,20 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            PermissionSeeder::class,
-            RoleSeeder::class,
-            SchoolYearSeeder::class,
-            EducationalLevelSeeder::class,
-            AcademicTermStructureSeeder::class,
-            GradeLevelSeeder::class,
-            SectionSeeder::class,
-            SubjectSeeder::class,
-            ProgramSeeder::class,
-            CurriculumSeeder::class,
-        ]);
-
-        $user = User::query()->firstOrCreate(
+        User::query()->firstOrCreate(
             ['email' => 'admin@gmail.com'],
             [
                 'name' => 'Super Admin',
@@ -38,6 +23,5 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
-        $user->assignRole('Superadmin');
     }
 }

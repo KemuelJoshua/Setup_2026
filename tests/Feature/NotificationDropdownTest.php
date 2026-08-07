@@ -36,7 +36,7 @@ test('notification dropdown contains only the authenticated users latest notific
         'updated_at' => now()->addMinute(),
     ]);
 
-    $response = $this->actingAs($user)->get(route('administration.dashboard'));
+    $response = $this->actingAs($user)->get(route('admin.dashboard'));
 
     $response
         ->assertOk()

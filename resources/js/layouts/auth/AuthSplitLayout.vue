@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
-import { home } from '@/routes';
+import { home as centralHome } from '@/routes';
+import { home as tenantHome } from '@/routes/tenant';
 
 const page = usePage();
 const name = page.props.name;
+const homeRoute = computed(() =>
+    page.props.tenant ? tenantHome() : centralHome(),
+);
 
 defineProps<{
     title?: string;
@@ -21,7 +26,7 @@ defineProps<{
         >
             <div class="absolute inset-0 bg-zinc-900" />
             <Link
-                :href="home()"
+                :href="homeRoute"
                 class="relative z-20 flex items-center text-lg font-medium"
             >
                 <AppLogoIcon class="mr-2 size-8 fill-current text-white" />

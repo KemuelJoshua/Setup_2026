@@ -9,7 +9,7 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    Role::findOrCreate('Superadmin', 'web');
+    Role::findOrCreate('School Admin', 'web');
 
     foreach (['admin view roles', 'admin create roles', 'admin update roles', 'admin delete roles'] as $permission) {
         Permission::create([

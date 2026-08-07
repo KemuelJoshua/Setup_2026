@@ -2,28 +2,45 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Academics\SchoolYearController;
+use App\Http\Controllers\Admin\Users\UserController;
+use App\Http\Middleware\EnsureTenantIsActive;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
-
-/*
-|--------------------------------------------------------------------------
-| Tenant Routes
-|--------------------------------------------------------------------------
-|
-| Here you can register the tenant routes for your application.
-| These routes are loaded by the TenantRouteServiceProvider.
-|
-| Feel free to customize them however you want. Good luck!
-|
-*/
+use Stancl\Tenancy\Middleware\ScopeSessions;
 
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
+    EnsureTenantIsActive::class,
     PreventAccessFromCentralDomains::class,
+    ScopeSessions::class,
 ])->group(function () {
-    Route::get('/', function () {
-        return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
+    Route::get('/', fn() => auth()->check()
+        ? to_route('admin.dashboard')
+        : to_route('login'))->name('tenant.home');
+
+    Route::middleware([])->prefix('admin')->name('admin.')->group(function () {
+        // Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+        
+        Route::get('dashboard', function () {
+            dd([
+                'tenant' => tenant(),
+                'user' => auth()->user(),
+                'tenancy_initialized' => tenancy()->initialized,
+                'host' => request()->getHost(),
+                'session_id' => session()->getId(),
+            ]);
+        })->name('dashboard');
+
+        Route::resource('users', UserController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        Route::resource('school-years', SchoolYearController::class)
+            ->only(['index', 'store', 'update', 'destroy']);
+
+        require __DIR__ . '/academics.php';
+        require __DIR__ . '/settings.php';
     });
 });

@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 uses(RefreshDatabase::class);
 
 test('authenticated users can create a role with permissions', function () {
-    Role::findOrCreate('Superadmin', 'web');
+    Role::findOrCreate('School Admin', 'web');
 
     $user = User::factory()->create();
     $createRolesPermission = Permission::create([

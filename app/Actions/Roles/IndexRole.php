@@ -2,8 +2,8 @@
 
 namespace App\Actions\Roles;
 
-use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Permission\Models\Role;
 
 class IndexRole
 {
@@ -11,7 +11,7 @@ class IndexRole
     {
         $search = trim((string) ($filters['search'] ?? ''));
         $guard = trim((string) ($filters['guard'] ?? 'all'));
-        
+
         return Role::query()
             ->select(['id', 'name', 'guard_name'])
             ->with([
@@ -25,7 +25,7 @@ class IndexRole
                     ->orWhere('guard_name', 'like', "%{$search}%")))
             ->when($guard !== 'all', fn (Builder $query) => $query->where('guard_name', $guard))
             ->whereNotIn('name', [
-                'Superadmin',
+                'School Admin',
                 'Teacher',
                 'Student',
             ])

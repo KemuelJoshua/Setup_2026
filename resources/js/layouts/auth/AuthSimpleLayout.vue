@@ -8,10 +8,15 @@ import {
     GraduationCap,
     NotebookTabs,
 } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
-import { home } from '@/routes';
+import { home as centralHome } from '@/routes';
+import { home as tenantHome } from '@/routes/tenant';
 
 const page = usePage();
+const homeRoute = computed(() =>
+    page.props.tenant ? tenantHome() : centralHome(),
+);
 
 defineProps<{
     title?: string;
@@ -61,7 +66,7 @@ defineProps<{
 
             <div class="relative z-10 flex items-center justify-between gap-6">
                 <Link
-                    :href="home()"
+                    :href="homeRoute"
                     class="flex w-fit items-center gap-3 rounded-lg focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-4 focus-visible:ring-offset-sidebar"
                 >
                     <span
@@ -136,7 +141,7 @@ defineProps<{
 
             <div class="relative z-10 w-full max-w-md">
                 <Link
-                    :href="home()"
+                    :href="homeRoute"
                     class="mx-auto mb-8 flex w-fit items-center gap-2.5 rounded-lg font-semibold focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 lg:hidden"
                 >
                     <span

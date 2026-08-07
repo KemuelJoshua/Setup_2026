@@ -16,12 +16,12 @@ class RoleSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        Role::findOrCreate('Superadmin', 'web');
+        Role::findOrCreate('School Admin', 'web');
         Role::findOrCreate('Teacher', 'web');
         Role::findOrCreate('Student', 'web');
 
-        $superadmin = Role::findOrCreate('Superadmin', 'web');
-        $superadmin->syncPermissions(Permission::all());
+        $schoolAdmin = Role::findOrCreate('School Admin', 'web');
+        $schoolAdmin->syncPermissions(Permission::all());
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

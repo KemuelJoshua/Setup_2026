@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import {
     BookOpenCheck,
     User2,
@@ -10,9 +10,10 @@ import {
     Users,
     BookOpen,
     ScrollText,
-    CalendarDays,
     Layers3,
+    Building2,
 } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import type { NavGroup } from '@/components/NavMain.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -35,6 +36,8 @@ import { index as IndexSection } from '@/routes/admin/academics/section';
 import { index as IndexSubject } from '@/routes/admin/academics/subject';
 import { index as IndexSchoolYear } from '@/routes/admin/school-years';
 import { index as userIndex } from '@/routes/admin/users';
+import { dashboard as centralDashboard } from '@/routes/central';
+import { index as tenantIndex } from '@/routes/central/tenants';
 import type { NavItem } from '@/types';
 
 const primaryNavItems: NavItem[] = [
@@ -98,12 +101,27 @@ const primaryNavItems: NavItem[] = [
     },
 ];
 
-const navigationGroups: NavGroup[] = [
-    {
-        title: 'Learning',
-        items: primaryNavItems,
-    },
-];
+const page = usePage();
+const isTenantApplication = computed(() => Boolean(page.props.tenant));
+const homeRoute = computed(() =>
+    isTenantApplication.value ? dashboard() : centralDashboard(),
+);
+const navigationGroups = computed<NavGroup[]>(() =>
+    isTenantApplication.value
+        ? [{ title: 'Learning', items: primaryNavItems }]
+        : [
+              {
+                  title: 'Platform',
+                  items: [
+                      {
+                          title: 'Schools',
+                          href: tenantIndex(),
+                          icon: Building2,
+                      },
+                  ],
+              },
+          ],
+);
 </script>
 
 <template>
@@ -118,7 +136,7 @@ const navigationGroups: NavGroup[] = [
                         as-child
                         class="h-13 rounded-md px-2.5 text-sidebar-foreground shadow-none transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-0! hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
                     >
-                        <Link :href="dashboard()">
+                        <Link :href="homeRoute">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>
