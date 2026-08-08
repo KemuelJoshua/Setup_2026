@@ -154,8 +154,8 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
         <template #title> School workspace </template>
 
         <template #description>
-            Provision and manage every school's isolated application,
-            domain, and access status.
+            Provision and manage every school's isolated application, domain,
+            and access status.
         </template>
 
         <template #actions>
@@ -165,9 +165,8 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             </Button>
         </template>
     </PageHero>
-    
-    <DefaultContainer>
 
+    <DefaultContainer>
         <DataTableContainer>
             <DataTableToolbar
                 v-model="searchQuery"
@@ -209,7 +208,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
     <Dialog v-model:open="isDeleteDialogOpen">
         <DialogContent v-if="selectedTenant">
             <Form
-                v-bind="destroy.form(selectedTenant.id)"
+                :action="destroy(selectedTenant.id)"
                 v-slot="{ processing }"
                 class="space-y-6"
                 :options="{ preserveScroll: true }"

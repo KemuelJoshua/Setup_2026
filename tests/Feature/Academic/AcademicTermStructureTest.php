@@ -23,6 +23,7 @@ beforeEach(function () {
         'admin create academic term structures',
         'admin update academic term structures',
         'admin delete academic term structures',
+        'admin create academic periods',
     ] as $permission) {
         Permission::findOrCreate($permission, 'web');
     }
@@ -104,6 +105,40 @@ test('authorized users can create a structure', function () {
         ->and($structure->educational_level_id)->toBe($educationalLevel->getKey())
         ->and($structure->type)->toBe(AcademicTermStructureType::Quarterly)
         ->and($structure->status)->toBe(AcademicStatus::Active);
+});
+
+test('authorized users can create a grading period from browser form values', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('admin create academic periods');
+    $structure = AcademicTermStructure::factory()->create([
+        'type' => AcademicTermStructureType::Semester,
+    ]);
+    $parent = AcademicPeriod::factory()->create([
+        'academic_term_structure_id' => $structure->getKey(),
+        'name' => 'First Semester',
+        'sequence' => 1,
+    ]);
+
+    $this
+        ->actingAs($user)
+        ->post(route('admin.academics.academic-periods.store'), [
+            'academic_term_structure_id' => (string) $structure->getKey(),
+            'parent_id' => (string) $parent->getKey(),
+            'name' => 'Prelim',
+            'code' => 'PRELIM',
+            'sequence' => '1',
+            'status' => AcademicStatus::Active->value,
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('admin.academics.academic-term-structures.index'));
+
+    $gradingPeriod = AcademicPeriod::query()
+        ->whereBelongsTo($structure, 'structure')
+        ->whereBelongsTo($parent, 'parent')
+        ->where('name', 'Prelim')
+        ->firstOrFail();
+
+    expect($gradingPeriod->sequence)->toBe(1);
 });
 
 test('authorized users can update a structure including its status', function () {

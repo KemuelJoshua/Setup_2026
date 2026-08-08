@@ -12,6 +12,15 @@ use Illuminate\Validation\Validator;
 
 abstract class AcademicPeriodRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'academic_term_structure_id' => $this->integer('academic_term_structure_id'),
+            'parent_id' => $this->filled('parent_id') ? $this->integer('parent_id') : null,
+            'sequence' => $this->integer('sequence'),
+        ]);
+    }
+
     public function authorize(): bool
     {
         return true;
