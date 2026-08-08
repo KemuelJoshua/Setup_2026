@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
             <div class="flex items-start gap-4">
                 <div
                     v-if="$slots.icon"
-                    class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm"
+                    class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary-foreground shadow-sm"
                 >
                     <slot name="icon" />
                 </div>

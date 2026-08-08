@@ -125,16 +125,14 @@ const navigationGroups = computed<NavGroup[]>(() =>
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="sidebar" class="bg-transparent">
-        <SidebarHeader
-            class="px-4  group-data-[collapsible=icon]:px-1"
-        >
+    <Sidebar variant="sidebar" class="bg-transparent">
+        <SidebarHeader class="px-4">
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton
                         size="lg"
                         as-child
-                        class="h-13 rounded-md px-2.5 text-sidebar-foreground shadow-none transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-0! hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
+                        class="h-13 rounded-md px-2.5 text-sidebar-foreground shadow-none transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
                     >
                         <Link :href="homeRoute">
                             <AppLogo />
@@ -144,9 +142,7 @@ const navigationGroups = computed<NavGroup[]>(() =>
             </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent
-            class="gap-3 px-4 py-5 group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-4"
-        >
+        <SidebarContent class="gap-3 px-4 py-5">
             <NavMain :groups="navigationGroups" />
         </SidebarContent>
 
