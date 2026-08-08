@@ -140,27 +140,29 @@ onBeforeUnmount(() => {
 <template>
     <Head title="Programs" />
 
+    <PageHero>
+        <template #icon>
+            <GraduationCap class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Academic planning
+        </template>
+        <template #title>Program workspace</template>
+        <template #description>
+            Manage academic programs and connect each one to the correct
+            educational level.
+        </template>
+        <template #actions>
+            <Button type="button" @click="openCreateDialog">
+                <Plus aria-hidden="true" />
+                Create program
+            </Button>
+        </template>
+    </PageHero>
+    
     <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <GraduationCap class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Academic planning
-            </template>
-            <template #title>Program workspace</template>
-            <template #description>
-                Manage academic programs and connect each one to the correct
-                educational level.
-            </template>
-            <template #actions>
-                <Button type="button" @click="openCreateDialog">
-                    <Plus aria-hidden="true" />
-                    Create program
-                </Button>
-            </template>
-        </PageHero>
+        
 
         <DataTableContainer>
             <DataTableToolbar

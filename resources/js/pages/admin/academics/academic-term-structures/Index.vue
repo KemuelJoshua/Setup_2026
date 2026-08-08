@@ -196,7 +196,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             item-label="Structure"
             search-placeholder="Search name or code..."
             search-label="Search academic term structures"
-            class="pt-4"
+            class="p-4 bg-card mb-3 border rounded-lg shadow-sm"
         >
             <template #filters>
                 <Select v-model="educationalLevelFilter">
@@ -490,6 +490,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             :links="academicTermStructures.links"
             :previous-page-url="academicTermStructures.prev_page_url"
             :next-page-url="academicTermStructures.next_page_url"
+            class="mt-4 bg-card border rounded-xl p-2 md:p-4"
         />
     </DefaultContainer>
 

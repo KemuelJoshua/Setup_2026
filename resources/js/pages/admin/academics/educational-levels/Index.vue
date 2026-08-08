@@ -103,28 +103,28 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
 <template>
     <Head title="Educational Levels" />
 
-    <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <School class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Academic foundations
-            </template>
-            <template #title>Educational level workspace</template>
-            <template #description>
-                Define the learning stages used to organize programs, grade
-                levels, subjects, and curriculum structures.
-            </template>
-            <template #actions>
-                <Button type="button" @click="openCreateDialog">
-                    <Plus aria-hidden="true" />
-                    Create educational level
-                </Button>
-            </template>
-        </PageHero>
+    <PageHero>
+        <template #icon>
+            <School class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Academic foundations
+        </template>
+        <template #title>Educational level workspace</template>
+        <template #description>
+            Define the learning stages used to organize programs, grade
+            levels, subjects, and curriculum structures.
+        </template>
+        <template #actions>
+            <Button type="button" @click="openCreateDialog">
+                <Plus aria-hidden="true" />
+                Create educational level
+            </Button>
+        </template>
+    </PageHero>
 
+    <DefaultContainer>
         <DataTableContainer>
             <DataTableToolbar
                 v-model="searchQuery"

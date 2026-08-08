@@ -15,6 +15,7 @@ import type { UserRoleOption } from '@/modules/users/components/UserFormSheet.vu
 import UserTable from '@/modules/users/components/UserTable.vue';
 import { index } from '@/routes/admin/users';
 import type { LengthAwarePaginator } from '@/types';
+import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
 
 defineOptions({
     layout: {
@@ -94,36 +95,36 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
 <template>
     <Head title="Users" />
 
-    <div class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <PageHero>
-            <template #icon>
-                <UsersRound class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Access management
-            </template>
-            <template #title>User workspace</template>
-            <template #description>
-                Create user accounts, assign roles, and manage access from one
-                organized workspace.
-            </template>
-            <template #actions>
-                <UserFormSheet
-                    v-model:open="isCreateSheetOpen"
-                    mode="create"
-                    :roles="roles"
-                >
-                    <template #trigger>
-                        <Button type="button">
-                            <Plus aria-hidden="true" />
-                            Create user
-                        </Button>
-                    </template>
-                </UserFormSheet>
-            </template>
-        </PageHero>
+    <PageHero>
+        <template #icon>
+            <UsersRound class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Access management
+        </template>
+        <template #title>User workspace</template>
+        <template #description>
+            Create user accounts, assign roles, and manage access from one
+            organized workspace.
+        </template>
+        <template #actions>
+            <UserFormSheet
+                v-model:open="isCreateSheetOpen"
+                mode="create"
+                :roles="roles"
+            >
+                <template #trigger>
+                    <Button type="button">
+                        <Plus aria-hidden="true" />
+                        Create user
+                    </Button>
+                </template>
+            </UserFormSheet>
+        </template>
+    </PageHero>
 
+    <DefaultContainer>
         <DataTableToolbar
             v-model="searchQuery"
             :count="users.total"
@@ -149,7 +150,8 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
                 :next-page-url="users.next_page_url"
             />
         </div>
-    </div>
+        
+    </DefaultContainer>
 
     <UserFormSheet
         v-model:open="isEditSheetOpen"

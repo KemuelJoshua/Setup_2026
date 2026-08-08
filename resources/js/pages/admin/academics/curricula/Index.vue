@@ -206,30 +206,32 @@ onBeforeUnmount(() => {
 
 <template>
     <Head title="Curricula" />
+    
+    <PageHero>
+        <template #icon>
+            <Layers3 class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Academic planning
+        </template>
+        <template #title>Curriculum workspace</template>
+        <template #description>
+            Build, organize, and maintain every program's subjects from one
+            clear workspace.
+        </template>
+        <template #actions>
+            <Button as-child>
+                <Link :href="create()">
+                    <Plus aria-hidden="true" />
+                    New curriculum
+                </Link>
+            </Button>
+        </template>
+    </PageHero>
 
     <DefaultContainer class="flex flex-1 flex-col gap-5 p-4 md:p-8">
-        <PageHero>
-            <template #icon>
-                <Layers3 class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Academic planning
-            </template>
-            <template #title>Curriculum workspace</template>
-            <template #description>
-                Build, organize, and maintain every program's subjects from one
-                clear workspace.
-            </template>
-            <template #actions>
-                <Button as-child>
-                    <Link :href="create()">
-                        <Plus aria-hidden="true" />
-                        New curriculum
-                    </Link>
-                </Button>
-            </template>
-        </PageHero>
+
 
         <div class="grid gap-3 sm:grid-cols-3">
             <Card>

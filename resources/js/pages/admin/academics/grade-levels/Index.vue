@@ -159,32 +159,32 @@ onBeforeUnmount(() => {
 <template>
     <Head title="Grade Levels" />
 
+    <PageHero>
+        <template #icon>
+            <Layers3 class="size-5" aria-hidden="true" />
+        </template>
+
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Academic planning
+        </template>
+
+        <template #title> Grade level workspace </template>
+
+        <template #description>
+            Create and organize the grade levels available under each
+            educational level.
+        </template>
+
+        <template #actions>
+            <Button type="button" @click="openCreateDialog">
+                <Plus class="size-4" aria-hidden="true" />
+                Create grade level
+            </Button>
+        </template>
+    </PageHero>
+    
     <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <Layers3 class="size-5" aria-hidden="true" />
-            </template>
-
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Academic planning
-            </template>
-
-            <template #title> Grade level workspace </template>
-
-            <template #description>
-                Create and organize the grade levels available under each
-                educational level.
-            </template>
-
-            <template #actions>
-                <Button type="button" @click="openCreateDialog">
-                    <Plus class="size-4" aria-hidden="true" />
-                    Create grade level
-                </Button>
-            </template>
-        </PageHero>
-
         <DataTableContainer>
             <DataTableToolbar
                 v-model="searchQuery"

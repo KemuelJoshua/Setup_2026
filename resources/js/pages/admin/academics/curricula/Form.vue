@@ -98,33 +98,33 @@ defineOptions({
 <template>
     <Head title="Create curriculum" />
 
-    <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <FilePlus2 class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Curriculum setup
-            </template>
-            <template #title>Create a curriculum</template>
-            <template #description>
-                Define the academic scope and structure first. You will organize
-                subjects by year and term next.
-            </template>
-            <template #actions>
-                <Button variant="outline" as-child>
-                    <Link :href="index()">
-                        <ArrowLeft aria-hidden="true" />
-                        All curricula
-                    </Link>
-                </Button>
-            </template>
-        </PageHero>
+    <PageHero>
+        <template #icon>
+            <FilePlus2 class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Curriculum setup
+        </template>
+        <template #title>Create a curriculum</template>
+        <template #description>
+            Define the academic scope and structure first. You will organize
+            subjects by year and term next.
+        </template>
+        <template #actions>
+            <Button variant="outline" as-child>
+                <Link :href="index()">
+                    <ArrowLeft aria-hidden="true" />
+                    All curricula
+                </Link>
+            </Button>
+        </template>
+    </PageHero>
 
+    <DefaultContainer>
         <ol
             aria-label="Curriculum creation progress"
-            class="grid overflow-hidden rounded-xl border bg-card shadow-sm sm:grid-cols-2"
+            class="grid overflow-hidden rounded-xl mb-4 border bg-card shadow-sm sm:grid-cols-2"
         >
             <li
                 aria-current="step"

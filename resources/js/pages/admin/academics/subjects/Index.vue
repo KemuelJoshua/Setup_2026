@@ -140,28 +140,28 @@ onBeforeUnmount(() => {
 <template>
     <Head title="Subjects" />
 
+    <PageHero>
+        <template #icon>
+            <BookOpen class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Course catalog
+        </template>
+        <template #title>Subject workspace</template>
+        <template #description>
+            Maintain the subject catalog used when building curriculum plans
+            across educational levels.
+        </template>
+        <template #actions>
+            <Button type="button" @click="openCreateDialog">
+                <Plus aria-hidden="true" />
+                Create subject
+            </Button>
+        </template>
+    </PageHero>
+    
     <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <BookOpen class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Course catalog
-            </template>
-            <template #title>Subject workspace</template>
-            <template #description>
-                Maintain the subject catalog used when building curriculum plans
-                across educational levels.
-            </template>
-            <template #actions>
-                <Button type="button" @click="openCreateDialog">
-                    <Plus aria-hidden="true" />
-                    Create subject
-                </Button>
-            </template>
-        </PageHero>
-
         <DataTableContainer>
             <DataTableToolbar
                 v-model="searchQuery"

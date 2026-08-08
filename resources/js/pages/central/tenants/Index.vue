@@ -141,31 +141,32 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
 <template>
     <Head title="Schools" />
 
+    <PageHero>
+        <template #icon>
+            <Building2 class="size-5" aria-hidden="true" />
+        </template>
+
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Tenant administration
+        </template>
+
+        <template #title> School workspace </template>
+
+        <template #description>
+            Provision and manage every school's isolated application,
+            domain, and access status.
+        </template>
+
+        <template #actions>
+            <Button type="button" @click="openCreateDialog">
+                <Plus class="size-4" aria-hidden="true" />
+                Create school
+            </Button>
+        </template>
+    </PageHero>
+    
     <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <Building2 class="size-5" aria-hidden="true" />
-            </template>
-
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Tenant administration
-            </template>
-
-            <template #title> School workspace </template>
-
-            <template #description>
-                Provision and manage every school's isolated application,
-                domain, and access status.
-            </template>
-
-            <template #actions>
-                <Button type="button" @click="openCreateDialog">
-                    <Plus class="size-4" aria-hidden="true" />
-                    Create school
-                </Button>
-            </template>
-        </PageHero>
 
         <DataTableContainer>
             <DataTableToolbar

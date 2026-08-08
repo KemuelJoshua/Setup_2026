@@ -140,27 +140,27 @@ onBeforeUnmount(() => {
 <template>
     <Head title="Sections" />
 
+    <PageHero>
+        <template #icon>
+            <LayoutGrid class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Class organization
+        </template>
+        <template #title>Section workspace</template>
+        <template #description>
+            Create and organize class sections for each educational level.
+        </template>
+        <template #actions>
+            <Button type="button" @click="openCreateDialog">
+                <Plus aria-hidden="true" />
+                Create section
+            </Button>
+        </template>
+    </PageHero>
+    
     <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <LayoutGrid class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Class organization
-            </template>
-            <template #title>Section workspace</template>
-            <template #description>
-                Create and organize class sections for each educational level.
-            </template>
-            <template #actions>
-                <Button type="button" @click="openCreateDialog">
-                    <Plus aria-hidden="true" />
-                    Create section
-                </Button>
-            </template>
-        </PageHero>
-
         <DataTableContainer>
             <DataTableToolbar
                 v-model="searchQuery"
