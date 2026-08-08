@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\Central\TenantController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::domain(config('tenancy.central_domains')[0])
     ->group(function (): void {
-        Route::inertia('/', 'Welcome')->name('home');
+        Route::get('/', WelcomeController::class)->name('home');
 
         Route::middleware(['auth'])
             ->prefix('central')
