@@ -24,7 +24,7 @@ afterEach(function (): void {
     });
 });
 
-it('provisions a school database with its domain and first administrator', function () {
+it('provisions a school database with only authorization data and its first administrator', function () {
     $platformAdministrator = User::factory()->create(['email_verified_at' => now()]);
     $centralTransactionLevelBeforeProvisioning = DB::connection(config('tenancy.database.central_connection'))->transactionLevel();
     $centralTransactionLevel = null;
@@ -56,7 +56,10 @@ it('provisions a school database with its domain and first administrator', funct
     $tenant->run(function (): void {
         $administrator = User::query()->where('email', 'admin@school-a.test')->firstOrFail();
 
-        expect($administrator->hasRole('School Admin'))->toBeTrue();
+        expect($administrator->hasRole('School Admin'))->toBeTrue()
+            ->and(DB::table('roles')->count())->toBeGreaterThan(0)
+            ->and(DB::table('permissions')->count())->toBeGreaterThan(0)
+            ->and(DB::table('school_years')->count())->toBe(0);
     });
 });
 

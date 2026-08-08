@@ -16,14 +16,6 @@ class TenantDatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
-            SchoolYearSeeder::class,
-            EducationalLevelSeeder::class,
-            AcademicTermStructureSeeder::class,
-            GradeLevelSeeder::class,
-            SectionSeeder::class,
-            SubjectSeeder::class,
-            ProgramSeeder::class,
-            CurriculumSeeder::class,
         ]);
     }
 }

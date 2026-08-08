@@ -3,7 +3,6 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     BookOpen,
-    ChevronRight,
     Clock3,
     GraduationCap,
     Layers3,
@@ -39,6 +38,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { index } from '@/routes/admin/academics/curriculum';
 import {
@@ -329,177 +329,165 @@ const handleDeleted = (): void => {
             No compatible year levels are configured for this curriculum.
         </div>
 
-        <nav
-            v-else
-            aria-label="Year level navigation"
-            class="sticky top-3 z-10 flex gap-2 overflow-x-auto rounded-xl border bg-background/95 p-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/80"
-        >
-            <Button
+        <Tabs v-else :default-value="availableYearLevels[0].id" class="w-full">
+            <div
+                class="overflow-x-auto rounded-xl border bg-background p-2 shadow-sm"
+            >
+                <TabsList class="h-auto w-max min-w-full justify-start">
+                    <TabsTrigger
+                        v-for="yearLevel in availableYearLevels"
+                        :key="yearLevel.id"
+                        :value="yearLevel.id"
+                        class="min-w-32 flex-none px-4 py-2.5"
+                    >
+                        <GraduationCap class="size-4" aria-hidden="true" />
+                        {{ yearLevel.name }}
+                        <Badge variant="secondary">
+                            {{
+                                curriculum.curriculum_subjects.filter(
+                                    (subject) =>
+                                        subject.year_level_id === yearLevel.id,
+                                ).length
+                            }}
+                        </Badge>
+                    </TabsTrigger>
+                </TabsList>
+            </div>
+
+            <TabsContent
                 v-for="yearLevel in availableYearLevels"
                 :key="yearLevel.id"
-                variant="ghost"
-                size="sm"
-                as-child
-                class="shrink-0"
+                :value="yearLevel.id"
+                class="mt-4 overflow-hidden rounded-xl border bg-card shadow-sm"
             >
-                <a :href="`#year-level-${yearLevel.id}`">
-                    {{ yearLevel.name }}
-                    <Badge variant="secondary">
-                        {{
-                            curriculum.curriculum_subjects.filter(
-                                (subject) =>
-                                    subject.year_level_id === yearLevel.id,
-                            ).length
-                        }}
-                    </Badge>
-                </a>
-            </Button>
-        </nav>
-
-        <details
-            v-for="yearLevel in availableYearLevels"
-            :key="yearLevel.id"
-            :id="`year-level-${yearLevel.id}`"
-            open
-            class="group scroll-mt-24 overflow-hidden rounded-xl border bg-card shadow-sm"
-        >
-            <summary
-                class="flex cursor-pointer list-none items-center gap-3 border-b bg-muted/20 px-5 py-4"
-            >
-                <ChevronRight
-                    class="size-4 transition-transform group-open:rotate-90"
-                    aria-hidden="true"
-                />
-                <GraduationCap class="size-5 text-primary" aria-hidden="true" />
-                <span class="font-semibold">{{ yearLevel.name }}</span>
-                <Badge variant="secondary" class="ml-auto">
-                    {{
-                        curriculum.curriculum_subjects.filter(
-                            (subject) => subject.year_level_id === yearLevel.id,
-                        ).length
-                    }}
-                    subjects
-                </Badge>
-            </summary>
-
-            <div class="grid gap-4 p-4 lg:grid-cols-2">
-                <section
-                    v-for="term in terms"
-                    :key="term.id"
-                    class="overflow-hidden rounded-lg border bg-background"
-                >
-                    <div
-                        class="flex items-center justify-between gap-3 border-b px-4 py-3"
+                <div class="grid gap-4 p-4 lg:grid-cols-2">
+                    <section
+                        v-for="term in terms"
+                        :key="term.id"
+                        class="overflow-hidden rounded-lg border bg-background"
                     >
-                        <div class="flex items-center gap-2">
-                            <BookOpen
-                                class="size-4 text-muted-foreground"
-                                aria-hidden="true"
-                            />
-                            <h2 class="text-sm font-semibold">
-                                {{ term.name }}
-                            </h2>
-                            <Badge variant="outline">
-                                {{ subjectsFor(yearLevel.id, term.id).length }}
-                            </Badge>
+                        <div
+                            class="flex items-center justify-between gap-3 border-b px-4 py-3"
+                        >
+                            <div class="flex items-center gap-2">
+                                <BookOpen
+                                    class="size-4 text-muted-foreground"
+                                    aria-hidden="true"
+                                />
+                                <h2 class="text-sm font-semibold">
+                                    {{ term.name }}
+                                </h2>
+                                <Badge variant="outline">
+                                    {{
+                                        subjectsFor(yearLevel.id, term.id)
+                                            .length
+                                    }}
+                                </Badge>
+                            </div>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                @click="openAddDialog(yearLevel.id, term.id)"
+                            >
+                                <Plus aria-hidden="true" />
+                                Add subject
+                            </Button>
                         </div>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            @click="openAddDialog(yearLevel.id, term.id)"
-                        >
-                            <Plus aria-hidden="true" />
-                            Add subject
-                        </Button>
-                    </div>
 
-                    <div class="divide-y">
-                        <p
-                            v-if="
-                                subjectsFor(yearLevel.id, term.id).length === 0
-                            "
-                            class="px-4 py-8 text-center text-sm text-muted-foreground"
-                        >
-                            No subjects added.
-                        </p>
+                        <div class="divide-y">
+                            <p
+                                v-if="
+                                    subjectsFor(yearLevel.id, term.id)
+                                        .length === 0
+                                "
+                                class="px-4 py-8 text-center text-sm text-muted-foreground"
+                            >
+                                No subjects added.
+                            </p>
 
-                        <article
-                            v-for="subject in subjectsFor(
-                                yearLevel.id,
-                                term.id,
-                            )"
-                            :key="subject.id"
-                            class="group/subject flex items-start justify-between gap-4 px-4 py-3 transition-colors hover:bg-muted/30"
-                        >
-                            <div class="min-w-0">
-                                <h3 class="text-sm font-medium">
-                                    {{ subject.subject_name }}
-                                </h3>
-                                <p class="mt-1 text-xs text-muted-foreground">
-                                    {{ subject.units ?? '0.00' }} units ·
-                                    {{ subject.lecture_hours ?? '0.00' }}
-                                    lecture ·
-                                    {{ subject.laboratory_hours ?? '0.00' }} lab
-                                </p>
-                                <div
-                                    v-if="subject.prerequisites.length"
-                                    class="mt-2 text-xs"
-                                >
-                                    <span class="text-muted-foreground">
-                                        Prerequisite:
-                                    </span>
-                                    {{
-                                        subject.prerequisites
-                                            .map((item) => item.name)
-                                            .join(', ')
-                                    }}
+                            <article
+                                v-for="subject in subjectsFor(
+                                    yearLevel.id,
+                                    term.id,
+                                )"
+                                :key="subject.id"
+                                class="group/subject flex items-start justify-between gap-4 px-4 py-3 transition-colors hover:bg-muted/30"
+                            >
+                                <div class="min-w-0">
+                                    <h3 class="text-sm font-medium">
+                                        {{ subject.subject_name }}
+                                    </h3>
+                                    <p
+                                        class="mt-1 text-xs text-muted-foreground"
+                                    >
+                                        {{ subject.units ?? '0.00' }} units ·
+                                        {{ subject.lecture_hours ?? '0.00' }}
+                                        lecture ·
+                                        {{
+                                            subject.laboratory_hours ?? '0.00'
+                                        }}
+                                        lab
+                                    </p>
+                                    <div
+                                        v-if="subject.prerequisites.length"
+                                        class="mt-2 text-xs"
+                                    >
+                                        <span class="text-muted-foreground">
+                                            Prerequisite:
+                                        </span>
+                                        {{
+                                            subject.prerequisites
+                                                .map((item) => item.name)
+                                                .join(', ')
+                                        }}
+                                    </div>
+                                    <div
+                                        v-if="subject.corequisites.length"
+                                        class="mt-1 text-xs"
+                                    >
+                                        <span class="text-muted-foreground">
+                                            Corequisite:
+                                        </span>
+                                        {{
+                                            subject.corequisites
+                                                .map((item) => item.name)
+                                                .join(', ')
+                                        }}
+                                    </div>
+                                    <p
+                                        v-if="subject.remarks"
+                                        class="mt-2 text-xs text-muted-foreground"
+                                    >
+                                        {{ subject.remarks }}
+                                    </p>
                                 </div>
-                                <div
-                                    v-if="subject.corequisites.length"
-                                    class="mt-1 text-xs"
-                                >
-                                    <span class="text-muted-foreground">
-                                        Corequisite:
-                                    </span>
-                                    {{
-                                        subject.corequisites
-                                            .map((item) => item.name)
-                                            .join(', ')
-                                    }}
-                                </div>
-                                <p
-                                    v-if="subject.remarks"
-                                    class="mt-2 text-xs text-muted-foreground"
-                                >
-                                    {{ subject.remarks }}
-                                </p>
-                            </div>
 
-                            <div class="flex shrink-0 gap-1">
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    aria-label="Edit subject"
-                                    @click="openEditDialog(subject)"
-                                >
-                                    <Pencil aria-hidden="true" />
-                                </Button>
-                                <Button
-                                    type="button"
-                                    size="icon"
-                                    variant="ghost"
-                                    class="text-destructive"
-                                    aria-label="Remove subject"
-                                    @click="openDeleteDialog(subject)"
-                                >
-                                    <Trash2 aria-hidden="true" />
-                                </Button>
-                            </div>
-                        </article>
-                    </div>
-                </section>
-            </div>
-        </details>
+                                <div class="flex shrink-0 gap-1">
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        aria-label="Edit subject"
+                                        @click="openEditDialog(subject)"
+                                    >
+                                        <Pencil aria-hidden="true" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        size="icon"
+                                        variant="ghost"
+                                        class="text-destructive"
+                                        aria-label="Remove subject"
+                                        @click="openDeleteDialog(subject)"
+                                    >
+                                        <Trash2 aria-hidden="true" />
+                                    </Button>
+                                </div>
+                            </article>
+                        </div>
+                    </section>
+                </div>
+            </TabsContent>
+        </Tabs>
     </DefaultContainer>
 
     <Dialog v-model:open="isDialogOpen">
