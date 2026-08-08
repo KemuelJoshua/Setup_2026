@@ -232,44 +232,44 @@ const handleDeleted = (): void => {
 <template>
     <Head :title="`${curriculum.name} subjects`" />
 
-    <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <BookOpen class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <GraduationCap class="size-3.5" aria-hidden="true" />
-                Subject planning
-            </template>
-            <template #title>{{ curriculum.name }}</template>
-            <template #description>
-                {{ curriculum.code }} · {{ curriculum.status }} ·
-                {{ curriculum.program?.name ?? 'No program' }} · Effective
-                {{ curriculum.effective_year }} ·
-                {{
-                    curriculum.academic_structure?.name ??
-                    'No academic structure assigned'
-                }}
-            </template>
-            <template #actions>
-                <div class="flex flex-wrap gap-2">
-                    <Button variant="outline" as-child>
-                        <Link :href="index()">
-                            <ArrowLeft aria-hidden="true" />
-                            All curricula
-                        </Link>
-                    </Button>
-                    <Button
-                        :disabled="!curriculum.academic_structure"
-                        @click="openAddDialog()"
-                    >
-                        <Plus aria-hidden="true" />
-                        Add subject
-                    </Button>
-                </div>
-            </template>
-        </PageHero>
+    <PageHero>
+        <template #icon>
+            <BookOpen class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <GraduationCap class="size-3.5" aria-hidden="true" />
+            Subject planning
+        </template>
+        <template #title>{{ curriculum.name }}</template>
+        <template #description>
+            {{ curriculum.code }} · {{ curriculum.status }} ·
+            {{ curriculum.program?.name ?? 'No program' }} · Effective
+            {{ curriculum.effective_year }} ·
+            {{
+                curriculum.academic_structure?.name ??
+                'No academic structure assigned'
+            }}
+        </template>
+        <template #actions>
+            <div class="flex flex-wrap gap-2">
+                <Button variant="outline" as-child>
+                    <Link :href="index()">
+                        <ArrowLeft aria-hidden="true" />
+                        All curricula
+                    </Link>
+                </Button>
+                <Button
+                    :disabled="!curriculum.academic_structure"
+                    @click="openAddDialog()"
+                >
+                    <Plus aria-hidden="true" />
+                    Add subject
+                </Button>
+            </div>
+        </template>
+    </PageHero>
 
+    <DefaultContainer>
         <div class="grid gap-3 sm:grid-cols-3">
             <Card>
                 <CardContent class="flex items-center gap-3 p-4">

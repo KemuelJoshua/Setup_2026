@@ -8,6 +8,23 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
+test('user management uses the standard Vue UI components', function () {
+    $index = file_get_contents(resource_path('js/pages/admin/users/Index.vue'));
+    $form = file_get_contents(resource_path(
+        'js/modules/users/components/UserFormDialog.vue',
+    ));
+
+    expect($index)
+        ->toContain("from '@/components/DataTableContainer.vue'")
+        ->toContain('<DataTablePageSizeSelect')
+        ->toContain('<UserFormDialog')
+        ->and($form)
+        ->toContain("from '@/components/ui/dialog'")
+        ->toContain("from '@/components/ui/select'")
+        ->toContain('<Dialog v-model:open="isOpen">')
+        ->not->toContain('<select');
+});
+
 test('authenticated users can view the users page', function () {
     $admin = User::factory()->create();
     $user = User::factory()->create([
@@ -24,13 +41,15 @@ test('authenticated users can view the users page', function () {
 
     $this
         ->actingAs($admin)
-        ->get(route('admin.users.index'))
+        ->get(route('admin.users.index', ['per_page' => 10]))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('admin/users/Index')
             ->has('users.data')
             ->where('users.data.0.name', 'Jane Manager')
             ->where('users.data.0.roles.0', 'Teacher')
+            ->where('users.per_page', 10)
+            ->where('filters.per_page', 10)
             ->has('roles'));
 });
 

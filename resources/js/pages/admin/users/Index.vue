@@ -1,21 +1,33 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Form, Head, router } from '@inertiajs/vue3';
 import { Plus, Sparkles, UsersRound } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
+import DataTableContainer from '@/components/DataTableContainer.vue';
 import PageHero from '@/components/PageHero.vue';
 import { Button } from '@/components/ui/button';
+import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
 import {
+    DataTable,
+    DataTablePageSizeSelect,
     DataTablePagination,
     DataTableToolbar,
 } from '@/components/ui/data-table';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { createColumns } from '@/modules/users/components/columns';
 import type { User } from '@/modules/users/components/columns';
-import UserDeleteDialog from '@/modules/users/components/UserDeleteDialog.vue';
-import UserFormSheet from '@/modules/users/components/UserFormSheet.vue';
-import type { UserRoleOption } from '@/modules/users/components/UserFormSheet.vue';
-import UserTable from '@/modules/users/components/UserTable.vue';
-import { index } from '@/routes/admin/users';
+import UserFormDialog from '@/modules/users/components/UserFormDialog.vue';
+import type { UserRoleOption } from '@/modules/users/components/UserFormDialog.vue';
+import { destroy, index } from '@/routes/admin/users';
 import type { LengthAwarePaginator } from '@/types';
-import DefaultContainer from '@/components/ui/containers/DefaultContainer.vue';
 
 defineOptions({
     layout: {
@@ -38,19 +50,19 @@ const props = defineProps<{
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
-const isCreateSheetOpen = ref(false);
-const isEditSheetOpen = ref(false);
+const isFormDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const selectedUser = ref<User | null>(null);
-const userPendingDeletion = ref<User | null>(null);
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-const fetchUsers = (): void => {
+const fetchUsers = (
+    perPage: string | number | undefined = props.users.per_page,
+): void => {
     router.visit(
         index({
             query: {
                 search: searchQuery.value || undefined,
-                per_page: props.users.per_page,
+                per_page: perPage,
             },
         }),
         {
@@ -64,12 +76,31 @@ const fetchUsers = (): void => {
 
 const openEditSheet = (user: User): void => {
     selectedUser.value = user;
-    isEditSheetOpen.value = true;
+    isFormDialogOpen.value = true;
 };
 
 const openDeleteDialog = (user: User): void => {
-    userPendingDeletion.value = user;
+    selectedUser.value = user;
     isDeleteDialogOpen.value = true;
+};
+
+const openCreateDialog = (): void => {
+    selectedUser.value = null;
+    isFormDialogOpen.value = true;
+};
+
+const columns = createColumns({
+    edit: openEditSheet,
+    delete: openDeleteDialog,
+});
+
+const handleDeleted = (): void => {
+    toast.success('User deleted successfully.');
+    isDeleteDialogOpen.value = false;
+};
+
+const handleDeleteError = (): void => {
+    toast.error('Unable to delete the user. Please try again.');
 };
 
 watch(searchQuery, () => {
@@ -77,15 +108,9 @@ watch(searchQuery, () => {
     searchTimer = window.setTimeout(fetchUsers, 300);
 });
 
-watch(isEditSheetOpen, (isOpen) => {
-    if (!isOpen) {
+watch([isFormDialogOpen, isDeleteDialogOpen], ([formOpen, deleteOpen]) => {
+    if (!formOpen && !deleteOpen) {
         selectedUser.value = null;
-    }
-});
-
-watch(isDeleteDialogOpen, (isOpen) => {
-    if (!isOpen) {
-        userPendingDeletion.value = null;
     }
 });
 
@@ -109,59 +134,95 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             organized workspace.
         </template>
         <template #actions>
-            <UserFormSheet
-                v-model:open="isCreateSheetOpen"
-                mode="create"
-                :roles="roles"
-            >
-                <template #trigger>
-                    <Button type="button">
-                        <Plus aria-hidden="true" />
-                        Create user
-                    </Button>
-                </template>
-            </UserFormSheet>
+            <Button type="button" @click="openCreateDialog">
+                <Plus aria-hidden="true" />
+                Create user
+            </Button>
         </template>
     </PageHero>
 
     <DefaultContainer>
-        <DataTableToolbar
-            v-model="searchQuery"
-            :count="users.total"
-            item-label="user"
-            search-placeholder="Search by name or email..."
-            search-label="Search users"
-        >
-        </DataTableToolbar>
+        <DataTableContainer>
+            <DataTableToolbar
+                v-model="searchQuery"
+                :count="users.total"
+                item-label="user"
+                search-placeholder="Search by name or email..."
+                search-label="Search users"
+                class="border-b px-4 py-4 sm:px-5"
+            >
+                <template #filters>
+                    <DataTablePageSizeSelect
+                        :model-value="users.per_page"
+                        @update:model-value="fetchUsers"
+                    />
+                </template>
+            </DataTableToolbar>
 
-        <div class="flex flex-col gap-4">
-            <UserTable
-                :users="users.data"
-                @edit="openEditSheet"
-                @delete="openDeleteDialog"
+            <DataTable
+                :columns="columns"
+                :data="users.data"
+                empty-message="No users found."
             />
 
-            <DataTablePagination
-                :from="users.from"
-                :to="users.to"
-                :total="users.total"
-                :links="users.links"
-                :previous-page-url="users.prev_page_url"
-                :next-page-url="users.next_page_url"
-            />
-        </div>
-        
+            <template #footer>
+                <DataTablePagination
+                    :from="users.from"
+                    :to="users.to"
+                    :total="users.total"
+                    :links="users.links"
+                    :previous-page-url="users.prev_page_url"
+                    :next-page-url="users.next_page_url"
+                />
+            </template>
+        </DataTableContainer>
     </DefaultContainer>
 
-    <UserFormSheet
-        v-model:open="isEditSheetOpen"
-        mode="edit"
+    <UserFormDialog
+        v-model:open="isFormDialogOpen"
         :user="selectedUser"
         :roles="roles"
     />
 
-    <UserDeleteDialog
-        v-model:open="isDeleteDialogOpen"
-        :user="userPendingDeletion"
-    />
+    <Dialog v-model:open="isDeleteDialogOpen">
+        <DialogContent v-if="selectedUser">
+            <Form
+                v-bind="destroy.form(selectedUser.id)"
+                v-slot="{ processing }"
+                class="space-y-6"
+                :options="{ preserveScroll: true }"
+                @success="handleDeleted"
+                @error="handleDeleteError"
+            >
+                <DialogHeader>
+                    <DialogTitle>Delete user?</DialogTitle>
+                    <DialogDescription>
+                        The <strong>{{ selectedUser.name }}</strong> account
+                        will be permanently deleted. This action cannot be
+                        undone.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <DialogFooter>
+                    <DialogClose as-child>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            :disabled="processing"
+                        >
+                            Cancel
+                        </Button>
+                    </DialogClose>
+
+                    <Button
+                        type="submit"
+                        variant="destructive"
+                        :disabled="processing"
+                    >
+                        {{ processing ? 'Deleting...' : 'Delete user' }}
+                    </Button>
+                </DialogFooter>
+            </Form>
+        </DialogContent>
+    </Dialog>
 </template>

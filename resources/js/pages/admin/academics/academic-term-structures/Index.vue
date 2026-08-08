@@ -196,7 +196,7 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
             item-label="Structure"
             search-placeholder="Search name or code..."
             search-label="Search academic term structures"
-            class="p-4 bg-card mb-3 border rounded-lg shadow-sm"
+            class="p-4 bg-card border rounded-lg shadow-sm"
         >
             <template #filters>
                 <Select v-model="educationalLevelFilter">
