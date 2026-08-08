@@ -127,7 +127,7 @@ const navigationGroups = computed<NavGroup[]>(() =>
 <template>
     <Sidebar collapsible="icon" variant="sidebar" class="bg-transparent">
         <SidebarHeader
-            class="border-b border-sidebar-border/70 px-4 py-4 group-data-[collapsible=icon]:px-1"
+            class="px-4  group-data-[collapsible=icon]:px-1"
         >
             <SidebarMenu>
                 <SidebarMenuItem>
@@ -152,5 +152,4 @@ const navigationGroups = computed<NavGroup[]>(() =>
 
         <SidebarRail />
     </Sidebar>
-    <slot />
 </template>

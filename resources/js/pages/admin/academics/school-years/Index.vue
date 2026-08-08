@@ -129,32 +129,32 @@ onBeforeUnmount(() => {
 <template>
     <Head title="School Years" />
 
+    <PageHero>
+        <template #icon>
+            <CalendarRange class="size-5" aria-hidden="true" />
+        </template>
+
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Academic calendar
+        </template>
+
+        <template #title> School year workspace </template>
+
+        <template #description>
+            Create and manage the academic periods used throughout the
+            school calendar.
+        </template>
+
+        <template #actions>
+            <Button type="button" @click="openCreateDialog">
+                <Plus class="size-4" aria-hidden="true" />
+                Create school year
+            </Button>
+        </template>
+    </PageHero>
+    
     <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <CalendarRange class="size-5" aria-hidden="true" />
-            </template>
-
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Academic calendar
-            </template>
-
-            <template #title> School year workspace </template>
-
-            <template #description>
-                Create and manage the academic periods used throughout the
-                school calendar.
-            </template>
-
-            <template #actions>
-                <Button type="button" @click="openCreateDialog">
-                    <Plus class="size-4" aria-hidden="true" />
-                    Create school year
-                </Button>
-            </template>
-        </PageHero>
-
         <DataTableContainer>
             <DataTableToolbar
                 v-model="searchQuery"

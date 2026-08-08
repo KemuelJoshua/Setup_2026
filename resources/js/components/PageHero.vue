@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
     <section
         :class="
             cn(
-                'relative overflow-hidden rounded-2xl border bg-card px-5 py-6 shadow-sm sm:px-7',
+                'relative overflow-hidden border-b bg-card px-5 py-6 shadow-sm sm:px-7',
                 props.class,
             )
         "

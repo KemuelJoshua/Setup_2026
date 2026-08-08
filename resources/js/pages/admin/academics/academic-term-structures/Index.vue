@@ -169,26 +169,27 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
 <template>
     <Head title="Academic Term Structures" />
 
+    <PageHero>
+        <template #icon>
+            <Network class="size-5" aria-hidden="true" />
+        </template>
+        <template #badge>
+            <Sparkles class="size-3.5" aria-hidden="true" />
+            Academic planning
+        </template>
+        <template #title>Academic Term Structures workspace</template>
+        <template #description>
+            Manage flexible semesters, quarters, terms, and grading periods.
+        </template>
+        <template #actions>
+            <Button type="button" @click="openStructureForm()">
+                <Plus aria-hidden="true" />
+                Add structure
+            </Button>
+        </template>
+    </PageHero>
+    
     <DefaultContainer>
-        <PageHero>
-            <template #icon>
-                <Network class="size-5" aria-hidden="true" />
-            </template>
-            <template #badge>
-                <Sparkles class="size-3.5" aria-hidden="true" />
-                Academic planning
-            </template>
-            <template #title>Academic Term Structures workspace</template>
-            <template #description>
-                Manage flexible semesters, quarters, terms, and grading periods.
-            </template>
-            <template #actions>
-                <Button type="button" @click="openStructureForm()">
-                    <Plus aria-hidden="true" />
-                    Add structure
-                </Button>
-            </template>
-        </PageHero>
         <DataTableToolbar
             v-model="searchQuery"
             :count="academicTermStructures.total"
