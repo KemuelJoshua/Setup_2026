@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Central\CategoryController;
 use App\Http\Controllers\Central\TenantController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,9 @@ Route::domain(config('tenancy.central_domains')[0])
                 ])->name('tenants.update-status');
 
                 Route::resource('/tenants', TenantController::class)
+                    ->except(['create', 'show', 'edit']);
+
+                Route::resource('/categories', CategoryController::class)
                     ->except(['create', 'show', 'edit']);
             });
     });

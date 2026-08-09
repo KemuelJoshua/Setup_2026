@@ -30,6 +30,7 @@ import type { Tenant } from './columns';
 
 const props = defineProps<{
     tenant: Tenant | null;
+    categories: Array<{ id: number; name: string; is_active: boolean }>;
 }>();
 
 const isOpen = defineModel<boolean>('open', { default: false });
@@ -139,6 +140,40 @@ const handleError = (): void => {
                             </div>
 
                             <div class="grid gap-2">
+                                <Label for="tenant-category">Category</Label>
+                                <Select
+                                    name="category_id"
+                                    :default-value="
+                                        tenant?.category_id?.toString()
+                                    "
+                                >
+                                    <SelectTrigger
+                                        id="tenant-category"
+                                        class="w-full"
+                                    >
+                                        <SelectValue
+                                            placeholder="Select a category"
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem
+                                            v-for="category in categories"
+                                            :key="category.id"
+                                            :value="category.id.toString()"
+                                        >
+                                            {{ category.name }}
+                                            {{
+                                                category.is_active
+                                                    ? ''
+                                                    : '(Inactive)'
+                                            }}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <InputError :message="errors.category_id" />
+                            </div>
+
+                            <div class="grid gap-2">
                                 <Label for="tenant-status">Status</Label>
                                 <Select
                                     name="is_active"
@@ -167,16 +202,109 @@ const handleError = (): void => {
                             </div>
 
                             <div class="grid gap-2 sm:col-span-2">
-                                <Label for="tenant-address">Address</Label>
+                                <Label for="tenant-address-line-1"
+                                    >Address line 1</Label
+                                >
                                 <Input
-                                    id="tenant-address"
-                                    name="school_address"
+                                    id="tenant-address-line-1"
+                                    name="school_address_line_1"
                                     :default-value="
-                                        tenant?.school_address ?? ''
+                                        tenant?.school_address_line_1 ?? ''
                                     "
-                                    placeholder="School address"
+                                    placeholder="Building, house or lot number, and street"
                                 />
-                                <InputError :message="errors.school_address" />
+                                <InputError
+                                    :message="errors.school_address_line_1"
+                                />
+                            </div>
+
+                            <div class="grid gap-2 sm:col-span-2">
+                                <Label for="tenant-address-line-2"
+                                    >Address line 2</Label
+                                >
+                                <Input
+                                    id="tenant-address-line-2"
+                                    name="school_address_line_2"
+                                    :default-value="
+                                        tenant?.school_address_line_2 ?? ''
+                                    "
+                                    placeholder="Subdivision, sitio, purok, or unit"
+                                />
+                                <InputError
+                                    :message="errors.school_address_line_2"
+                                />
+                            </div>
+
+                            <div class="grid gap-2">
+                                <Label for="tenant-barangay">Barangay</Label>
+                                <Input
+                                    id="tenant-barangay"
+                                    name="school_barangay"
+                                    :default-value="
+                                        tenant?.school_barangay ?? ''
+                                    "
+                                    placeholder="Barangay"
+                                />
+                                <InputError :message="errors.school_barangay" />
+                            </div>
+
+                            <div class="grid gap-2">
+                                <Label for="tenant-city-municipality"
+                                    >City / municipality</Label
+                                >
+                                <Input
+                                    id="tenant-city-municipality"
+                                    name="school_city_municipality"
+                                    :default-value="
+                                        tenant?.school_city_municipality ?? ''
+                                    "
+                                    placeholder="City or municipality"
+                                />
+                                <InputError
+                                    :message="errors.school_city_municipality"
+                                />
+                            </div>
+
+                            <div class="grid gap-2">
+                                <Label for="tenant-province">Province</Label>
+                                <Input
+                                    id="tenant-province"
+                                    name="school_province"
+                                    :default-value="
+                                        tenant?.school_province ?? ''
+                                    "
+                                    placeholder="Province"
+                                />
+                                <InputError :message="errors.school_province" />
+                            </div>
+
+                            <div class="grid gap-2">
+                                <Label for="tenant-region">Region</Label>
+                                <Input
+                                    id="tenant-region"
+                                    name="school_region"
+                                    :default-value="tenant?.school_region ?? ''"
+                                    placeholder="Region"
+                                />
+                                <InputError :message="errors.school_region" />
+                            </div>
+
+                            <div class="grid gap-2">
+                                <Label for="tenant-postal-code"
+                                    >Postal code</Label
+                                >
+                                <Input
+                                    id="tenant-postal-code"
+                                    name="school_postal_code"
+                                    :default-value="
+                                        tenant?.school_postal_code ?? ''
+                                    "
+                                    inputmode="numeric"
+                                    placeholder="Postal code"
+                                />
+                                <InputError
+                                    :message="errors.school_postal_code"
+                                />
                             </div>
                         </div>
                     </TabsContent>

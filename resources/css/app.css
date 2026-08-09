@@ -104,53 +104,53 @@
        BASE
        Clean Government / Education Neutral
     ========================================================= */
-    --background: hsl(215 30% 98%);
-    --foreground: hsl(220 30% 12%);
+    --background: hsl(0 30% 98%);
+    --foreground: hsl(0 25% 12%);
 
     /* =========================================================
        SURFACES
     ========================================================= */
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(220 30% 12%);
+    --card-foreground: hsl(0 25% 12%);
 
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(220 30% 12%);
+    --popover-foreground: hsl(0 25% 12%);
 
     /* =========================================================
-       DEPED MAKATI BLUE
+       PRIMARY RED
     ========================================================= */
-    --primary: hsl(216 92% 34%);
+    --primary: hsl(355 78% 38%);
     --primary-foreground: hsl(0 0% 100%);
 
-    --primary-hover: hsl(216 92% 40%);
-    --primary-active: hsl(216 94% 28%);
+    --primary-hover: hsl(355 78% 44%);
+    --primary-active: hsl(355 82% 31%);
 
-    --primary-soft: hsl(216 75% 96%);
-    --primary-muted: hsl(216 60% 90%);
+    --primary-soft: hsl(355 70% 96%);
+    --primary-muted: hsl(355 55% 90%);
 
-    --primary-glow: hsla(216, 92%, 34%, 0.22);
+    --primary-glow: hsla(355, 78%, 38%, 0.22);
 
     /* =========================================================
-       MAKATI GOLD
+       SECONDARY GOLD
     ========================================================= */
     --secondary: hsl(45 96% 52%);
-    --secondary-foreground: hsl(220 35% 12%);
+    --secondary-foreground: hsl(0 30% 12%);
 
     --secondary-hover: hsl(45 96% 58%);
     --secondary-active: hsl(42 94% 45%);
 
     /* =========================================================
        ACCENT
-       Soft Makati Gold
+       Soft Gold
     ========================================================= */
     --accent: hsl(46 100% 94%);
-    --accent-foreground: hsl(216 92% 27%);
+    --accent-foreground: hsl(355 78% 31%);
 
     /* =========================================================
        MUTED
     ========================================================= */
-    --muted: hsl(215 25% 95%);
-    --muted-foreground: hsl(217 12% 43%);
+    --muted: hsl(0 20% 95%);
+    --muted-foreground: hsl(0 10% 43%);
 
     /* =========================================================
        STATES
@@ -170,19 +170,19 @@
     /* =========================================================
        INPUTS
     ========================================================= */
-    --border: hsl(216 20% 87%);
-    --input: hsl(216 20% 89%);
-    --ring: hsl(216 92% 34%);
+    --border: hsl(355 18% 87%);
+    --input: hsl(355 18% 89%);
+    --ring: hsl(355 78% 38%);
 
     /* =========================================================
        CHARTS
-       DepEd Blue, Makati Gold, Red, Green, Light Blue
+       Red, Gold, Blue, Green, Orange
     ========================================================= */
-    --chart-1: hsl(216 92% 34%);
+    --chart-1: hsl(355 78% 38%);
     --chart-2: hsl(45 96% 52%);
-    --chart-3: hsl(0 72% 50%);
+    --chart-3: hsl(216 82% 48%);
     --chart-4: hsl(145 60% 38%);
-    --chart-5: hsl(198 82% 52%);
+    --chart-5: hsl(24 90% 54%);
 
     /* =========================================================
        RADIUS
@@ -194,127 +194,130 @@
     ========================================================= */
     --sidebar: hsl(0 0% 100%);
     --sidebar-background: hsl(0 0% 100%);
-    --sidebar-foreground: hsl(220 30% 15%);
+    --sidebar-foreground: hsl(0 25% 15%);
 
-    --sidebar-primary: hsl(216 92% 34%);
+    --sidebar-primary: hsl(355 78% 38%);
     --sidebar-primary-foreground: hsl(0 0% 100%);
 
-    --sidebar-accent: hsl(216 75% 96%);
-    --sidebar-accent-foreground: hsl(216 92% 27%);
+    --sidebar-accent: hsl(355 70% 96%);
+    --sidebar-accent-foreground: hsl(355 78% 31%);
 
-    --sidebar-border: hsl(216 20% 88%);
-    --sidebar-ring: hsl(216 92% 34%);
+    --sidebar-border: hsl(355 18% 88%);
+    --sidebar-ring: hsl(355 78% 38%);
 
     /* =========================================================
        SHADOWS
     ========================================================= */
-    --shadow-color: hsla(216, 30%, 12%, 0.09);
-    --shadow-primary: hsla(216, 92%, 34%, 0.2);
+    --shadow-color: hsla(355, 25%, 12%, 0.09);
+    --shadow-primary: hsla(355, 78%, 38%, 0.2);
 }
 
 .dark {
     /* =========================================================
        BASE
+       Neutral Slate
     ========================================================= */
-    --background: hsl(220 32% 8%);
-    --foreground: hsl(215 25% 96%);
+    --background: hsl(222 25% 8%);
+    --foreground: hsl(215 20% 96%);
 
     /* =========================================================
        SURFACES
     ========================================================= */
-    --card: hsl(220 28% 11%);
-    --card-foreground: hsl(215 25% 96%);
+    --card: hsl(222 22% 11%);
+    --card-foreground: hsl(215 20% 96%);
 
-    --popover: hsl(220 28% 11%);
-    --popover-foreground: hsl(215 25% 96%);
-
-    /* =========================================================
-       DEPED MAKATI BLUE
-    ========================================================= */
-    --primary: hsl(213 90% 58%);
-    --primary-foreground: hsl(220 40% 8%);
-
-    --primary-hover: hsl(213 92% 64%);
-    --primary-active: hsl(216 88% 50%);
-
-    --primary-soft: hsl(216 32% 16%);
-    --primary-muted: hsl(216 28% 21%);
-
-    --primary-glow: hsla(213, 90%, 58%, 0.3);
+    --popover: hsl(222 22% 11%);
+    --popover-foreground: hsl(215 20% 96%);
 
     /* =========================================================
-       MAKATI GOLD
+       PRIMARY RED
     ========================================================= */
-    --secondary: hsl(45 94% 58%);
-    --secondary-foreground: hsl(220 40% 9%);
+    --primary: hsl(355 76% 58%);
+    --primary-foreground: hsl(0 0% 100%);
 
-    --secondary-hover: hsl(46 96% 64%);
-    --secondary-active: hsl(42 90% 50%);
+    --primary-hover: hsl(355 78% 64%);
+    --primary-active: hsl(355 74% 50%);
+
+    --primary-soft: hsl(355 24% 16%);
+    --primary-muted: hsl(355 22% 21%);
+
+    --primary-glow: hsla(355, 76%, 58%, 0.25);
+
+    /* =========================================================
+       SECONDARY GOLD
+    ========================================================= */
+    --secondary: hsl(45 90% 58%);
+    --secondary-foreground: hsl(222 30% 10%);
+
+    --secondary-hover: hsl(45 92% 64%);
+    --secondary-active: hsl(42 88% 50%);
 
     /* =========================================================
        ACCENT
+       Neutral surface with subtle red emphasis
     ========================================================= */
-    --accent: hsl(216 32% 17%);
-    --accent-foreground: hsl(45 94% 65%);
+    --accent: hsl(222 18% 17%);
+    --accent-foreground: hsl(355 76% 68%);
 
     /* =========================================================
        MUTED
     ========================================================= */
-    --muted: hsl(220 22% 15%);
-    --muted-foreground: hsl(216 15% 68%);
+    --muted: hsl(222 18% 15%);
+    --muted-foreground: hsl(215 14% 68%);
 
     /* =========================================================
        STATES
     ========================================================= */
-    --destructive: hsl(0 78% 60%);
+    --destructive: hsl(0 72% 58%);
     --destructive-foreground: hsl(0 0% 100%);
 
     --success: hsl(145 58% 50%);
-    --success-foreground: hsl(220 35% 8%);
+    --success-foreground: hsl(222 30% 8%);
 
-    --warning: hsl(44 96% 58%);
+    --warning: hsl(44 94% 58%);
     --warning-foreground: hsl(40 90% 10%);
 
-    --info: hsl(205 90% 60%);
-    --info-foreground: hsl(220 35% 8%);
+    --info: hsl(205 85% 60%);
+    --info-foreground: hsl(222 30% 8%);
 
     /* =========================================================
        INPUTS
     ========================================================= */
-    --border: hsl(216 22% 21%);
-    --input: hsl(216 22% 18%);
-    --ring: hsl(213 90% 58%);
+    --border: hsl(220 16% 22%);
+    --input: hsl(220 17% 18%);
+    --ring: hsl(355 76% 58%);
 
     /* =========================================================
        CHARTS
     ========================================================= */
-    --chart-1: hsl(213 90% 58%);
-    --chart-2: hsl(45 94% 58%);
-    --chart-3: hsl(0 78% 62%);
-    --chart-4: hsl(145 58% 52%);
-    --chart-5: hsl(195 85% 62%);
+    --chart-1: hsl(355 76% 60%);
+    --chart-2: hsl(45 90% 58%);
+    --chart-3: hsl(213 85% 62%);
+    --chart-4: hsl(145 55% 52%);
+    --chart-5: hsl(25 85% 62%);
 
     /* =========================================================
        SIDEBAR
+       Neutral instead of red-tinted
     ========================================================= */
-    --sidebar: hsl(220 30% 10%);
-    --sidebar-background: hsl(220 30% 10%);
-    --sidebar-foreground: hsl(215 25% 96%);
+    --sidebar: hsl(222 24% 10%);
+    --sidebar-background: hsl(222 24% 10%);
+    --sidebar-foreground: hsl(215 20% 96%);
 
-    --sidebar-primary: hsl(213 90% 58%);
-    --sidebar-primary-foreground: hsl(220 40% 8%);
+    --sidebar-primary: hsl(355 76% 58%);
+    --sidebar-primary-foreground: hsl(0 0% 100%);
 
-    --sidebar-accent: hsl(216 32% 17%);
-    --sidebar-accent-foreground: hsl(45 94% 65%);
+    --sidebar-accent: hsl(222 18% 17%);
+    --sidebar-accent-foreground: hsl(355 76% 68%);
 
-    --sidebar-border: hsl(216 22% 21%);
-    --sidebar-ring: hsl(213 90% 58%);
+    --sidebar-border: hsl(220 16% 21%);
+    --sidebar-ring: hsl(355 76% 58%);
 
     /* =========================================================
        SHADOWS
     ========================================================= */
     --shadow-color: hsla(0, 0%, 0%, 0.5);
-    --shadow-primary: hsla(213, 90%, 58%, 0.27);
+    --shadow-primary: hsla(355, 76%, 58%, 0.22);
 }
 
 @layer base {

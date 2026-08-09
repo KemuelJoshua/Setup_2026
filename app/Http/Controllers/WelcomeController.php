@@ -18,6 +18,13 @@ class WelcomeController extends Controller
                 'school_code',
                 'school_name',
                 'school_address',
+                'school_address_line_1',
+                'school_address_line_2',
+                'school_barangay',
+                'school_city_municipality',
+                'school_province',
+                'school_region',
+                'school_postal_code',
                 'school_motto',
                 'data',
             ])

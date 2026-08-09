@@ -12,6 +12,7 @@ import {
     ScrollText,
     Layers3,
     Building2,
+    Tags,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -37,9 +38,11 @@ import { index as IndexSubject } from '@/routes/admin/academics/subject';
 import { index as IndexSchoolYear } from '@/routes/admin/school-years';
 import { index as userIndex } from '@/routes/admin/users';
 import { dashboard as centralDashboard } from '@/routes/central';
+import { index as categoryIndex } from '@/routes/central/categories';
 import { index as tenantIndex } from '@/routes/central/tenants';
 import type { NavItem } from '@/types';
 
+// Define the primary navigation items for the sidebar
 const primaryNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -106,6 +109,8 @@ const isTenantApplication = computed(() => Boolean(page.props.tenant));
 const homeRoute = computed(() =>
     isTenantApplication.value ? dashboard() : centralDashboard(),
 );
+
+// Determine the navigation groups based on the application type
 const navigationGroups = computed<NavGroup[]>(() =>
     isTenantApplication.value
         ? [{ title: 'Learning', items: primaryNavItems }]
@@ -117,6 +122,11 @@ const navigationGroups = computed<NavGroup[]>(() =>
                           title: 'Schools',
                           href: tenantIndex(),
                           icon: Building2,
+                      },
+                      {
+                          title: 'Categories',
+                          href: categoryIndex(),
+                          icon: Tags,
                       },
                   ],
               },
@@ -132,7 +142,7 @@ const navigationGroups = computed<NavGroup[]>(() =>
                     <SidebarMenuButton
                         size="lg"
                         as-child
-                        class="h-13 rounded-md px-2.5 text-sidebar-foreground shadow-none transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
+                        class="h-32 rounded-md px-2.5 text-sidebar-foreground shadow-none transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
                     >
                         <Link :href="homeRoute">
                             <AppLogo />
@@ -142,7 +152,7 @@ const navigationGroups = computed<NavGroup[]>(() =>
             </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarContent class="gap-3 px-4 py-5">
+        <SidebarContent class="gap-3 px-4 pb-5">
             <NavMain :groups="navigationGroups" />
         </SidebarContent>
 

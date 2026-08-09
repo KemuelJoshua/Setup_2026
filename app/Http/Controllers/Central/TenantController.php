@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\StoreTenantRequest;
 use App\Http\Requests\Central\UpdateTenantRequest;
 use App\Http\Requests\Central\UpdateTenantStatusRequest;
+use App\Models\Category;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,9 +33,18 @@ class TenantController extends Controller
             ->withQueryString()
             ->through(fn (Tenant $tenant): array => [
                 'id' => $tenant->getTenantKey(),
+                'category_id' => $tenant->category_id,
+                'category' => $tenant->category?->only(['id', 'name']),
                 'school_code' => $tenant->school_code,
                 'school_name' => $tenant->school_name,
                 'school_address' => $tenant->school_address,
+                'school_address_line_1' => $tenant->school_address_line_1,
+                'school_address_line_2' => $tenant->school_address_line_2,
+                'school_barangay' => $tenant->school_barangay,
+                'school_city_municipality' => $tenant->school_city_municipality,
+                'school_province' => $tenant->school_province,
+                'school_region' => $tenant->school_region,
+                'school_postal_code' => $tenant->school_postal_code,
                 'school_email' => $tenant->school_email,
                 'school_contact_number' => $tenant->school_contact_number,
                 'school_motto' => $tenant->school_motto,
@@ -47,6 +57,9 @@ class TenantController extends Controller
         return Inertia::render('central/tenants/Index', [
             'tenants' => $tenants,
             'filters' => $filters,
+            'categories' => Category::query()
+                ->orderBy('name')
+                ->get(['id', 'name', 'is_active']),
         ]);
     }
 

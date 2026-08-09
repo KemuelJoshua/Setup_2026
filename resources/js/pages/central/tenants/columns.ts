@@ -12,9 +12,18 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
 export interface Tenant {
     id: string;
+    category_id: number;
+    category: { id: number; name: string } | null;
     school_code: string;
     school_name: string;
     school_address: string | null;
+    school_address_line_1: string | null;
+    school_address_line_2: string | null;
+    school_barangay: string | null;
+    school_city_municipality: string | null;
+    school_province: string | null;
+    school_region: string | null;
+    school_postal_code: string | null;
     school_email: string | null;
     school_contact_number: string | null;
     school_motto: string | null;
@@ -59,6 +68,21 @@ export const createColumns = (
                     row.original.school_code,
                 ),
             ]),
+    },
+    {
+        accessorKey: 'category.name',
+        meta: { className: 'min-w-[160px]' },
+        header: ({ column }) =>
+            h(DataTableColumnHeader as Component, {
+                column,
+                title: 'Category',
+            }),
+        cell: ({ row }) =>
+            h(
+                'span',
+                { class: 'text-sm text-muted-foreground' },
+                row.original.category?.name ?? 'Uncategorized',
+            ),
     },
     {
         accessorKey: 'domain',

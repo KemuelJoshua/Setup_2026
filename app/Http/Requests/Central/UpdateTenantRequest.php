@@ -23,9 +23,16 @@ class UpdateTenantRequest extends FormRequest
         $centralDomains = array_map('mb_strtolower', config('tenancy.central_domains', []));
 
         return [
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
             'school_code' => ['required', 'string', 'max:255', Rule::unique('tenants', 'school_code')->ignore($tenant)],
             'school_name' => ['required', 'string', 'max:255'],
-            'school_address' => ['nullable', 'string', 'max:255'],
+            'school_address_line_1' => ['nullable', 'string', 'max:255'],
+            'school_address_line_2' => ['nullable', 'string', 'max:255'],
+            'school_barangay' => ['nullable', 'string', 'max:255'],
+            'school_city_municipality' => ['nullable', 'string', 'max:255'],
+            'school_province' => ['nullable', 'string', 'max:255'],
+            'school_region' => ['nullable', 'string', 'max:255'],
+            'school_postal_code' => ['nullable', 'string', 'max:20'],
             'school_email' => ['nullable', 'email', 'max:255'],
             'school_contact_number' => ['nullable', 'string', 'max:255'],
             'school_motto' => ['nullable', 'string', 'max:255'],

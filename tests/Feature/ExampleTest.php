@@ -7,6 +7,17 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
+test('keeps a legacy school address when structured fields are empty', function () {
+    $school = Tenant::query()->forceCreate([
+        'id' => 'legacy-school',
+        'school_code' => 'LEGACY',
+        'school_name' => 'Legacy School',
+        'school_address' => 'Makati City',
+    ]);
+
+    expect($school->school_address)->toBe('Makati City');
+});
+
 test('shows active schools with a configured domain', function () {
     Event::fake();
 
@@ -14,7 +25,11 @@ test('shows active schools with a configured domain', function () {
         'id' => 'active-school',
         'school_code' => 'ACTIVE',
         'school_name' => 'Active Learning Academy',
-        'school_address' => 'Makati City',
+        'school_address_line_1' => '123 Learning Street',
+        'school_barangay' => 'Barangay Uno',
+        'school_city_municipality' => 'Makati City',
+        'school_region' => 'NCR',
+        'school_postal_code' => '1200',
         'school_motto' => 'Learn with purpose',
     ]);
     $activeSchool->domains()->create(['domain' => 'active-school.test']);
@@ -41,7 +56,7 @@ test('shows active schools with a configured domain', function () {
         ->where('schools.0.id', $activeSchool->getTenantKey())
         ->where('schools.0.code', 'ACTIVE')
         ->where('schools.0.name', 'Active Learning Academy')
-        ->where('schools.0.address', 'Makati City')
+        ->where('schools.0.address', '123 Learning Street, Barangay Uno, Makati City, NCR, 1200')
         ->where('schools.0.motto', 'Learn with purpose')
         ->where('schools.0.url', 'http://active-school.test')
     );

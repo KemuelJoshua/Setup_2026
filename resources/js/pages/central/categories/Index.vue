@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, router } from '@inertiajs/vue3';
-import { Building2, Plus, Sparkles } from '@lucide/vue';
+import { Plus, Sparkles, Tags } from '@lucide/vue';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 
@@ -23,38 +23,31 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { destroy, index, updateStatus } from '@/routes/central/tenants';
+import { destroy, index } from '@/routes/central/categories';
 import type { LengthAwarePaginator } from '@/types';
 
 import { createColumns } from './columns';
-import type { Tenant, TenantFilters } from './columns';
+import type { Category, CategoryFilters } from './columns';
 import CreateUpdate from './CreateUpdate.vue';
 
 defineOptions({
     layout: {
-        breadcrumbs: [
-            {
-                title: 'Schools',
-                href: index(),
-            },
-        ],
+        breadcrumbs: [{ title: 'Categories', href: index() }],
     },
 });
 
 const props = defineProps<{
-    tenants: LengthAwarePaginator<Tenant>;
-    filters: TenantFilters;
-    categories: Array<{ id: number; name: string; is_active: boolean }>;
+    categories: LengthAwarePaginator<Category>;
+    filters: CategoryFilters;
 }>();
 
 const searchQuery = ref(props.filters.search ?? '');
 const isFormDialogOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
-const selectedTenant = ref<Tenant | null>(null);
-
+const selectedCategory = ref<Category | null>(null);
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
-const fetchTenants = (
+const fetchCategories = (
     perPage: string | number | undefined = props.filters.per_page,
 ): void => {
     router.visit(
@@ -65,7 +58,7 @@ const fetchTenants = (
             },
         }),
         {
-            only: ['tenants', 'filters'],
+            only: ['categories', 'filters'],
             preserveScroll: true,
             preserveState: true,
             replace: true,
@@ -73,66 +66,34 @@ const fetchTenants = (
     );
 };
 
-const handleSearch = (): void => {
-    window.clearTimeout(searchTimer);
-    searchTimer = window.setTimeout(() => fetchTenants(), 300);
-};
-
 const openCreateDialog = (): void => {
-    selectedTenant.value = null;
+    selectedCategory.value = null;
     isFormDialogOpen.value = true;
 };
 
-const openEditDialog = (tenant: Tenant): void => {
-    selectedTenant.value = tenant;
+const openEditDialog = (category: Category): void => {
+    selectedCategory.value = category;
     isFormDialogOpen.value = true;
 };
 
-const openDeleteDialog = (tenant: Tenant): void => {
-    selectedTenant.value = tenant;
+const openDeleteDialog = (category: Category): void => {
+    selectedCategory.value = category;
     isDeleteDialogOpen.value = true;
-};
-
-const toggleTenantStatus = (tenant: Tenant): void => {
-    router.patch(
-        updateStatus.url(tenant.id),
-        { is_active: !tenant.is_active },
-        {
-            preserveScroll: true,
-            onSuccess: () =>
-                toast.success(
-                    tenant.is_active
-                        ? 'School deactivated successfully.'
-                        : 'School activated successfully.',
-                ),
-            onError: () => toast.error('Unable to update the school status.'),
-        },
-    );
 };
 
 const columns = createColumns({
     edit: openEditDialog,
-    toggleStatus: toggleTenantStatus,
     delete: openDeleteDialog,
 });
 
-const handleDeleted = (): void => {
-    toast.success('School deleted successfully.');
-    isDeleteDialogOpen.value = false;
-};
-
-const handleDeleteError = (errors: Record<string, string>): void => {
-    toast.error(
-        errors.tenant ??
-            'Unable to delete the school. Deactivate it before deleting.',
-    );
-};
-
-watch(searchQuery, handleSearch);
+watch(searchQuery, () => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => fetchCategories(), 300);
+});
 
 watch([isFormDialogOpen, isDeleteDialogOpen], ([formOpen, deleteOpen]) => {
     if (!formOpen && !deleteOpen) {
-        selectedTenant.value = null;
+        selectedCategory.value = null;
     }
 });
 
@@ -140,29 +101,25 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
 </script>
 
 <template>
-    <Head title="Schools" />
+    <Head title="Categories" />
 
     <PageHero>
         <template #icon>
-            <Building2 class="size-5" aria-hidden="true" />
+            <Tags class="size-5" aria-hidden="true" />
         </template>
-
         <template #badge>
             <Sparkles class="size-3.5" aria-hidden="true" />
-            Tenant administration
+            School organization
         </template>
-
-        <template #title> School workspace </template>
-
+        <template #title> Categories </template>
         <template #description>
-            Provision and manage every school's isolated application, domain,
-            and access status.
+            Organize schools into reusable categories for the public welcome
+            page and central administration.
         </template>
-
         <template #actions>
             <Button type="button" @click="openCreateDialog">
                 <Plus class="size-4" aria-hidden="true" />
-                Create school
+                Create category
             </Button>
         </template>
     </PageHero>
@@ -171,34 +128,34 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
         <DataTableContainer>
             <DataTableToolbar
                 v-model="searchQuery"
-                :count="tenants.total"
-                item-label="school"
-                search-placeholder="Search name, code, domain, or email..."
-                search-label="Search schools"
+                :count="categories.total"
+                item-label="category"
+                search-placeholder="Search categories..."
+                search-label="Search categories"
                 class="border-b px-4 py-4 sm:px-5"
             >
                 <template #filters>
                     <DataTablePageSizeSelect
-                        :model-value="tenants.per_page"
-                        @update:model-value="fetchTenants"
+                        :model-value="categories.per_page"
+                        @update:model-value="fetchCategories"
                     />
                 </template>
             </DataTableToolbar>
 
             <DataTable
                 :columns="columns"
-                :data="tenants.data"
-                empty-message="No schools found."
+                :data="categories.data"
+                empty-message="No categories found."
             />
 
             <template #footer>
                 <DataTablePagination
-                    :from="tenants.from"
-                    :to="tenants.to"
-                    :total="tenants.total"
-                    :links="tenants.links"
-                    :previous-page-url="tenants.prev_page_url"
-                    :next-page-url="tenants.next_page_url"
+                    :from="categories.from"
+                    :to="categories.to"
+                    :total="categories.total"
+                    :links="categories.links"
+                    :previous-page-url="categories.prev_page_url"
+                    :next-page-url="categories.next_page_url"
                 />
             </template>
         </DataTableContainer>
@@ -206,29 +163,37 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
 
     <CreateUpdate
         v-model:open="isFormDialogOpen"
-        :tenant="selectedTenant"
-        :categories="categories"
+        :category="selectedCategory"
     />
 
     <Dialog v-model:open="isDeleteDialogOpen">
-        <DialogContent v-if="selectedTenant">
+        <DialogContent v-if="selectedCategory">
             <Form
-                :action="destroy(selectedTenant.id)"
+                :action="destroy(selectedCategory.id)"
                 v-slot="{ processing }"
                 class="space-y-6"
                 :options="{ preserveScroll: true }"
-                @success="handleDeleted"
-                @error="handleDeleteError"
+                @success="
+                    () => {
+                        toast.success('Category deleted successfully.');
+                        isDeleteDialogOpen = false;
+                    }
+                "
+                @error="
+                    (errors) =>
+                        toast.error(
+                            errors.category ?? 'Unable to delete the category.',
+                        )
+                "
             >
                 <DialogHeader>
-                    <DialogTitle>Delete school?</DialogTitle>
+                    <DialogTitle>Delete category?</DialogTitle>
                     <DialogDescription>
-                        <strong>{{ selectedTenant.school_name }}</strong>
-                        and its tenant database will be permanently deleted.
-                        This action cannot be undone.
+                        <strong>{{ selectedCategory.name }}</strong> will be
+                        permanently deleted. Categories assigned to schools
+                        cannot be deleted.
                     </DialogDescription>
                 </DialogHeader>
-
                 <DialogFooter>
                     <DialogClose as-child>
                         <Button
@@ -239,13 +204,12 @@ onBeforeUnmount(() => window.clearTimeout(searchTimer));
                             Cancel
                         </Button>
                     </DialogClose>
-
                     <Button
                         type="submit"
                         variant="destructive"
                         :disabled="processing"
                     >
-                        {{ processing ? 'Deleting...' : 'Delete school' }}
+                        {{ processing ? 'Deleting...' : 'Delete category' }}
                     </Button>
                 </DialogFooter>
             </Form>

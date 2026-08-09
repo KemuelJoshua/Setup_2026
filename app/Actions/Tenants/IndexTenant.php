@@ -15,7 +15,10 @@ class IndexTenant
         $search = trim((string) ($filters['search'] ?? ''));
 
         return Tenant::query()
-            ->with('domains:id,domain,tenant_id')
+            ->with([
+                'category:id,name',
+                'domains:id,domain,tenant_id',
+            ])
             ->when(
                 $search !== '',
                 fn (Builder $query) => $query->where(
