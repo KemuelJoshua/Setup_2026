@@ -102,222 +102,172 @@
 :root {
     /* =========================================================
        BASE
-       Clean Government / Education Neutral
     ========================================================= */
-    --background: hsl(0 30% 98%);
-    --foreground: hsl(0 25% 12%);
+    --background: hsl(215 30% 98%);
+    --foreground: hsl(211 35% 12%);
 
-    /* =========================================================
-       SURFACES
-    ========================================================= */
+    /* SURFACES */
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(0 25% 12%);
+    --card-foreground: hsl(211 35% 12%);
 
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(0 25% 12%);
+    --popover-foreground: hsl(211 35% 12%);
 
-    /* =========================================================
-       PRIMARY RED
-    ========================================================= */
-    --primary: hsl(355 78% 38%);
+    /* PRIMARY — #153a63 */
+    --primary: hsl(211 65% 24%);
     --primary-foreground: hsl(0 0% 100%);
 
-    --primary-hover: hsl(355 78% 44%);
-    --primary-active: hsl(355 82% 31%);
+    --primary-hover: hsl(211 65% 30%);
+    --primary-active: hsl(211 68% 19%);
 
-    --primary-soft: hsl(355 70% 96%);
-    --primary-muted: hsl(355 55% 90%);
+    --primary-soft: hsl(211 45% 96%);
+    --primary-muted: hsl(211 36% 89%);
+    --primary-glow: hsla(211, 65%, 24%, 0.22);
 
-    --primary-glow: hsla(355, 78%, 38%, 0.22);
+    /* SECONDARY — AMBER */
+    --secondary: hsl(38 92% 50%);
+    --secondary-foreground: hsl(30 70% 10%);
 
-    /* =========================================================
-       SECONDARY GOLD
-    ========================================================= */
-    --secondary: hsl(45 96% 52%);
-    --secondary-foreground: hsl(0 30% 12%);
+    --secondary-hover: hsl(40 96% 56%);
+    --secondary-active: hsl(35 92% 43%);
 
-    --secondary-hover: hsl(45 96% 58%);
-    --secondary-active: hsl(42 94% 45%);
+    /* ACCENT */
+    --accent: hsl(40 100% 94%);
+    --accent-foreground: hsl(211 65% 24%);
 
-    /* =========================================================
-       ACCENT
-       Soft Gold
-    ========================================================= */
-    --accent: hsl(46 100% 94%);
-    --accent-foreground: hsl(355 78% 31%);
+    /* MUTED */
+    --muted: hsl(215 25% 95%);
+    --muted-foreground: hsl(215 14% 43%);
 
-    /* =========================================================
-       MUTED
-    ========================================================= */
-    --muted: hsl(0 20% 95%);
-    --muted-foreground: hsl(0 10% 43%);
-
-    /* =========================================================
-       STATES
-    ========================================================= */
+    /* STATES */
     --destructive: hsl(0 75% 50%);
     --destructive-foreground: hsl(0 0% 100%);
 
     --success: hsl(145 63% 36%);
     --success-foreground: hsl(0 0% 100%);
 
-    --warning: hsl(42 95% 50%);
-    --warning-foreground: hsl(35 65% 12%);
+    --warning: hsl(38 92% 50%);
+    --warning-foreground: hsl(30 70% 10%);
 
     --info: hsl(205 90% 48%);
     --info-foreground: hsl(0 0% 100%);
 
-    /* =========================================================
-       INPUTS
-    ========================================================= */
-    --border: hsl(355 18% 87%);
-    --input: hsl(355 18% 89%);
-    --ring: hsl(355 78% 38%);
+    /* INPUTS */
+    --border: hsl(211 18% 87%);
+    --input: hsl(211 18% 89%);
+    --ring: hsl(211 65% 24%);
 
-    /* =========================================================
-       CHARTS
-       Red, Gold, Blue, Green, Orange
-    ========================================================= */
-    --chart-1: hsl(355 78% 38%);
-    --chart-2: hsl(45 96% 52%);
-    --chart-3: hsl(216 82% 48%);
+    /* CHARTS */
+    --chart-1: hsl(211 65% 24%);
+    --chart-2: hsl(38 92% 50%);
+    --chart-3: hsl(0 72% 50%);
     --chart-4: hsl(145 60% 38%);
-    --chart-5: hsl(24 90% 54%);
+    --chart-5: hsl(198 82% 52%);
 
-    /* =========================================================
-       RADIUS
-    ========================================================= */
     --radius: 0.5rem;
 
-    /* =========================================================
-       SIDEBAR
-    ========================================================= */
+    /* SIDEBAR */
     --sidebar: hsl(0 0% 100%);
     --sidebar-background: hsl(0 0% 100%);
-    --sidebar-foreground: hsl(0 25% 15%);
+    --sidebar-foreground: hsl(211 35% 15%);
 
-    --sidebar-primary: hsl(355 78% 38%);
+    --sidebar-primary: hsl(211 65% 24%);
     --sidebar-primary-foreground: hsl(0 0% 100%);
 
-    --sidebar-accent: hsl(355 70% 96%);
-    --sidebar-accent-foreground: hsl(355 78% 31%);
+    --sidebar-accent: hsl(211 45% 95%);
+    --sidebar-accent-foreground: hsl(211 65% 24%);
 
-    --sidebar-border: hsl(355 18% 88%);
-    --sidebar-ring: hsl(355 78% 38%);
+    --sidebar-border: hsl(211 18% 88%);
+    --sidebar-ring: hsl(211 65% 24%);
 
-    /* =========================================================
-       SHADOWS
-    ========================================================= */
-    --shadow-color: hsla(355, 25%, 12%, 0.09);
-    --shadow-primary: hsla(355, 78%, 38%, 0.2);
+    /* SHADOWS */
+    --shadow-color: hsla(211, 35%, 12%, 0.09);
+    --shadow-primary: hsla(211, 65%, 24%, 0.2);
 }
 
 .dark {
     /* =========================================================
        BASE
-       Neutral Slate
     ========================================================= */
-    --background: hsl(222 25% 8%);
-    --foreground: hsl(215 20% 96%);
+    --background: hsl(215 28% 7%);
+    --foreground: hsl(210 20% 96%);
 
-    /* =========================================================
-       SURFACES
-    ========================================================= */
-    --card: hsl(222 22% 11%);
-    --card-foreground: hsl(215 20% 96%);
+    /* SURFACES */
+    --card: hsl(214 24% 13%);
+    --card-foreground: hsl(210 20% 96%);
 
-    --popover: hsl(222 22% 11%);
-    --popover-foreground: hsl(215 20% 96%);
+    --popover: hsl(214 24% 13%);
+    --popover-foreground: hsl(210 20% 96%);
 
-    /* =========================================================
-       PRIMARY RED
-    ========================================================= */
-    --primary: hsl(355 76% 58%);
+    /* PRIMARY — unchanged #153a63 */
+    --primary: hsl(211 65% 24%);
     --primary-foreground: hsl(0 0% 100%);
 
-    --primary-hover: hsl(355 78% 64%);
-    --primary-active: hsl(355 74% 50%);
+    /* Brighter interactions for better visibility */
+    --primary-hover: hsl(211 65% 34%);
+    --primary-active: hsl(211 68% 28%);
 
-    --primary-soft: hsl(355 24% 16%);
-    --primary-muted: hsl(355 22% 21%);
+    --primary-soft: hsl(211 38% 19%);
+    --primary-muted: hsl(211 36% 25%);
+    --primary-glow: hsla(211, 85%, 60%, 0.48);
 
-    --primary-glow: hsla(355, 76%, 58%, 0.25);
+    /* SECONDARY — unchanged amber */
+    --secondary: hsl(38 92% 50%);
+    --secondary-foreground: hsl(30 70% 10%);
 
-    /* =========================================================
-       SECONDARY GOLD
-    ========================================================= */
-    --secondary: hsl(45 90% 58%);
-    --secondary-foreground: hsl(222 30% 10%);
+    --secondary-hover: hsl(40 96% 56%);
+    --secondary-active: hsl(35 92% 43%);
 
-    --secondary-hover: hsl(45 92% 64%);
-    --secondary-active: hsl(42 88% 50%);
+    /* ACCENT */
+    --accent: hsl(211 30% 18%);
+    --accent-foreground: hsl(40 92% 68%);
 
-    /* =========================================================
-       ACCENT
-       Neutral surface with subtle red emphasis
-    ========================================================= */
-    --accent: hsl(222 18% 17%);
-    --accent-foreground: hsl(355 76% 68%);
+    /* MUTED */
+    --muted: hsl(214 20% 17%);
+    --muted-foreground: hsl(214 14% 70%);
 
-    /* =========================================================
-       MUTED
-    ========================================================= */
-    --muted: hsl(222 18% 15%);
-    --muted-foreground: hsl(215 14% 68%);
-
-    /* =========================================================
-       STATES
-    ========================================================= */
-    --destructive: hsl(0 72% 58%);
+    /* STATES */
+    --destructive: hsl(0 65% 54%);
     --destructive-foreground: hsl(0 0% 100%);
 
-    --success: hsl(145 58% 50%);
-    --success-foreground: hsl(222 30% 8%);
+    --success: hsl(145 55% 44%);
+    --success-foreground: hsl(0 0% 100%);
 
-    --warning: hsl(44 94% 58%);
-    --warning-foreground: hsl(40 90% 10%);
+    --warning: hsl(38 92% 50%);
+    --warning-foreground: hsl(30 70% 10%);
 
-    --info: hsl(205 85% 60%);
-    --info-foreground: hsl(222 30% 8%);
+    --info: hsl(205 78% 54%);
+    --info-foreground: hsl(0 0% 100%);
 
-    /* =========================================================
-       INPUTS
-    ========================================================= */
-    --border: hsl(220 16% 22%);
-    --input: hsl(220 17% 18%);
-    --ring: hsl(355 76% 58%);
+    /* INPUTS */
+    --border: hsl(211 22% 27%);
+    --input: hsl(211 22% 20%);
+    --ring: hsl(211 82% 64%);
 
-    /* =========================================================
-       CHARTS
-    ========================================================= */
-    --chart-1: hsl(355 76% 60%);
-    --chart-2: hsl(45 90% 58%);
-    --chart-3: hsl(213 85% 62%);
-    --chart-4: hsl(145 55% 52%);
-    --chart-5: hsl(25 85% 62%);
+    /* CHARTS */
+    --chart-1: hsl(211 72% 62%);
+    --chart-2: hsl(38 92% 50%);
+    --chart-3: hsl(0 68% 58%);
+    --chart-4: hsl(145 55% 48%);
+    --chart-5: hsl(198 78% 58%);
 
-    /* =========================================================
-       SIDEBAR
-       Neutral instead of red-tinted
-    ========================================================= */
-    --sidebar: hsl(222 24% 10%);
-    --sidebar-background: hsl(222 24% 10%);
-    --sidebar-foreground: hsl(215 20% 96%);
+    /* SIDEBAR */
+    --sidebar: hsl(215 30% 9%);
+    --sidebar-background: hsl(215 30% 9%);
+    --sidebar-foreground: hsl(210 20% 94%);
 
-    --sidebar-primary: hsl(355 76% 58%);
+    --sidebar-primary: hsl(211 65% 24%);
     --sidebar-primary-foreground: hsl(0 0% 100%);
 
-    --sidebar-accent: hsl(222 18% 17%);
-    --sidebar-accent-foreground: hsl(355 76% 68%);
+    --sidebar-accent: hsl(211 34% 19%);
+    --sidebar-accent-foreground: hsl(40 92% 68%);
 
-    --sidebar-border: hsl(220 16% 21%);
-    --sidebar-ring: hsl(355 76% 58%);
+    --sidebar-border: hsl(211 22% 25%);
+    --sidebar-ring: hsl(211 82% 64%);
 
-    /* =========================================================
-       SHADOWS
-    ========================================================= */
+    /* SHADOWS */
     --shadow-color: hsla(0, 0%, 0%, 0.5);
-    --shadow-primary: hsla(355, 76%, 58%, 0.22);
+    --shadow-primary: hsla(211, 85%, 55%, 0.4);
 }
 
 @layer base {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class WelcomeController extends Controller
         $schools = Tenant::query()
             ->select([
                 'id',
+                'category_id',
                 'school_code',
                 'school_name',
                 'school_address',
@@ -42,6 +44,7 @@ class WelcomeController extends Controller
 
                 return [
                     'id' => $tenant->getTenantKey(),
+                    'categoryId' => $tenant->category_id,
                     'code' => $tenant->school_code,
                     'name' => $tenant->school_name,
                     'address' => $tenant->school_address,
@@ -51,6 +54,22 @@ class WelcomeController extends Controller
             })
             ->values();
 
-        return Inertia::render('Welcome', ['schools' => $schools]);
+        $categories = Category::query()
+            ->select(['id', 'name'])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Category $category): array => [
+                'id' => $category->getKey(),
+                'name' => $category->name,
+                'schools' => $schools
+                    ->where('categoryId', $category->getKey())
+                    ->values(),
+            ]);
+
+        return Inertia::render('Welcome', [
+            'categories' => $categories,
+            'schools' => $schools,
+        ]);
     }
 }

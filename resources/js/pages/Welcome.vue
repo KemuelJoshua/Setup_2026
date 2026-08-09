@@ -1,23 +1,11 @@
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3';
-import {
-    ArrowUpRight,
-    Building2,
-    GraduationCap,
-    MapPin,
-    Moon,
-    Search,
-    School,
-    Sparkles,
-    Sun,
-    X,
-} from '@lucide/vue';
-import { computed, ref } from 'vue';
-
-import { useAppearance } from '@/composables/useAppearance';
+import { Head } from '@inertiajs/vue3';
+import { ArrowDown, ChevronDown } from '@lucide/vue';
+import { ref } from 'vue';
 
 type SchoolDirectoryItem = {
     id: string;
+    categoryId: number | null;
     code: string;
     name: string;
     address: string | null;
@@ -25,300 +13,212 @@ type SchoolDirectoryItem = {
     url: string;
 };
 
-const props = defineProps<{
+type SchoolCategory = {
+    id: number;
+    name: string;
+    schools: SchoolDirectoryItem[];
+};
+
+defineProps<{
+    categories: SchoolCategory[];
     schools: SchoolDirectoryItem[];
 }>();
 
-const page = usePage();
-const searchQuery = ref('');
-const { resolvedAppearance, updateAppearance } = useAppearance();
+type DropdownId = number | 'all';
 
-const nextAppearance = computed(() =>
-    resolvedAppearance.value === 'dark' ? 'light' : 'dark',
-);
+const openDropdown = ref<DropdownId | null>(null);
 
-const themeIcon = computed(() =>
-    resolvedAppearance.value === 'dark' ? Sun : Moon,
-);
+const handleDropdownToggle = (dropdownId: DropdownId, event: Event): void => {
+    const dropdown = event.currentTarget as HTMLDetailsElement;
 
-const themeLabel = computed(() =>
-    resolvedAppearance.value === 'dark'
-        ? 'Switch to light mode'
-        : 'Switch to dark mode',
-);
-
-const filteredSchools = computed(() => {
-    const query = searchQuery.value.trim().toLocaleLowerCase();
-
-    if (!query) {
-        return props.schools;
+    if (dropdown.open) {
+        openDropdown.value = dropdownId;
+    } else if (openDropdown.value === dropdownId) {
+        openDropdown.value = null;
     }
-
-    return props.schools.filter((school) =>
-        [school.name, school.code, school.address]
-            .filter(Boolean)
-            .some((value) => value?.toLocaleLowerCase().includes(query)),
-    );
-});
-
-const schoolInitials = (name: string): string =>
-    name
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((word) => word.charAt(0))
-        .join('')
-        .toLocaleUpperCase();
+};
 </script>
 
 <template>
-    <Head title="Find your school" />
+    <Head title="DepEd Makati Learning Management System" />
 
-    <div
-        class="relative min-h-svh overflow-hidden bg-background text-foreground"
-    >
-        <div
-            class="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(circle_at_50%_-10%,var(--primary-glow),transparent_58%)] opacity-70"
-            aria-hidden="true"
-        />
-        <div
-            class="pointer-events-none absolute top-52 -left-20 size-72 rounded-full border border-primary/10"
-            aria-hidden="true"
-        />
-        <div
-            class="pointer-events-none absolute top-64 -left-8 size-44 rounded-full border border-primary/10"
-            aria-hidden="true"
-        />
-
+    <div class="min-h-svh bg-slate-50 text-slate-950">
         <header
-            class="relative z-20 border-b border-border/70 bg-background/80 backdrop-blur-xl"
+            class="relative z-50 border-t-4 border-amber-400 bg-primary text-white shadow-lg"
         >
             <div
-                class="mx-auto flex h-18 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-10"
+                class="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-3 lg:flex-row lg:items-center lg:justify-between lg:gap-8 lg:px-10 lg:py-0"
             >
-                <div class="flex min-w-0 items-center gap-3">
-                    <span
-                        class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[var(--shadow-primary)] shadow-md"
-                    >
-                        <GraduationCap class="size-5" :stroke-width="1.8" />
-                    </span>
-                    <div class="min-w-0">
-                        <p class="truncate text-sm font-semibold sm:text-base">
-                            {{ page.props.name }}
+                <a href="#top" class="flex shrink-0 items-center gap-3 lg:h-18">
+                    <img
+                        src="/img/makati-deped.png"
+                        alt="DepEd Makati logo"
+                        class="size-11 rounded-full bg-white object-contain ring-2 ring-white/20"
+                    />
+                    <div>
+                        <p class="text-base font-bold tracking-tight">
+                            DepEd Makati LMS
                         </p>
-                        <p class="truncate text-[11px] text-muted-foreground">
-                            Student learning portal
+                        <p
+                            class="text-[10px] tracking-[0.14em] text-blue-100 uppercase"
+                        >
+                            Schools Division Office
                         </p>
                     </div>
-                </div>
+                </a>
 
-                <button
-                    type="button"
-                    class="flex size-10 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                    :aria-label="themeLabel"
-                    :title="themeLabel"
-                    @click="updateAppearance(nextAppearance)"
+                <nav
+                    aria-label="School categories"
+                    class="flex flex-wrap gap-1 pb-1 lg:h-18 lg:flex-nowrap lg:items-stretch lg:pb-0"
                 >
-                    <component
-                        :is="themeIcon"
-                        class="size-5"
-                        :stroke-width="1.8"
-                    />
-                </button>
+                    <details
+                        v-for="category in categories"
+                        :key="category.id"
+                        :open="openDropdown === category.id"
+                        class="group relative shrink-0 lg:flex"
+                        @toggle="handleDropdownToggle(category.id, $event)"
+                    >
+                        <summary
+                            class="flex h-11 cursor-pointer list-none items-center gap-1.5 rounded-lg px-3 text-xs font-semibold text-blue-50 transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none lg:h-full lg:rounded-none lg:px-3.5"
+                        >
+                            {{ category.name }}
+                            <ChevronDown
+                                class="size-3.5 transition-transform group-open:rotate-180"
+                                aria-hidden="true"
+                            />
+                        </summary>
+                        <div
+                            class="relative z-50 mt-1 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white py-2 text-slate-800 shadow-2xl lg:absolute lg:top-full lg:left-0 lg:mt-0"
+                        >
+                            <a
+                                v-for="school in category.schools"
+                                :key="school.id"
+                                :href="school.url"
+                                class="flex items-center justify-between gap-4 px-4 py-3 text-sm transition hover:bg-blue-50 hover:text-primary focus:bg-blue-50 focus:outline-none"
+                            >
+                                <span class="line-clamp-2 font-medium">{{
+                                    school.name
+                                }}</span>
+                                <span
+                                    class="shrink-0 text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+                                >
+                                    {{ school.code }}
+                                </span>
+                            </a>
+                            <p
+                                v-if="category.schools.length === 0"
+                                class="px-4 py-3 text-sm text-muted-foreground"
+                            >
+                                No tenants in this category yet.
+                            </p>
+                        </div>
+                    </details>
+
+                    <details
+                        :open="openDropdown === 'all'"
+                        class="group relative shrink-0 lg:flex"
+                        @toggle="handleDropdownToggle('all', $event)"
+                    >
+                        <summary
+                            class="flex h-11 cursor-pointer list-none items-center gap-1.5 rounded-lg px-3 text-xs font-semibold text-blue-50 transition hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none lg:h-full lg:rounded-none lg:px-3.5"
+                        >
+                            All Schools
+                            <ChevronDown
+                                class="size-3.5 transition-transform group-open:rotate-180"
+                                aria-hidden="true"
+                            />
+                        </summary>
+                        <div
+                            class="relative z-50 mt-1 max-h-96 w-72 overflow-y-auto rounded-xl border border-slate-200 bg-white py-2 text-slate-800 shadow-2xl lg:absolute lg:top-full lg:right-0 lg:mt-0"
+                        >
+                            <a
+                                v-for="school in schools"
+                                :key="school.id"
+                                :href="school.url"
+                                class="flex items-center justify-between gap-4 px-4 py-3 text-sm transition hover:bg-blue-50 hover:text-primary focus:bg-blue-50 focus:outline-none"
+                            >
+                                <span class="line-clamp-2 font-medium">{{
+                                    school.name
+                                }}</span>
+                                <span
+                                    class="shrink-0 text-[10px] font-bold tracking-wider text-slate-400 uppercase"
+                                >
+                                    {{ school.code }}
+                                </span>
+                            </a>
+                            <p
+                                v-if="schools.length === 0"
+                                class="px-4 py-3 text-sm text-slate-500"
+                            >
+                                No schools available yet.
+                            </p>
+                        </div>
+                    </details>
+                </nav>
             </div>
         </header>
 
-        <main class="relative z-10">
+        <main>
             <section
-                class="mx-auto max-w-7xl px-5 pt-14 pb-8 sm:px-8 sm:pt-20 lg:px-10"
+                id="top"
+                class="relative isolate flex min-h-[calc(100svh-8.75rem)] items-center justify-center overflow-hidden bg-primary px-5 py-16 text-white sm:min-h-[calc(100svh-8rem)] lg:min-h-[calc(100svh-4.75rem)] lg:px-10"
             >
-                <div class="mx-auto max-w-3xl text-center">
+                <img
+                    src="/img/background_optimized.jpg"
+                    alt=""
+                    class="absolute inset-0 -z-20 size-full object-cover object-center"
+                />
+                <div
+                    class="absolute inset-0 -z-10 bg-linear-to-b from-primary/18 to-primary/32"
+                    aria-hidden="true"
+                />
+
+                <div
+                    class="w-full max-w-4xl rounded-3xl border border-white/25 bg-primary/60 px-6 py-9 text-center shadow-2xl backdrop-blur-md sm:px-12 sm:py-12"
+                >
                     <div
-                        class="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-[var(--primary-soft)] px-3 py-1.5 text-xs font-semibold text-primary"
+                        class="flex items-center justify-center gap-5 sm:gap-8"
                     >
-                        <Sparkles class="size-3.5" />
-                        Your classroom is one step away
+                        <img
+                            src="/img/makati-deped.png"
+                            alt="Department of Education Makati logo"
+                            class="size-24 rounded-full bg-white object-contain shadow-xl ring-4 ring-white/25 sm:size-32"
+                        />
+                        <span
+                            class="h-20 w-px bg-white/35 sm:h-28"
+                            aria-hidden="true"
+                        />
+                        <img
+                            src="/img/makati-logo.png"
+                            alt="City of Makati logo"
+                            class="size-24 rounded-full bg-white object-contain shadow-xl ring-4 ring-white/25 sm:size-32"
+                        />
                     </div>
 
+                    <p
+                        class="mt-8 text-xs font-bold tracking-[0.3em] text-amber-300 uppercase sm:text-sm"
+                    >
+                        Department of Education · Makati City
+                    </p>
                     <h1
-                        class="mt-6 text-4xl leading-[1.08] font-semibold tracking-[-0.04em] sm:text-5xl lg:text-6xl"
+                        class="mx-auto mt-3 max-w-3xl text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl"
                     >
-                        Find your school.
-                        <span class="text-primary">Start learning.</span>
+                        Learning without limits
                     </h1>
-
                     <p
-                        class="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg"
+                        class="mx-auto mt-5 max-w-2xl text-sm leading-7 text-blue-50 sm:text-lg"
                     >
-                        Search for your school below to open its learning portal
-                        and sign in to your classes.
+                        Your gateway to Makati City's public school learning
+                        communities—where every learner can connect, grow, and
+                        succeed.
                     </p>
-
-                    <div class="relative mx-auto mt-9 max-w-2xl text-left">
-                        <Search
-                            class="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground"
-                            aria-hidden="true"
-                        />
-                        <input
-                            v-model="searchQuery"
-                            type="search"
-                            name="school-search"
-                            autocomplete="off"
-                            placeholder="Search by school name, code, or location"
-                            aria-label="Search schools"
-                            class="h-14 w-full rounded-2xl border border-border bg-card pr-12 pl-12 text-sm shadow-[0_20px_50px_-28px_var(--shadow-color)] transition placeholder:text-muted-foreground focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus:outline-none sm:text-base"
-                        />
-                        <button
-                            v-if="searchQuery"
-                            type="button"
-                            class="absolute top-1/2 right-3 flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                            aria-label="Clear school search"
-                            @click="searchQuery = ''"
-                        >
-                            <X class="size-4" />
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <section
-                class="mx-auto max-w-7xl px-5 pt-6 pb-20 sm:px-8 lg:px-10 lg:pb-28"
-            >
-                <div class="mb-5 flex items-end justify-between gap-4">
-                    <div>
-                        <p
-                            class="text-xs font-semibold tracking-[0.16em] text-primary uppercase"
-                        >
-                            School directory
-                        </p>
-                        <h2
-                            class="mt-1 text-xl font-semibold tracking-tight sm:text-2xl"
-                        >
-                            Choose your campus
-                        </h2>
-                    </div>
-                    <p
-                        class="shrink-0 text-xs text-muted-foreground sm:text-sm"
-                    >
-                        {{ filteredSchools.length }}
-                        {{
-                            filteredSchools.length === 1 ? 'school' : 'schools'
-                        }}
-                    </p>
-                </div>
-
-                <div
-                    v-if="filteredSchools.length"
-                    class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
-                >
-                    <a
-                        v-for="school in filteredSchools"
-                        :key="school.id"
-                        :href="school.url"
-                        class="group relative flex min-h-60 flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_24px_55px_-30px_var(--shadow-color)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none sm:p-6"
-                    >
-                        <div
-                            class="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100 group-focus-visible:scale-x-100"
-                            aria-hidden="true"
-                        />
-
-                        <div class="flex items-start justify-between gap-4">
-                            <span
-                                class="flex size-13 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary-soft)] text-sm font-bold tracking-wide text-primary ring-1 ring-primary/10"
-                                aria-hidden="true"
-                            >
-                                {{ schoolInitials(school.name) }}
-                            </span>
-                            <span
-                                class="rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
-                            >
-                                {{ school.code }}
-                            </span>
-                        </div>
-
-                        <div class="mt-5 flex-1">
-                            <h3
-                                class="text-lg leading-snug font-semibold tracking-tight sm:text-xl"
-                            >
-                                {{ school.name }}
-                            </h3>
-                            <p
-                                v-if="school.motto"
-                                class="mt-2 line-clamp-2 text-sm text-muted-foreground italic"
-                            >
-                                “{{ school.motto }}”
-                            </p>
-                            <p
-                                v-if="school.address"
-                                class="mt-3 flex items-start gap-2 text-xs leading-5 text-muted-foreground"
-                            >
-                                <MapPin
-                                    class="mt-0.5 size-3.5 shrink-0 text-primary"
-                                />
-                                <span class="line-clamp-2">{{
-                                    school.address
-                                }}</span>
-                            </p>
-                        </div>
-
-                        <div
-                            class="mt-6 flex items-center justify-between border-t border-border/70 pt-4 text-sm font-semibold text-primary"
-                        >
-                            Open school portal
-                            <ArrowUpRight
-                                class="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                            />
-                        </div>
-                    </a>
-                </div>
-
-                <div
-                    v-else
-                    class="rounded-2xl border border-dashed border-border bg-card/70 px-6 py-14 text-center"
-                >
-                    <span
-                        class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground"
-                    >
-                        <School class="size-6" />
-                    </span>
-                    <h3 class="mt-4 font-semibold">
-                        {{
-                            schools.length
-                                ? 'No matching school found'
-                                : 'No schools available yet'
-                        }}
-                    </h3>
-                    <p
-                        class="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground"
-                    >
-                        {{
-                            schools.length
-                                ? 'Check the spelling or try searching with your school code or location.'
-                                : 'Please check back later or contact your school administrator for help.'
-                        }}
-                    </p>
-                    <button
-                        v-if="schools.length"
-                        type="button"
-                        class="mt-5 cursor-pointer text-sm font-semibold text-primary hover:underline"
-                        @click="searchQuery = ''"
-                    >
-                        View all schools
-                    </button>
                 </div>
             </section>
         </main>
 
-        <footer class="relative z-10 border-t border-border/70 bg-card/60">
-            <div
-                class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-center text-xs text-muted-foreground sm:flex-row sm:px-8 sm:text-left lg:px-10"
-            >
-                <span class="flex items-center gap-2">
-                    <Building2 class="size-4 text-primary" />
-                    {{ page.props.name }} · Learning Management System
-                </span>
-                <span>Need help? Contact your school administrator.</span>
-            </div>
+        <footer class="bg-primary px-5 py-6 text-center text-xs text-blue-100">
+            Department of Education – Schools Division Office of Makati City ·
+            Learning Management System
         </footer>
     </div>
 </template>
