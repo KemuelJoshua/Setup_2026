@@ -30,7 +30,7 @@ const navigationGroups: NavGroup[] = [
 
 <template>
     <Sidebar
-        collapsible="icon"
+        collapsible="offcanvas"
         variant="sidebar"
         class="app-sidebar top-16 h-[calc(100svh-4rem)] border-t-0 bg-sidebar"
     >

@@ -15,6 +15,8 @@ test('the application navbar spans above the sidebar and content', function () {
         ->toContain('<AppLogo />')
         ->toContain('Search items, transactions, documents...')
         ->and($sidebar)
+        ->toContain('collapsible="offcanvas"')
+        ->not->toContain('collapsible="icon"')
         ->not->toContain('<SidebarHeader')
         ->not->toContain('<AppLogo');
 });
