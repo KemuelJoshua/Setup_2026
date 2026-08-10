@@ -81,7 +81,7 @@ watch(
         class="gap-1.5 p-0 shadow-none"
     >
         <SidebarGroupLabel
-            class="h-7 px-3 text-[11px] font-semibold tracking-[0.1em] text-sidebar-foreground/40 uppercase"
+            class="h-7 px-3 text-[11px] font-semibold tracking-widest text-sidebar-foreground/40 uppercase"
         >
             {{ group.title }}
         </SidebarGroupLabel>
@@ -101,7 +101,7 @@ watch(
                         <component
                             v-if="item.icon"
                             :is="item.icon"
-                            class="size-[18px] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu-button:scale-105"
+                            class="size-4.5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu-button:scale-105"
                             :stroke-width="1.8"
                         />
                         <span>{{ item.title }}</span>
@@ -114,7 +114,7 @@ watch(
                         <component
                             v-if="item.icon"
                             :is="item.icon"
-                            class="size-[18px] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu-button:scale-105"
+                            class="size-4.5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu-button:scale-105"
                             :stroke-width="1.8"
                         />
                         <span>{{ item.title }}</span>
