@@ -81,9 +81,13 @@ watch(
         class="gap-1.5 p-0 shadow-none"
     >
         <SidebarGroupLabel
-            class="h-7 px-3 text-[11px] font-semibold tracking-widest text-sidebar-foreground/40 uppercase"
+            class="flex h-7 items-center gap-3 text-[11px] font-semibold tracking-widest text-sidebar-foreground/40 uppercase"
         >
-            {{ group.title }}
+            <span class="shrink-0">
+                {{ group.title }}
+            </span>
+
+            <span class="h-px flex-1 bg-sidebar-border" />
         </SidebarGroupLabel>
         <SidebarMenu class="gap-2">
             <SidebarMenuItem v-for="item in group.items" :key="item.title">

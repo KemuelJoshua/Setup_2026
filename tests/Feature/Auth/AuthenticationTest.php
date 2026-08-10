@@ -17,6 +17,32 @@ test('login screen can be rendered', function () {
     );
 });
 
+test('login screen uses the SIMS visual assets and application color variables', function () {
+    $loginPage = file_get_contents(resource_path('js/pages/auth/Login.vue'));
+
+    expect($loginPage)
+        ->toContain('/img/sims-logo.png')
+        ->toContain('/img/sims-logo-dark.png')
+        ->toContain('/img/DOST-TAPI.png')
+        ->toContain('/img/inventory-warehouse-transparent.png')
+        ->toContain('xl:grid-cols')
+        ->toContain('max-w-120')
+        ->toContain('backdrop-blur-xl')
+        ->toContain('max-w-md')
+        ->toContain('text-[clamp(2rem,2.8vw,3.15rem)]')
+        ->toContain('toggleAppearance')
+        ->toContain('bg-background')
+        ->toContain('bg-card')
+        ->toContain('bg-primary')
+        ->toContain('text-muted-foreground')
+        ->not->toContain('bg-red-')
+        ->not->toContain('text-red-')
+        ->not->toContain('bg-slate-')
+        ->not->toContain('text-slate-')
+        ->not->toContain('Continue with Google')
+        ->not->toContain('Continue with Microsoft');
+});
+
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 

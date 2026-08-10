@@ -21,16 +21,11 @@ test('the application navbar spans above the sidebar and content', function () {
         ->not->toContain('<AppLogo');
 });
 
-test('the sidebar always uses its dark color variables', function () {
-    $styles = file_get_contents(resource_path('css/app.css'));
+test('the sidebar always uses the application dark color variables', function () {
     $sidebar = file_get_contents(resource_path('js/components/AppSidebar.vue'));
 
-    expect($styles)
-        ->toContain('.app-sidebar {')
-        ->toContain('--sidebar-background: hsl(220 16% 10%);')
-        ->toContain('--sidebar-foreground: hsl(220 20% 96%);')
-        ->and($sidebar)
-        ->toContain('class="app-sidebar')
+    expect($sidebar)
+        ->toContain('class="dark')
         ->toContain('bg-sidebar')
-        ->not->toContain('dark:bg-sidebar');
+        ->not->toContain('app-sidebar');
 });

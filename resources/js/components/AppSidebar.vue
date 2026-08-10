@@ -26,211 +26,235 @@ import { dashboard } from '@/routes/admin';
 import { index as userIndex } from '@/routes/admin/users';
 import type { NavItem } from '@/types';
 
-const primaryNavItems: NavItem[] = [
+const navigationGroups: NavGroup[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: Gauge,
+        title: 'Overview',
+        items: [
+            {
+                title: 'Dashboard',
+                href: dashboard(),
+                icon: Gauge,
+            },
+        ],
     },
     {
-        title: 'Master File Management',
-        href: '/admin/master-files',
-        icon: FileStack,
-        children: [
+        title: 'Inventory Setup',
+        items: [
             {
-                title: 'Overview',
+                title: 'Master File Management',
                 href: '/admin/master-files',
+                icon: FileStack,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/master-files',
+                    },
+                ],
             },
-        ],
-    },
-    {
-        title: 'Supply Inventory Module',
-        href: '/admin/supply-inventory',
-        icon: Boxes,
-        children: [
             {
-                title: 'Overview',
+                title: 'Supply Inventory Module',
                 href: '/admin/supply-inventory',
+                icon: Boxes,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/supply-inventory',
+                    },
+                ],
             },
-        ],
-    },
-    {
-        title: 'Warehouse Management',
-        href: '/admin/warehouses',
-        icon: Warehouse,
-        children: [
             {
-                title: 'Overview',
+                title: 'Warehouse Management',
                 href: '/admin/warehouses',
+                icon: Warehouse,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/warehouses',
+                    },
+                ],
             },
-        ],
-    },
-    {
-        title: 'Receiving Management',
-        href: '/admin/receiving',
-        icon: PackageOpen,
-        children: [
             {
-                title: 'Overview',
-                href: '/admin/receiving',
-            },
-        ],
-    },
-    {
-        title: 'Stock Issuance',
-        href: '/admin/stock-issuance',
-        icon: PackageCheck,
-        children: [
-            {
-                title: 'Overview',
-                href: '/admin/stock-issuance',
-            },
-        ],
-    },
-    {
-        title: 'Stock Monitoring',
-        href: '/admin/stock-monitoring',
-        icon: Activity,
-        children: [
-            {
-                title: 'Overview',
-                href: '/admin/stock-monitoring',
-            },
-        ],
-    },
-    {
-        title: 'Inventory Transactions',
-        href: '/admin/inventory-transactions',
-        icon: RefreshCw,
-        children: [
-            {
-                title: 'Overview',
-                href: '/admin/inventory-transactions',
-            },
-        ],
-    },
-    {
-        title: 'Stock Adjustment',
-        href: '/admin/stock-adjustments',
-        icon: SlidersHorizontal,
-        children: [
-            {
-                title: 'Overview',
-                href: '/admin/stock-adjustments',
-            },
-        ],
-    },
-    {
-        title: 'Physical Inventory',
-        href: '/admin/physical-inventory',
-        icon: ClipboardCheck,
-        children: [
-            {
-                title: 'Overview',
-                href: '/admin/physical-inventory',
-            },
-        ],
-    },
-    {
-        title: 'Reorder Management',
-        href: '/admin/reorders',
-        icon: ShoppingCart,
-        children: [
-            {
-                title: 'Overview',
-                href: '/admin/reorders',
-            },
-        ],
-    },
-    {
-        title: 'Barcode & QR Management',
-        href: '/admin/barcode-qr',
-        icon: Barcode,
-        children: [
-            {
-                title: 'Overview',
+                title: 'Barcode & QR Management',
                 href: '/admin/barcode-qr',
+                icon: Barcode,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/barcode-qr',
+                    },
+                ],
             },
         ],
     },
     {
-        title: 'Asset Integration',
-        href: '/admin/asset-integration',
-        icon: Archive,
-        children: [
+        title: 'Inventory Operations',
+        items: [
             {
-                title: 'Overview',
-                href: '/admin/asset-integration',
+                title: 'Receiving Management',
+                href: '/admin/receiving',
+                icon: PackageOpen,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/receiving',
+                    },
+                ],
+            },
+            {
+                title: 'Stock Issuance',
+                href: '/admin/stock-issuance',
+                icon: PackageCheck,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/stock-issuance',
+                    },
+                ],
+            },
+            {
+                title: 'Inventory Transactions',
+                href: '/admin/inventory-transactions',
+                icon: RefreshCw,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/inventory-transactions',
+                    },
+                ],
+            },
+            {
+                title: 'Stock Adjustment',
+                href: '/admin/stock-adjustments',
+                icon: SlidersHorizontal,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/stock-adjustments',
+                    },
+                ],
+            },
+            {
+                title: 'Physical Inventory',
+                href: '/admin/physical-inventory',
+                icon: ClipboardCheck,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/physical-inventory',
+                    },
+                ],
             },
         ],
     },
     {
-        title: 'Approval Workflow',
-        href: '/admin/approval-workflow',
-        icon: GitPullRequest,
-        children: [
+        title: 'Monitoring & Planning',
+        items: [
             {
-                title: 'Overview',
-                href: '/admin/approval-workflow',
+                title: 'Stock Monitoring',
+                href: '/admin/stock-monitoring',
+                icon: Activity,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/stock-monitoring',
+                    },
+                ],
             },
-        ],
-    },
-    {
-        title: 'Notifications',
-        href: '/admin/notifications',
-        icon: Bell,
-        children: [
             {
-                title: 'Overview',
-                href: '/admin/notifications',
+                title: 'Reorder Management',
+                href: '/admin/reorders',
+                icon: ShoppingCart,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/reorders',
+                    },
+                ],
             },
-        ],
-    },
-    {
-        title: 'Reports',
-        href: '/admin/reports',
-        icon: FileChartColumn,
-        children: [
             {
-                title: 'Overview',
+                title: 'Reports',
                 href: '/admin/reports',
+                icon: FileChartColumn,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/reports',
+                    },
+                ],
             },
         ],
     },
     {
-        title: 'Settings',
-        href: '/admin/settings',
-        icon: Settings,
-        children: [
+        title: 'Workflow & Integration',
+        items: [
             {
-                title: 'Overview',
-                href: '/admin/settings',
+                title: 'Approval Workflow',
+                href: '/admin/approval-workflow',
+                icon: GitPullRequest,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/approval-workflow',
+                    },
+                ],
             },
             {
-                title: 'Users',
-                href: userIndex(),
-                icon: User2,
+                title: 'Asset Integration',
+                href: '/admin/asset-integration',
+                icon: Archive,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/asset-integration',
+                    },
+                ],
+            },
+            {
+                title: 'Notifications',
+                href: '/admin/notifications',
+                icon: Bell,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/notifications',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        title: 'Administration',
+        items: [
+            {
+                title: 'Settings',
+                href: '/admin/settings',
+                icon: Settings,
+                children: [
+                    {
+                        title: 'Overview',
+                        href: '/admin/settings',
+                    },
+                    {
+                        title: 'Users',
+                        href: userIndex(),
+                        icon: User2,
+                    },
+                ],
             },
         ],
     },
 ];
 
-const navigationGroups: NavGroup[] = [
-    {
-        title: 'Learning',
-        items: primaryNavItems,
-    },
-];
 </script>
 
 <template>
     <Sidebar
         collapsible="offcanvas"
         variant="sidebar"
-        class="app-sidebar top-16 h-[calc(100svh-4rem)] border-t-0 bg-sidebar"
+        class="dark top-16 h-[calc(100svh-4rem)] border-t-0 bg-sidebar"
     >
         <SidebarContent
-            class="scrollbar-none gap-3 px-3 py-4 pb-24 group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-4 [&::-webkit-scrollbar]:hidden"
+            class="scrollbar-none gap-3 px-3 py-4 group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-4 [&::-webkit-scrollbar]:hidden"
         >
             <NavMain :groups="navigationGroups" />
         </SidebarContent>
