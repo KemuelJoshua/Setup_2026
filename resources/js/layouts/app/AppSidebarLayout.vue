@@ -22,15 +22,23 @@ const pageKey = computed(() => page.url);
 
 <template>
     <AppShell variant="sidebar">
-        <AppSidebar />
-        <AppContent variant="sidebar" class="overflow-x-hidden">
+        <div class="flex min-h-svh w-full flex-col">
             <AppSidebarHeader :breadcrumbs="breadcrumbs" />
-            <div class="relative flex flex-1 flex-col">
-                <div :key="pageKey" class="flex flex-1 flex-col">
-                    <slot />
-                </div>
+
+            <div data-test="app-body" class="flex min-h-0 flex-1">
+                <AppSidebar />
+                <AppContent
+                    variant="sidebar"
+                    class="min-h-[calc(100svh-4rem)] overflow-x-hidden border-0"
+                >
+                    <div class="relative flex flex-1 flex-col">
+                        <div :key="pageKey" class="flex flex-1 flex-col">
+                            <slot />
+                        </div>
+                    </div>
+                </AppContent>
             </div>
-        </AppContent>
+        </div>
         <Toaster />
     </AppShell>
 </template>

@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { Brush, LogOut, Shield, Sparkles, UserCircle2 } from '@lucide/vue';
+import {
+    Brush,
+    ChevronDown,
+    LogOut,
+    Shield,
+    Sparkles,
+    UserCircle2,
+} from '@lucide/vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,9 +24,15 @@ import { edit as editProfile } from '@/routes/admin/settings/profile';
 import { edit as editSecurity } from '@/routes/admin/settings/security';
 import type { User } from '@/types';
 
-defineProps<{
-    user: User;
-}>();
+withDefaults(
+    defineProps<{
+        user: User;
+        showDetails?: boolean;
+    }>(),
+    {
+        showDetails: false,
+    },
+);
 
 const accountItems = [
     {
@@ -53,7 +66,7 @@ const handleLogout = (): void => {
             <Button
                 variant="ghost"
                 size="icon"
-                class="relative size-10 w-auto cursor-pointer rounded-md p-1 text-sidebar-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-primary focus-visible:ring-sidebar-ring"
+                class="relative size-10 w-auto cursor-pointer gap-2 rounded-md p-1 text-sidebar-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-primary focus-visible:ring-sidebar-ring"
                 aria-label="Open account menu"
             >
                 <Avatar class="size-8 overflow-hidden rounded-full">
@@ -68,6 +81,23 @@ const handleLogout = (): void => {
                         {{ getInitials(user.name) }}
                     </AvatarFallback>
                 </Avatar>
+                <span
+                    v-if="showDetails"
+                    class="hidden min-w-0 text-left xl:block"
+                >
+                    <span class="block max-w-36 truncate text-xs font-semibold">
+                        {{ user.name }}
+                    </span>
+                    <span
+                        class="block max-w-36 truncate text-[10px] text-muted-foreground"
+                    >
+                        {{ user.email }}
+                    </span>
+                </span>
+                <ChevronDown
+                    v-if="showDetails"
+                    class="mr-1 hidden size-4 opacity-50 xl:block"
+                />
             </Button>
         </SheetTrigger>
 

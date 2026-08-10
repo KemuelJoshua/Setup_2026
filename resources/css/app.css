@@ -314,6 +314,18 @@
     --shadow-primary: hsla(355,82%,50%,.25);
 }
 
+.app-sidebar {
+    --sidebar: hsl(220 16% 10%);
+    --sidebar-background: hsl(220 16% 10%);
+    --sidebar-foreground: hsl(220 20% 96%);
+    --sidebar-primary: hsl(355 82% 50%);
+    --sidebar-primary-foreground: white;
+    --sidebar-accent: hsl(220 12% 16%);
+    --sidebar-accent-foreground: hsl(220 20% 96%);
+    --sidebar-border: hsl(220 12% 20%);
+    --sidebar-ring: hsl(355 82% 50%);
+}
+
 @layer base {
     * {
         @apply border-border outline-ring/50;
